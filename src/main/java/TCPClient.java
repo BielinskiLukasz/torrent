@@ -9,7 +9,7 @@ class TCPClient {
 
         String sentence;
         String modifiedSentence;
-        Socket clientSocket = new Socket("127.0.0.1", 6789);
+        Socket clientSocket = new Socket(Congif.HOST_IP, Congif.PORT_NR);
 
         BufferedReader inFromUser =
                 new BufferedReader(new InputStreamReader(System.in));
