@@ -38,7 +38,7 @@ public class FileList {
         testGetFileInfoListResults(clientFileInfoList);
     }
 
-    static void testGetFileInfoListResults(List<FileInfo> clientFileInfoList) {
+    private static void testGetFileInfoListResults(List<FileInfo> clientFileInfoList) {
         clientFileInfoList.forEach(
                 file -> {
                     System.out.println(file.clientId);
@@ -51,6 +51,23 @@ public class FileList {
                     System.out.println(sb.toString());
                 }
         );
+    }
+
+    static List<String> preparingFileInfoListToSend(List<FileInfo> clientFileInfoList) {
+        List<String> readyToSendList = new ArrayList<>();
+
+        clientFileInfoList.forEach(
+                fileInfo -> {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < fileInfo.md5.length; i++) {
+                        sb.append(Integer.toString((fileInfo.md5[i] & 0xff) + 0x100, 16).substring(1));
+                    }
+
+                    readyToSendList.add(fileInfo.clientId + ";" + fileInfo.name + ";" + sb.toString());
+                }
+        );
+
+        return readyToSendList;
     }
 
 }

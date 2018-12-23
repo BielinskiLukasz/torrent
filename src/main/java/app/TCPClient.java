@@ -29,14 +29,15 @@ public class TCPClient {
         reCheckConnectionMessage(inFromServer);
 
         getFileInfoList(clientNumber);
+        sendFileInfoListMessage(clientFileInfoList, outToServer);
 
         clientSocket.close();
 
     }
 
     private void checkConnectionMessage(int clientNumber, DataOutputStream outToServer) throws IOException {
-        String sentence = clientTag + "Client_" + clientNumber + " request connection with server";
-        System.out.println(sentence);
+        String sentence = "Client_" + clientNumber + " request connection with server";
+        System.out.println(clientTag + sentence);
         outToServer.writeBytes(sentence + '\n');
     }
 
@@ -47,7 +48,23 @@ public class TCPClient {
 
     private void getFileInfoList(int clientNumber) {
         clientFileInfoList = FileList.getFileInfoList(clientNumber);
-        FileList.testGetFileInfoListResults(clientFileInfoList);
+//        FileList.testGetFileInfoListResults(clientFileInfoList);
+    }
+
+    private void sendFileInfoListMessage(List<FileInfo> clientFileInfoList, DataOutputStream outToServer) {
+        List<String> readyToSendList = FileList.preparingFileInfoListToSend(clientFileInfoList);
+
+        readyToSendList.forEach(
+                fileData -> {
+                    try {
+                        System.out.println(clientTag + fileData);
+                        outToServer.writeBytes(fileData + '\n');
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
+
     }
 
 }

@@ -30,6 +30,22 @@ public class TCPServer {
             System.out.println(SERVER_TAG + clientSentence);
             responseClientSentence = clientSentence + '\n';
             outToClient.writeBytes(responseClientSentence);
+
+            clientSentence = inFromClient.readLine() + " - received";
+            System.out.println(SERVER_TAG + clientSentence);
+            responseClientSentence = clientSentence + '\n';
+            outToClient.writeBytes(responseClientSentence);
+
+            clientSentence = inFromClient.readLine() + " - received";
+            System.out.println(SERVER_TAG + clientSentence);
+            responseClientSentence = clientSentence + '\n';
+            outToClient.writeBytes(responseClientSentence);
+
+            clientSentence = inFromClient.readLine() + " - received";
+            System.out.println(SERVER_TAG + clientSentence);
+            responseClientSentence = clientSentence + '\n';
+            outToClient.writeBytes(responseClientSentence);
+
         }
 
     }
