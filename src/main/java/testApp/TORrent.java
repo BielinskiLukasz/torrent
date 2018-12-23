@@ -1,3 +1,8 @@
+package testApp;
+
+import app.TCPClient;
+import app.TCPServer;
+
 public class TORrent {
 
     public static void main(String[] args) {

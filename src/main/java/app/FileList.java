@@ -1,3 +1,5 @@
+package app;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,10 @@ public class FileList {
                 file -> clientFileInfoList.add(new FileInfo(file, clientId))
         );
 
+        showResults();
+    }
+
+    private static void showResults() {
         clientFileInfoList.forEach(
                 file -> {
                     System.out.println(file.clientId);

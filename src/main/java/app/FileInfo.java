@@ -1,3 +1,5 @@
+package app;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,7 +24,6 @@ class FileInfo {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
         try {
             this.md5 = MD5Sum.md5(data);

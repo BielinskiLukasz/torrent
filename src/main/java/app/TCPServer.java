@@ -1,3 +1,5 @@
+package app;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -5,9 +7,9 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-class TCPServer {
+public class TCPServer {
 
-    TCPServer() throws IOException {
+    public TCPServer() throws IOException {
 
         System.out.println("Server created");
 
@@ -30,7 +32,4 @@ class TCPServer {
 
     }
 
-    public static void main(String[] argv) {
-
-    }
 }

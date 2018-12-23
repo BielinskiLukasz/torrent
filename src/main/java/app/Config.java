@@ -1,3 +1,5 @@
+package app;
+
 class Config {
 
     static final String BASIC_PATH = "D:\\TORrent_";
