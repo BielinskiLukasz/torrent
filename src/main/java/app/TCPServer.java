@@ -9,9 +9,11 @@ import java.net.Socket;
 
 public class TCPServer {
 
+    private static final String SERVER_TAG = "<SERVER>: ";
+
     public TCPServer() throws IOException {
 
-        System.out.println("Server created");
+        System.out.println(SERVER_TAG + "Server created");
 
         String clientSentence;
         String responseClientSentence;
@@ -25,7 +27,7 @@ public class TCPServer {
                     new DataOutputStream(connectionSocket.getOutputStream());
 
             clientSentence = inFromClient.readLine() + " - connected";
-            System.out.println("SERVER: " + clientSentence);
+            System.out.println(SERVER_TAG + clientSentence);
             responseClientSentence = clientSentence + '\n';
             outToClient.writeBytes(responseClientSentence);
         }

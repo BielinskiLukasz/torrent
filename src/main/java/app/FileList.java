@@ -6,9 +6,6 @@ import java.util.List;
 
 public class FileList {
 
-    private static List<String> clientFileNameList;
-    private static List<FileInfo> clientFileInfoList;
-
     private static List<String> getFileList(String directoryPath) {
         List<String> directoryFileList = new ArrayList<>();
         File folder = new File(directoryPath);
@@ -25,19 +22,23 @@ public class FileList {
         return directoryFileList;
     }
 
-    public static void main(String[] args) {
-        int clientId = 1;
-        clientFileNameList = getFileList("D:\\TORrent_" + clientId);
+    static List<FileInfo> getFileInfoList(int clientNumber) {
+        List<String> clientFileNameList = getFileList(Config.BASIC_PATH + clientNumber);
 
-        clientFileInfoList = new ArrayList<>();
+        List<FileInfo> clientFileInfoList = new ArrayList<>();
         clientFileNameList.forEach(
-                file -> clientFileInfoList.add(new FileInfo(file, clientId))
+                file -> clientFileInfoList.add(new FileInfo(file, clientNumber))
         );
 
-        showResults();
+        return clientFileInfoList;
     }
 
-    private static void showResults() {
+    public static void main(String[] args) {
+        List<FileInfo> clientFileInfoList = getFileInfoList(1);
+        testGetFileInfoListResults(clientFileInfoList);
+    }
+
+    static void testGetFileInfoListResults(List<FileInfo> clientFileInfoList) {
         clientFileInfoList.forEach(
                 file -> {
                     System.out.println(file.clientId);
