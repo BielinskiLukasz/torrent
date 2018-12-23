@@ -6,13 +6,8 @@ public class TORrentServer {
 
     public static void main(String[] args) {
 
-        new Thread(() -> {
-            try {
-                TCPServer server = new TCPServer();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+        TCPServer server = new TCPServer();
+        server.run();
 
     }
 
