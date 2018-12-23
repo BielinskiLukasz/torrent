@@ -31,6 +31,14 @@ public class TORrent {
             }
         }).start();
 
+        new Thread(() -> {
+            try {
+                TCPClient client3 = new TCPClient(3);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
     }
 
 }

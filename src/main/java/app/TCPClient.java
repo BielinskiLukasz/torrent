@@ -38,6 +38,8 @@ public class TCPClient {
             reCheckConnectionMessage(inFromServer);
         }
 
+        outToServer.close();
+        inFromServer.close();
         clientSocket.close();
 
     }
