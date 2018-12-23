@@ -2,10 +2,11 @@ package app;
 
 public enum Command {
 
-    REGISTER,
-    CLIENT_FILES_LIST,
-    SERVER_FILES_LIST,
+    CONNECT,
+    SEND_FILES_LIST,
+    REQUEST_FILES_LIST,
     PULL,
-    PUSH
+    PUSH,
+    CLOSE
 
 }

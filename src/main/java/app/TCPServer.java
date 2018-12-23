@@ -72,12 +72,12 @@ public class TCPServer extends Thread {
                     String command = sentences[0];
                     System.out.println(command); // TODO Tests
 
-                    if (!command.equals(Command.SERVER_FILES_LIST.name())) {
+                    if (!command.equals(Command.REQUEST_FILES_LIST.name())) {
                         clientSentence = sentences[1];
                         System.out.println(SERVER_TAG + clientSentence); // TODO Tests
                     }
 
-                    if (command.equals(Command.REGISTER.name())) {
+                    if (command.equals(Command.CONNECT.name())) {
                         clientSentence += " - connected";
 
                         responseClientSentence = clientSentence + '\n';
@@ -88,11 +88,11 @@ public class TCPServer extends Thread {
                         }
                     }
 
-                    if (command.equals(Command.CLIENT_FILES_LIST.name())) {
+                    if (command.equals(Command.SEND_FILES_LIST.name())) {
                         serverFileInfoList.add(FileList.unpackFileInfo(clientSentence));
                     }
 
-                    if (command.equals(Command.SERVER_FILES_LIST.name())) {
+                    if (command.equals(Command.REQUEST_FILES_LIST.name())) {
                         try {
                             Objects.requireNonNull(outToClient).writeBytes("" + serverFileInfoList.size() + '\n'); // Send list size
                         } catch (IOException e) {
@@ -103,7 +103,7 @@ public class TCPServer extends Thread {
                         DataOutputStream finalOutToClient = outToClient;
                         readyToSendList.forEach(
                                 fileData -> {
-                                    fileData = Command.SERVER_FILES_LIST + "*" + fileData;
+                                    fileData = Command.REQUEST_FILES_LIST + "*" + fileData;
                                     System.out.println(SERVER_TAG + fileData); // TODO Tests
                                     try {
                                         Objects.requireNonNull(finalOutToClient).writeBytes(fileData + '\n');

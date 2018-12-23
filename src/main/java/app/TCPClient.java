@@ -13,6 +13,10 @@ public class TCPClient extends Thread {
     private int clientNumber;
     private static List<FileInfo> clientFileInfoList;
     private String clientTag;
+    private ClientConsole console;
+    private DataOutputStream outToServer;
+    private BufferedReader inFromServer;
+    private Socket clientSocket;
 
     public TCPClient(int clientNumber) {
 
@@ -21,64 +25,82 @@ public class TCPClient extends Thread {
 
         System.out.println(clientTag + "Client " + clientNumber + " created"); // TODO Tests
 
+        clientSocket = null;
+        outToServer = null;
+        inFromServer = null;
+
+        console = new ClientConsole();
+        console.run();
     }
 
     public void run() {
 
-        Socket clientSocket = null;
-        DataOutputStream outToServer = null;
-        BufferedReader inFromServer = null;
-
         try {
             clientSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
             outToServer = new DataOutputStream(Objects.requireNonNull(clientSocket).getOutputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
             inFromServer = new BufferedReader(new InputStreamReader(Objects.requireNonNull(clientSocket).getInputStream()));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        checkConnectionMessage(clientNumber, Objects.requireNonNull(outToServer));
-        reCheckConnectionMessage(Objects.requireNonNull(inFromServer));
 
-        getFileInfoList(clientNumber);
-        sendFileInfoListMessage(clientFileInfoList, outToServer);
+        // TODO implements waiting for command and then do actions!!!
 
-        getServerFileList(outToServer);
-        int serverListSize = 0;
+        while (clientNumber == 1) { // TODO refactor while condition
+            // TODO get command if sent
+            Command command = null;
 
-        try {
-            serverListSize = Integer.parseInt(inFromServer.readLine());
-        } catch (IOException e) {
-            e.printStackTrace();
+            perform(Objects.requireNonNull(command));
         }
 
-        System.out.println(serverListSize); // TODO Tests
-        for (int i = 0; i < serverListSize; i++) {
-            reCheckConnectionMessage(inFromServer);
-        }
 
-        try {
-            outToServer.close();
-            inFromServer.close();
-            clientSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+    }
+
+    private void perform(Command command, String... args) {
+
+        switch (command) {
+            case CONNECT:
+                checkConnectionMessage(clientNumber, Objects.requireNonNull(outToServer));
+                reCheckConnectionMessage(Objects.requireNonNull(inFromServer));
+                break;
+
+            case SEND_FILES_LIST:
+                getFileInfoList(clientNumber);
+                sendFileInfoListMessage(clientFileInfoList, outToServer);
+                break;
+
+            case REQUEST_FILES_LIST:
+                getServerFileList(outToServer);
+                int serverListSize = 0;
+
+                try {
+                    serverListSize = Integer.parseInt(inFromServer.readLine());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println(serverListSize); // TODO Tests
+                for (int i = 0; i < serverListSize; i++) {
+                    reCheckConnectionMessage(inFromServer);
+                }
+                break;
+
+            case CLOSE:
+                try {
+                    outToServer.close();
+                    inFromServer.close();
+                    clientSocket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+
         }
 
     }
 
     private void getServerFileList(DataOutputStream outToServer) {
-        String sentence = Command.SERVER_FILES_LIST.name();
+        String sentence = Command.REQUEST_FILES_LIST.name();
         System.out.println(clientTag + sentence); // TODO Tests
         try {
             outToServer.writeBytes(sentence + '\n');
@@ -88,7 +110,7 @@ public class TCPClient extends Thread {
     }
 
     private void checkConnectionMessage(int clientNumber, DataOutputStream outToServer) {
-        String sentence = Command.REGISTER + "*" + "Client_" + clientNumber + " request connection with server";
+        String sentence = Command.CONNECT + "*" + "Client_" + clientNumber + " request connection with server";
         System.out.println(clientTag + sentence); // TODO Tests
         try {
             outToServer.writeBytes(sentence + '\n');
@@ -117,7 +139,7 @@ public class TCPClient extends Thread {
 
         readyToSendList.forEach(
                 fileData -> {
-                    fileData = Command.CLIENT_FILES_LIST + "*" + fileData;
+                    fileData = Command.SEND_FILES_LIST + "*" + fileData;
                     System.out.println(clientTag + fileData); // TODO Tests
                     try {
                         outToServer.writeBytes(fileData + '\n');
