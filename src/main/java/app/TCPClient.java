@@ -29,7 +29,7 @@ public class TCPClient extends Thread {
         outToServer = null;
         inFromServer = null;
 
-        console = new ClientConsole();
+        console = new ClientConsole(this);
         console.run();
     }
 
@@ -48,17 +48,17 @@ public class TCPClient extends Thread {
 
         while (clientNumber == 1) { // TODO refactor while condition
             // TODO get command if sent
-            Command command = null;
+            String command = null;
 
-            perform(Objects.requireNonNull(command));
+            perform(command);
         }
 
 
     }
 
-    private void perform(Command command, String... args) {
+    void perform(String command) {
 
-        switch (command) {
+        switch (Command.valueOf(command)) {
             case CONNECT:
                 checkConnectionMessage(clientNumber, Objects.requireNonNull(outToServer));
                 reCheckConnectionMessage(Objects.requireNonNull(inFromServer));

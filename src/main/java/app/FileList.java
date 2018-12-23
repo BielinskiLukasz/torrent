@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileList {
+class FileList {
 
     private static List<String> getFileList(String directoryPath) {
         List<String> directoryFileList = new ArrayList<>();
@@ -31,11 +31,6 @@ public class FileList {
         );
 
         return clientFileInfoList;
-    }
-
-    public static void main(String[] args) {
-        List<FileInfo> clientFileInfoList = getFileInfoList(1);
-        testGetFileInfoListResults(clientFileInfoList);
     }
 
     private static void testGetFileInfoListResults(List<FileInfo> clientFileInfoList) { // TODO Tests

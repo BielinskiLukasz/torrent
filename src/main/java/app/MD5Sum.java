@@ -3,7 +3,7 @@ package app;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class MD5Sum {
+class MD5Sum {
 
     static String md5(byte[] input) throws NoSuchAlgorithmException {
         MessageDigest mDigest = MessageDigest.getInstance("MD5");
@@ -15,10 +15,6 @@ public class MD5Sum {
         }
 
         return sb.toString();
-    }
-
-    public static void main(String[] args) {
-
     }
 
 }
