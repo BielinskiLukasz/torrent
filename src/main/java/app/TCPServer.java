@@ -6,14 +6,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TCPServer {
 
     private static final String SERVER_TAG = "<SERVER>: ";
+    private List<FileInfo> serverFileInfoList;
 
     public TCPServer() throws IOException {
 
-        System.out.println(SERVER_TAG + "Server created");
+        serverFileInfoList = new ArrayList<>();
+        System.out.println(SERVER_TAG + "Server created"); // TODO Tests
 
         String clientSentence;
         String responseClientSentence;
@@ -21,31 +25,50 @@ public class TCPServer {
 
         while (true) {
             Socket connectionSocket = welcomeSocket.accept();
-            BufferedReader inFromClient =
-                    new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-            DataOutputStream outToClient =
-                    new DataOutputStream(connectionSocket.getOutputStream());
 
-            clientSentence = inFromClient.readLine() + " - connected";
-            System.out.println(SERVER_TAG + clientSentence);
-            responseClientSentence = clientSentence + '\n';
-            outToClient.writeBytes(responseClientSentence);
+            BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+            DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
 
-            clientSentence = inFromClient.readLine() + " - received";
-            System.out.println(SERVER_TAG + clientSentence);
-            responseClientSentence = clientSentence + '\n';
-            outToClient.writeBytes(responseClientSentence);
+            while (!connectionSocket.isClosed()) {
+                clientSentence = inFromClient.readLine();
+                if (clientSentence != null) {
+                    String[] sentences = clientSentence.split("\\*");
+                    String command = sentences[0];
+                    System.out.println(command); // TODO Tests
+                    if (!command.equals(Command.SERVER_FILES_LIST.toString())) {
+                        clientSentence = sentences[1];
+                        System.out.println(SERVER_TAG + clientSentence); // TODO Tests
+                    }
 
-            clientSentence = inFromClient.readLine() + " - received";
-            System.out.println(SERVER_TAG + clientSentence);
-            responseClientSentence = clientSentence + '\n';
-            outToClient.writeBytes(responseClientSentence);
+                    if (command.equals(Command.REGISTER.toString())) {
+                        clientSentence += " - connected";
 
-            clientSentence = inFromClient.readLine() + " - received";
-            System.out.println(SERVER_TAG + clientSentence);
-            responseClientSentence = clientSentence + '\n';
-            outToClient.writeBytes(responseClientSentence);
+                        responseClientSentence = clientSentence + '\n';
+                        outToClient.writeBytes(responseClientSentence);
+                    }
 
+                    if (command.equals(Command.CLIENT_FILES_LIST.toString())) {
+                        serverFileInfoList.add(FileList.unpackFileInfo(clientSentence));
+                    }
+
+                    if (command.equals(Command.SERVER_FILES_LIST.toString())) {
+                        outToClient.writeBytes("" + serverFileInfoList.size() + '\n'); // Send list size
+                        List<String> readyToSendList = FileList.packFileInfoList(serverFileInfoList);
+
+                        readyToSendList.forEach(
+                                fileData -> {
+                                    fileData = Command.SERVER_FILES_LIST + "*" + fileData;
+                                    System.out.println(SERVER_TAG + fileData); // TODO Tests
+                                    try {
+                                        outToClient.writeBytes(fileData + '\n');
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                        );
+                    }
+                }
+            }
         }
 
     }

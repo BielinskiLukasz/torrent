@@ -10,7 +10,7 @@ class FileInfo {
 
     int clientId;
     String name;
-    byte[] md5;
+    String md5;
 
     FileInfo(String fileName, int clientId) {
         this.clientId = clientId;
@@ -31,5 +31,13 @@ class FileInfo {
             e.printStackTrace();
         }
 
+    }
+
+    FileInfo(String data) {
+        String[] splitedData = data.split("\\|");
+
+        this.clientId = Integer.parseInt(splitedData[0]);
+        this.name = splitedData[1];
+        this.md5 = splitedData[2];
     }
 }

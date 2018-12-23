@@ -38,36 +38,38 @@ public class FileList {
         testGetFileInfoListResults(clientFileInfoList);
     }
 
-    private static void testGetFileInfoListResults(List<FileInfo> clientFileInfoList) {
+    private static void testGetFileInfoListResults(List<FileInfo> clientFileInfoList) { // TODO Tests
         clientFileInfoList.forEach(
                 file -> {
                     System.out.println(file.clientId);
                     System.out.println(file.name);
-
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < file.md5.length; i++) {
-                        sb.append(Integer.toString((file.md5[i] & 0xff) + 0x100, 16).substring(1));
-                    }
-                    System.out.println(sb.toString());
+                    System.out.println(file.md5);
                 }
         );
     }
 
-    static List<String> preparingFileInfoListToSend(List<FileInfo> clientFileInfoList) {
+    static List<String> packFileInfoList(List<FileInfo> clientFileInfoList) {
         List<String> readyToSendList = new ArrayList<>();
 
         clientFileInfoList.forEach(
-                fileInfo -> {
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < fileInfo.md5.length; i++) {
-                        sb.append(Integer.toString((fileInfo.md5[i] & 0xff) + 0x100, 16).substring(1));
-                    }
-
-                    readyToSendList.add(fileInfo.clientId + ";" + fileInfo.name + ";" + sb.toString());
-                }
+                fileInfo -> readyToSendList.add(fileInfo.clientId + "|" + fileInfo.name + "|" + fileInfo.md5)
         );
 
         return readyToSendList;
+    }
+
+    static List<FileInfo> unpackFileInfoList(List<String> packedList) {
+        List<FileInfo> unpackList = new ArrayList<>();
+
+        packedList.forEach(
+                data -> unpackList.add(new FileInfo(data))
+        );
+
+        return unpackList;
+    }
+
+    static FileInfo unpackFileInfo(String packedFileInfo) {
+        return new FileInfo(packedFileInfo);
     }
 
 }
