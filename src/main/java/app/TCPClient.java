@@ -16,7 +16,9 @@ public class TCPClient extends Thread {
     private ClientConsole console;
     private DataOutputStream outToServer;
     private BufferedReader inFromServer;
+    private BufferedReader userCommand;
     private Socket clientSocket;
+    private String sentence;
 
     public TCPClient(int clientNumber) {
 
@@ -28,9 +30,7 @@ public class TCPClient extends Thread {
         clientSocket = null;
         outToServer = null;
         inFromServer = null;
-
-        console = new ClientConsole(this);
-        console.run();
+        userCommand = null;
     }
 
     public void run() {
@@ -39,20 +39,19 @@ public class TCPClient extends Thread {
             clientSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
             outToServer = new DataOutputStream(Objects.requireNonNull(clientSocket).getOutputStream());
             inFromServer = new BufferedReader(new InputStreamReader(Objects.requireNonNull(clientSocket).getInputStream()));
+            userCommand = new BufferedReader(new InputStreamReader(System.in));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
-        // TODO implements waiting for command and then do actions!!!
-
-        while (clientNumber == 1) { // TODO refactor while condition
-            // TODO get command if sent
-            String command = null;
-
-            perform(command);
+        try {
+            sentence = userCommand.readLine();
+            outToServer.writeBytes(sentence + '\n');
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
+        perform(sentence);
 
     }
 
