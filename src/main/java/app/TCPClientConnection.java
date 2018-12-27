@@ -1,6 +1,7 @@
 package app;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
@@ -15,13 +16,13 @@ public class TCPClientConnection extends Thread {
     }
 
     public void run() {
-        ServerSocket clientSocket = null;
+        ServerSocket hostServerSocket = null;
 
         try {
-            clientSocket = new ServerSocket(Config.PORT_NR + client.clientNumber);
-            // TODO implements connection actions (users, files, communication)
+            hostServerSocket = new ServerSocket(Config.PORT_NR + client.clientNumber);
+            connectWithServer();
         } catch (IOException e) {
-            System.out.println("TCPClientConnection - Client initiation " + e);
+            System.out.println("TCPClientConnection - client initiation " + e);
             e.printStackTrace();
         }
 
@@ -31,15 +32,15 @@ public class TCPClientConnection extends Thread {
             String clientSentence;
 
             try {
-                connectionSocket = clientSocket.accept();
-                if (!clientSocket.isClosed()) {
+                connectionSocket = hostServerSocket.accept();
+                if (!hostServerSocket.isClosed()) {
                     inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                     clientSentence = inFromServer.readLine();
 
                     TCPClientAction.perform(client.clientNumber, connectionSocket, clientSentence);
                 }
             } catch (IOException e) {
-                System.out.println("TCPClientConnection - connect with server " + e);
+                System.out.println("TCPClientConnection - read line " + e);
                 e.printStackTrace();
             }
 
@@ -48,6 +49,30 @@ public class TCPClientConnection extends Thread {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void connectWithServer() {
+        Socket hostClientSocket = null;
+        DataOutputStream outToServer = null;
+        BufferedReader inFromServer = null;
+
+        try {
+            hostClientSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
+            outToServer = new DataOutputStream(hostClientSocket.getOutputStream());
+            inFromServer = new BufferedReader(new InputStreamReader(hostClientSocket.getInputStream()));
+
+        } catch (IOException e) {
+            System.out.println("TCPClientConnection - connect with server " + e);
+            e.printStackTrace();
+        }
+
+        // TODO implement adding user, files on server side
+
+        try {
+            hostClientSocket.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e);
         }
     }
 }

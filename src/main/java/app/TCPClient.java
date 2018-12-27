@@ -25,6 +25,8 @@ public class TCPClient extends Thread {
         outToServer = null;
         inFromServer = null;
         userCommand = null;
+
+        System.out.println("TCPClient - create client"); // TODO debug log
     }
 
     public void run() {
