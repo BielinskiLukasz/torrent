@@ -21,7 +21,7 @@ public class TCPServerConnection extends Thread {
         try {
             inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
-            System.out.println("Client connection " + e);
+            System.out.println("TCPServerConnection - Client connection " + e);
             e.printStackTrace();
         }
 
@@ -30,7 +30,7 @@ public class TCPServerConnection extends Thread {
             try {
                 clientSentence = inFromClient.readLine();
             } catch (IOException e) {
-                System.out.println("Client read line " + e);
+                System.out.println("TCPServerConnection - Client read line " + e);
                 e.printStackTrace();
             }
 

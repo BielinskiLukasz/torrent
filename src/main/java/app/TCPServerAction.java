@@ -10,6 +10,7 @@ class TCPServerAction {
     static void perform(TCPServer server, Socket connectionSocket, String clientSentence) { // TODO refactor method
 
         String responseClientSentence;
+        System.out.println(clientSentence); // TODO test clientSentence
 
         DataOutputStream outToClient = null;
         try {
@@ -27,6 +28,7 @@ class TCPServerAction {
             }
 
             if (command.equals(Command.CONNECT.name())) {
+                System.out.println(clientSentence); // TODO test connection
                 clientSentence += " - connected";
 
                 responseClientSentence = clientSentence + '\n';

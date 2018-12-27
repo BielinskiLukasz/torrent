@@ -33,7 +33,7 @@ public class TCPServer extends Thread {
                 TCPServerConnection connection = new TCPServerConnection(this, connectionSocket);
                 connection.run();
             } catch (IOException e) {
-                System.out.println("Server connection " + e);
+                System.out.println("TCPServer - Server connection " + e);
                 e.printStackTrace();
             }
 
