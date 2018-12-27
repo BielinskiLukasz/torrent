@@ -12,10 +12,10 @@ public class TORrent {
         TCPClient client2 = new TCPClient(2);
         TCPClient client3 = new TCPClient(3);
 
-        server.run();
-        client1.run();
-        client2.run();
-        client3.run();
+        server.start();
+        client1.start();
+        client2.start();
+        client3.start();
 
     }
 

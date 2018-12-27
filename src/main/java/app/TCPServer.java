@@ -41,7 +41,7 @@ public class TCPServer extends Thread {
                 connectionSocket = welcomeSocket.accept();
                 System.out.println("TCPServer: while try12"); // TODO debug log
                 TCPServerConnection connection = new TCPServerConnection(this, connectionSocket);
-                connection.run();
+                connection.start();
                 System.out.println("TCPServer: while try13"); // TODO debug log
             } catch (IOException e) {
                 System.out.println("TCPServer - server connection " + e);

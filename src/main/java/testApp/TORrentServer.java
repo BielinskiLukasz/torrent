@@ -7,7 +7,7 @@ public class TORrentServer {
     public static void main(String[] args) {
 
         TCPServer server = new TCPServer();
-        server.run();
+        server.start();
 
     }
 
