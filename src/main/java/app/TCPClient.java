@@ -30,8 +30,8 @@ public class TCPClient extends Thread {
     }
 
     public void run() {
-        TCPClientConnection connection = new TCPClientConnection(this);
         TCPClientApp app = new TCPClientApp(this);
+        TCPClientConnection connection = new TCPClientConnection(this, app);
         app.run();
         connection.run();
 

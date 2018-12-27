@@ -10,9 +10,11 @@ import java.net.Socket;
 public class TCPClientConnection extends Thread {
 
     private TCPClient client;
+    private TCPClientApp app;
 
-    TCPClientConnection(TCPClient tcpClient) {
+    TCPClientConnection(TCPClient tcpClient, TCPClientApp tcpClientApp) {
         this.client = tcpClient;
+        this.app = tcpClientApp;
     }
 
     public void run() {
@@ -72,13 +74,15 @@ public class TCPClientConnection extends Thread {
         }
 
         // TODO implement adding user, files on server side
-//        String helloMessage = Command.CONNECT + Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.clientNumber;
-//        try {
-//            outToServer.writeBytes(helloMessage);
-//        } catch (IOException e) {
-//            System.out.println("TCPClientConnection - connect command " + e);
-//            e.printStackTrace();
-//        } // TODO move it to TCPClientConnectionAction
+        String helloMessage = Command.CONNECT + Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.clientNumber;
+        try {
+            outToServer.writeBytes(helloMessage);
+            String helloResponse = inFromServer.readLine();
+            app.message = helloMessage;
+        } catch (IOException e) {
+            System.out.println("TCPClientConnection - connect command " + e);
+            e.printStackTrace();
+        } // TODO move it to TCPClientConnectionAction
 
         try {
             hostClientSocket.close();

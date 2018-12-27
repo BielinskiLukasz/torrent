@@ -38,10 +38,9 @@ public class TCPServerConnection extends Thread {
                 e.printStackTrace();
             }
 
-//            if(clientSentence != null) {
-//                String message = TCPServerAction.perform(server, connectionSocket, clientSentence);
-//                System.out.println(message);
-//            }
+            if (clientSentence != null) {
+                TCPServerAction.perform(server, connectionSocket, clientSentence);
+            }
 
             try { // TODO sleep
                 sleep(1000);

@@ -1,10 +1,22 @@
 package app;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 
 class TCPServerAction {
 
-    static String perform(TCPServer server, Socket connectionSocket, String clientSentence) { // TODO refactor method
+    static void perform(TCPServer server, Socket connectionSocket, String clientSentence) { // TODO refactor method
+        DataOutputStream outToClient;
+
+        String command = getCommand(clientSentence);
+
+        try {
+            outToClient = new DataOutputStream(connectionSocket.getOutputStream());
+            outToClient.writeBytes(command);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         /*String responseClientSentence;
         System.out.println(clientSentence); // TODO test clientSentence
@@ -61,6 +73,11 @@ class TCPServerAction {
             }
 
         }*/
-        return null;
     }
+
+    private static String getCommand(String clientSentence) {
+        String[] sentences = clientSentence.split(Config.SENTENCE_SPLITS_CHAR);
+        return sentences[0];
+    }
+
 }

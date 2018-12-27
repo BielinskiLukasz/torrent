@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 public class TCPClientApp extends Thread {
 
     private TCPClient client;
+    String message;
 
     TCPClientApp(TCPClient tcpClient) {
         this.client = tcpClient;
@@ -19,17 +20,30 @@ public class TCPClientApp extends Thread {
         System.out.println("TCPClientApp: run"); // TODO debug log
 
         while (true) {
+            System.out.println("TCPClientApp: while try11"); // TODO debug log
             try {
+                System.out.println("TCPClientApp: while try12"); // TODO debug log
                 inFromUser = new BufferedReader(new InputStreamReader(System.in));
+                System.out.println("TCPClientApp: while try13"); // TODO debug log
                 userSentence = inFromUser.readLine();
 
+                System.out.println("TCPClientApp: while try14"); // TODO debug log
                 TCPClientAppAction.perform(client.clientNumber, userSentence);
+                System.out.println("TCPClientApp: while try15"); // TODO debug log
 
             } catch (IOException e) {
                 System.out.println("TCPClientApp - user command " + e);
                 e.printStackTrace();
                 this.interrupt();
             }
+
+            System.out.println("TCPClientApp: while if before"); // TODO debug log
+            if (message != null) {
+                System.out.println("TCPClientApp: while if"); // TODO debug log
+                System.out.println(message);
+                message = null;
+            }
+            System.out.println("TCPClientApp: while if after"); // TODO debug log
 
             try { // TODO sleep
                 sleep(1000);
