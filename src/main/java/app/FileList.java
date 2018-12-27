@@ -33,16 +33,6 @@ class FileList {
         return clientFileInfoList;
     }
 
-    private static void testGetFileInfoListResults(List<FileInfo> clientFileInfoList) { // TODO Tests
-        clientFileInfoList.forEach(
-                file -> {
-                    System.out.println(file.clientId);
-                    System.out.println(file.name);
-                    System.out.println(file.md5);
-                }
-        );
-    }
-
     static List<String> packFileInfoList(List<FileInfo> clientFileInfoList) {
         List<String> readyToSendList = new ArrayList<>();
 

@@ -18,7 +18,6 @@ public class TCPServer extends Thread {
     public TCPServer() {
 
         serverFileInfoList = new ArrayList<>();
-        System.out.println(SERVER_TAG + "Server created"); // TODO Tests
 
     }
 
@@ -55,12 +54,6 @@ public class TCPServer extends Thread {
 
             while (!Objects.requireNonNull(welcomeSocket).isClosed()) {
 
-                try { // TODO Tests
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
                 try {
                     clientSentence = Objects.requireNonNull(inFromClient).readLine();
                 } catch (IOException e) {
@@ -70,11 +63,9 @@ public class TCPServer extends Thread {
                 if (clientSentence != null) {
                     String[] sentences = clientSentence.split("\\*");
                     String command = sentences[0];
-                    System.out.println(command); // TODO Tests
 
                     if (!command.equals(Command.REQUEST_FILES_LIST.name())) {
                         clientSentence = sentences[1];
-                        System.out.println(SERVER_TAG + clientSentence); // TODO Tests
                     }
 
                     if (command.equals(Command.CONNECT.name())) {
@@ -104,7 +95,6 @@ public class TCPServer extends Thread {
                         readyToSendList.forEach(
                                 fileData -> {
                                     fileData = Command.REQUEST_FILES_LIST + "*" + fileData;
-                                    System.out.println(SERVER_TAG + fileData); // TODO Tests
                                     try {
                                         Objects.requireNonNull(finalOutToClient).writeBytes(fileData + '\n');
                                     } catch (IOException e) {
@@ -114,14 +104,8 @@ public class TCPServer extends Thread {
                         );
                     }
 
-                    if (command.equals(Command.PULL.name())) {
-
-                    }
-
                 }
             }
-
-            System.out.println(SERVER_TAG + "inner while out");
 
         }
 

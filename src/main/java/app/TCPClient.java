@@ -25,8 +25,6 @@ public class TCPClient extends Thread {
         this.clientNumber = clientNumber;
         this.clientTag = "CLIENT_" + clientNumber + ": ";
 
-        System.out.println(clientTag + "Client " + clientNumber + " created"); // TODO Tests
-
         clientSocket = null;
         outToServer = null;
         inFromServer = null;
@@ -78,7 +76,6 @@ public class TCPClient extends Thread {
                     e.printStackTrace();
                 }
 
-                System.out.println(serverListSize); // TODO Tests
                 for (int i = 0; i < serverListSize; i++) {
                     reCheckConnectionMessage(inFromServer);
                 }
@@ -100,7 +97,6 @@ public class TCPClient extends Thread {
 
     private void getServerFileList(DataOutputStream outToServer) {
         String sentence = Command.REQUEST_FILES_LIST.name();
-        System.out.println(clientTag + sentence); // TODO Tests
         try {
             outToServer.writeBytes(sentence + '\n');
         } catch (IOException e) {
@@ -110,7 +106,6 @@ public class TCPClient extends Thread {
 
     private void checkConnectionMessage(int clientNumber, DataOutputStream outToServer) {
         String sentence = Command.CONNECT + "*" + "Client_" + clientNumber + " request connection with server";
-        System.out.println(clientTag + sentence); // TODO Tests
         try {
             outToServer.writeBytes(sentence + '\n');
         } catch (IOException e) {
@@ -119,13 +114,7 @@ public class TCPClient extends Thread {
     }
 
     private void reCheckConnectionMessage(BufferedReader inFromServer) {
-        String modifiedSentence = null;
-        try {
-            modifiedSentence = inFromServer.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println(clientTag + modifiedSentence); // TODO Tests
+
     }
 
     private void getFileInfoList(int clientNumber) {
@@ -139,7 +128,6 @@ public class TCPClient extends Thread {
         readyToSendList.forEach(
                 fileData -> {
                     fileData = Command.SEND_FILES_LIST + "*" + fileData;
-                    System.out.println(clientTag + fileData); // TODO Tests
                     try {
                         outToServer.writeBytes(fileData + '\n');
                     } catch (IOException e) {
