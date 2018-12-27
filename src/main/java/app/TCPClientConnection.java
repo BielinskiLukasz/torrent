@@ -18,6 +18,8 @@ public class TCPClientConnection extends Thread {
     public void run() {
         ServerSocket hostServerSocket = null;
 
+        System.out.println("TCPClientConnection: run"); // TODO debug log <-- not visible
+
         try {
             hostServerSocket = new ServerSocket(Config.PORT_NR + client.clientNumber);
             connectWithServer();
@@ -49,6 +51,8 @@ public class TCPClientConnection extends Thread {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+            System.out.println("TCPClientConnection: while..."); // TODO debug log <-- not visible
         }
     }
 
@@ -68,11 +72,19 @@ public class TCPClientConnection extends Thread {
         }
 
         // TODO implement adding user, files on server side
+//        String helloMessage = Command.CONNECT + Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.clientNumber;
+//        try {
+//            outToServer.writeBytes(helloMessage);
+//        } catch (IOException e) {
+//            System.out.println("TCPClientConnection - connect command " + e);
+//            e.printStackTrace();
+//        } // TODO move it to TCPClientConnectionAction
 
         try {
             hostClientSocket.close();
         } catch (IOException e) {
-            System.out.println("Error: " + e);
+            System.out.println("TCPClientConnection - close client socket " + e);
+            e.printStackTrace();
         }
     }
 }

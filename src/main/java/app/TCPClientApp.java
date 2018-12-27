@@ -16,6 +16,8 @@ public class TCPClientApp extends Thread {
         BufferedReader inFromUser;
         String userSentence;
 
+        System.out.println("TCPClientApp: run"); // TODO debug log
+
         while (true) {
             try {
                 inFromUser = new BufferedReader(new InputStreamReader(System.in));
@@ -34,6 +36,8 @@ public class TCPClientApp extends Thread {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+            System.out.println("TCPClientApp: while..."); // TODO debug log <-- not visible
         }
     }
 }

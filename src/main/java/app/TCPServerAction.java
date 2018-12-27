@@ -1,15 +1,12 @@
 package app;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.Socket;
-import java.util.List;
 
 class TCPServerAction {
 
-    static void perform(TCPServer server, Socket connectionSocket, String clientSentence) { // TODO refactor method
+    static String perform(TCPServer server, Socket connectionSocket, String clientSentence) { // TODO refactor method
 
-        String responseClientSentence;
+        /*String responseClientSentence;
         System.out.println(clientSentence); // TODO test clientSentence
 
         DataOutputStream outToClient = null;
@@ -28,7 +25,6 @@ class TCPServerAction {
             }
 
             if (command.equals(Command.CONNECT.name())) {
-                System.out.println(clientSentence); // TODO test connection
                 clientSentence += " - connected";
 
                 responseClientSentence = clientSentence + '\n';
@@ -64,8 +60,7 @@ class TCPServerAction {
                 );
             }
 
-        }
-
+        }*/
+        return null;
     }
-
 }

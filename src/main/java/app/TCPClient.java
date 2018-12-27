@@ -26,14 +26,16 @@ public class TCPClient extends Thread {
         inFromServer = null;
         userCommand = null;
 
-        System.out.println("TCPClient - create client"); // TODO debug log
+        System.out.println("TCPClient: create client"); // TODO debug log
     }
 
     public void run() {
         TCPClientConnection connection = new TCPClientConnection(this);
         TCPClientApp app = new TCPClientApp(this);
-        connection.run();
         app.run();
+        connection.run();
+
+        System.out.println("TCPClient - run all"); // TODO debug log <-- not visible
 
         /*try {
             clientSocket = new Socket(Config.HOST_IP, Config.PORT_NR);

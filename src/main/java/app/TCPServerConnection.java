@@ -13,15 +13,19 @@ public class TCPServerConnection extends Thread {
     TCPServerConnection(TCPServer tcpServer, Socket connectionSocket) {
         this.server = tcpServer;
         this.connectionSocket = connectionSocket;
+
+        System.out.println("TCPServerConnection: create connection"); // TODO debug log
     }
 
     public void run() {
+
+        System.out.println("TCPServerConnection: run"); // TODO debug log
 
         BufferedReader inFromClient = null;
         try {
             inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
-            System.out.println("TCPServerConnection - Client connection " + e);
+            System.out.println("TCPServerConnection - client connection " + e);
             e.printStackTrace();
         }
 
@@ -30,17 +34,22 @@ public class TCPServerConnection extends Thread {
             try {
                 clientSentence = inFromClient.readLine();
             } catch (IOException e) {
-                System.out.println("TCPServerConnection - Client read line " + e);
+                System.out.println("TCPServerConnection - read line " + e);
                 e.printStackTrace();
             }
 
-            TCPServerAction.perform(server, connectionSocket, clientSentence);
+//            if(clientSentence != null) {
+//                String message = TCPServerAction.perform(server, connectionSocket, clientSentence);
+//                System.out.println(message);
+//            }
 
             try { // TODO sleep
                 sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+            System.out.println("TCPServerConnection: while..."); // TODO debug log
         }
     }
 }
