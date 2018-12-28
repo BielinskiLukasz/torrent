@@ -25,7 +25,7 @@ class TCPClientAction {
                 try {
                     outToServer = new DataOutputStream(connectionSocket.getOutputStream());
                 } catch (IOException e) {
-                    System.out.println("TCPClientAction - creating outputStream and inputBufferedReader " + e);
+                    System.out.println("TCPClientAction - creating dataOutputStream " + e);
                     e.printStackTrace();
                 }
                 System.out.println(command + " input: " + clientSentence); // TODO debug log
@@ -50,12 +50,10 @@ class TCPClientAction {
 
     private static void connect(int clientNumber, Socket connectionSocket, String clientSentence) {
         DataOutputStream outToServer = null;
-        BufferedReader inFromServer = null;
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
-            inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
-            System.out.println("TCPClientAction - creating outputStream and inputBufferedReader " + e);
+            System.out.println("TCPClientAction - creating dataOutputStream " + e);
             e.printStackTrace();
         }
 
@@ -67,6 +65,14 @@ class TCPClientAction {
                     Config.SENTENCE_SPLITS_CHAR + clientNumber + "\n");
         } catch (IOException e) {
             System.out.println("TCPClientAction - write to server " + e);
+            e.printStackTrace();
+        }
+
+        BufferedReader inFromServer = null;
+        try {
+            inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+        } catch (IOException e) {
+            System.out.println("TCPClientAction - creating inputBufferedReader " + e);
             e.printStackTrace();
         }
 

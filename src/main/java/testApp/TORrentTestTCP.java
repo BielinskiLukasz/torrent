@@ -3,10 +3,9 @@ package testApp;
 import app.client.TCPClient;
 import app.server.TCPServer;
 
-public class TORrent {
+public class TORrentTestTCP {
 
     public static void main(String[] args) {
-
         TCPServer server = new TCPServer();
         TCPClient client1 = new TCPClient(1);
         TCPClient client2 = new TCPClient(2);
@@ -22,7 +21,5 @@ public class TORrent {
         client4.start();
         client5.start();
         client6.start();
-
     }
-
 }

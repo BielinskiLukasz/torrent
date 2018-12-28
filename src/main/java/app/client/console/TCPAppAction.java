@@ -2,7 +2,6 @@ package app.client.console;
 
 import app.Utils.ActionUtils;
 import app.Utils.Config;
-import app.server.CommandServer;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -18,23 +17,35 @@ class TCPAppAction {
 
         switch (getCommandApp(command)) {
             case FILES_LIST:
-                Socket connectionSocket;
-                DataOutputStream outToServer = null;
-                BufferedReader inFromServer = null;
+                Socket connectionSocket = null;
                 try {
                     connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
-                    outToServer = new DataOutputStream(connectionSocket.getOutputStream());
-                    inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                 } catch (IOException e) {
-                    System.out.println("TCPAppAction - creating socket, outputStream and inputBufferedReader " + e);
+                    System.out.println("TCPAppAction - creating socket " + e);
+                    e.printStackTrace();
+                }
+
+                DataOutputStream outToServer = null;
+                try {
+                    outToServer = new DataOutputStream(connectionSocket.getOutputStream());
+                } catch (IOException e) {
+                    System.out.println("TCPAppAction - creating dataOutputStream " + e);
                     e.printStackTrace();
                 }
 
                 System.out.println(command + " output: " + "no message"); // TODO debug log
                 try {
-                    outToServer.writeBytes(CommandServer.FILES_LIST + "\n");
+                    outToServer.writeBytes(command + "\n");
                 } catch (IOException e) {
                     System.out.println("TCPAppAction - write to server " + e);
+                    e.printStackTrace();
+                }
+
+                BufferedReader inFromServer = null;
+                try {
+                    inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+                } catch (IOException e) {
+                    System.out.println("TCPAppAction - creating inputBufferedReader " + e);
                     e.printStackTrace();
                 }
 
@@ -46,6 +57,10 @@ class TCPAppAction {
                     e.printStackTrace();
                 }
                 System.out.println(command + " input: " + response); // TODO debug log
+                break;
+
+            case CLOSE:
+                // TODO implement
                 break;
 
             case EMPTY_COMMAND:
@@ -65,7 +80,15 @@ class TCPAppAction {
             case "FILES_LIST":
             case "FILES LIST":
             case "FILESLIST":
+            case "FILE_LIST":
+            case "FILE LIST":
+            case "FILELIST":
                 return CommandApp.FILES_LIST;
+
+            case "CLOSE":
+            case "EXIT":
+            case "QUIT":
+                return CommandApp.CLOSE;
 
             case "":
                 return CommandApp.EMPTY_COMMAND;
