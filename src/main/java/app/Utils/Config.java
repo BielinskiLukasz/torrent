@@ -7,5 +7,4 @@ public class Config {
     public static final int PORT_NR = 10000;
 
     public static final String SENTENCE_SPLITS_CHAR = "*";
-
 }

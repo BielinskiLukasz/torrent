@@ -18,10 +18,9 @@ public class TCPClientConnection extends Thread {
     }
 
     public void run() {
-        ServerSocket hostServerSocket = null;
-
         System.out.println("TCPClientConnection: run"); // TODO debug log <-- not visible
 
+        ServerSocket hostServerSocket = null;
         try {
             hostServerSocket = new ServerSocket(Config.PORT_NR + client.getClientNumber());
             connectWithServer();
@@ -57,10 +56,9 @@ public class TCPClientConnection extends Thread {
     }
 
     private void connectWithServer() {
-        Socket hostClientSocket = null;
-
         System.out.println("TCPClientConnection: connectWithServer"); // TODO debug log
 
+        Socket hostClientSocket = null;
         try {
             hostClientSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
         } catch (IOException e) {

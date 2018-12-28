@@ -18,7 +18,6 @@ public class TCPServerConnection extends Thread {
     }
 
     public void run() {
-
         System.out.println("TCPServerConnection: run"); // TODO debug log
 
         BufferedReader inFromClient = null;

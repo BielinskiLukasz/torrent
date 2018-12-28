@@ -12,6 +12,21 @@ import java.net.Socket;
 class TCPClientAction {
 
     static void perform(int clientNumber, Socket connectionSocket, String clientSentence) {
+
+        String command = ActionUtils.getCommand(clientSentence);
+
+        switch (CommandClient.valueOf(command)) {
+            case CONNECT:
+                connect(clientNumber, connectionSocket, clientSentence);
+                break;
+
+            default:
+                System.out.println('"' + command + '"' + " command is not supported yet"); // TODO debug log
+                break;
+        }
+    }
+
+    private static void connect(int clientNumber, Socket connectionSocket, String clientSentence) {
         DataOutputStream outToServer = null;
         BufferedReader inFromServer = null;
         try {
@@ -23,31 +38,23 @@ class TCPClientAction {
         }
 
         String command = ActionUtils.getCommand(clientSentence);
-
-        switch (CommandClient.valueOf(command)) {
-            case CONNECT:
-                String message = ActionUtils.getMessage(clientSentence);
-                System.out.println(command + " output: " + message); // TODO debug log
-                try {
-                    outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + message +
-                            Config.SENTENCE_SPLITS_CHAR + clientNumber + "\n");
-                } catch (IOException e) {
-                    System.out.println("TCPClientAction - write to server " + e);
-                    e.printStackTrace();
-                }
-
-                String response = null;
-                try {
-                    response = inFromServer.readLine();
-                } catch (IOException e) {
-                    System.out.println("TCPClientAction - read from server " + e);
-                    e.printStackTrace();
-                }
-                System.out.println(command + " input: " + response); // TODO debug log
-                break;
-            default:
-                System.out.println('"' + command + '"' + " command is not supported yet"); // TODO debug log
-                break;
+        String message = ActionUtils.getMessage(clientSentence);
+        System.out.println(command + " output: " + message); // TODO debug log
+        try {
+            outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + message +
+                    Config.SENTENCE_SPLITS_CHAR + clientNumber + "\n");
+        } catch (IOException e) {
+            System.out.println("TCPClientAction - write to server " + e);
+            e.printStackTrace();
         }
+
+        String response = null;
+        try {
+            response = inFromServer.readLine();
+        } catch (IOException e) {
+            System.out.println("TCPClientAction - read from server " + e);
+            e.printStackTrace();
+        }
+        System.out.println(command + " input: " + response); // TODO debug log
     }
 }

@@ -3,17 +3,18 @@ package app.Utils;
 public class ActionUtils {
 
     public static String getCommand(String clientSentence) {
-        String[] sentences = clientSentence.split("\\" + Config.SENTENCE_SPLITS_CHAR);
-        return sentences[0];
+        return splitSentence(clientSentence)[0];
     }
 
     public static String getMessage(String clientSentence) {
-        String[] sentences = clientSentence.split("\\" + Config.SENTENCE_SPLITS_CHAR);
-        return sentences[1];
+        return splitSentence(clientSentence)[1];
     }
 
     public static int getClientNumber(String clientSentence) {
-        String[] sentences = clientSentence.split("\\" + Config.SENTENCE_SPLITS_CHAR);
-        return Integer.parseInt(sentences[2]);
+        return Integer.parseInt(splitSentence(clientSentence)[2]);
+    }
+
+    private static String[] splitSentence(String clientSentence) {
+        return clientSentence.split("\\" + Config.SENTENCE_SPLITS_CHAR);
     }
 }

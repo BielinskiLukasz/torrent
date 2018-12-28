@@ -15,10 +15,10 @@ public class TCPClientApp extends Thread {
     }
 
     public void run() {
+        System.out.println("TCPClientApp: run"); // TODO debug log
+
         BufferedReader inFromUser;
         String userSentence;
-
-        System.out.println("TCPClientApp: run"); // TODO debug log
 
         while (true) {
             try {

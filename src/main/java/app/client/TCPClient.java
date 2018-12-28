@@ -4,9 +4,6 @@ import app.Utils.FileInfo;
 import app.client.console.TCPClientApp;
 import app.client.host.TCPClientConnection;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.net.Socket;
 import java.util.List;
 
 public class TCPClient extends Thread {
@@ -14,30 +11,19 @@ public class TCPClient extends Thread {
     private int clientNumber;
     private static List<FileInfo> clientFileInfoList;
 
-    private DataOutputStream outToServer;
-    private BufferedReader inFromServer;
-    private BufferedReader userCommand;
-    private Socket clientSocket;
-
     public TCPClient(int clientNumber) {
-
         this.clientNumber = clientNumber;
-
-        clientSocket = null;
-        outToServer = null;
-        inFromServer = null;
-        userCommand = null;
 
         System.out.println("TCPClient: create client"); // TODO debug log
     }
 
     public void run() {
+        System.out.println("TCPClient - run"); // TODO debug log
+
         TCPClientApp app = new TCPClientApp(this);
         TCPClientConnection connection = new TCPClientConnection(this);
         app.start();
         connection.start();
-
-        System.out.println("TCPClient - run"); // TODO debug log
 
         /*try {
             clientSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
@@ -67,11 +53,6 @@ public class TCPClient extends Thread {
     void perform(String command) {
 
         switch (CommandApp.valueOf(command)) {
-            case CONNECT:
-                checkConnectionMessage(clientNumber, outToServer);
-                reCheckConnectionMessage(inFromServer);
-                break;
-
             case SEND_FILES_LIST:
                 getFileInfoList(clientNumber);
                 sendFileInfoListMessage(clientFileInfoList, outToServer);
@@ -101,9 +82,7 @@ public class TCPClient extends Thread {
                     e.printStackTrace();
                 }
                 break;
-
         }
-
     }
 
     private void getServerFileList(DataOutputStream outToServer) {
@@ -113,19 +92,6 @@ public class TCPClient extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void checkConnectionMessage(int clientNumber, DataOutputStream outToServer) {
-        String sentence = CommandApp.CONNECT + "*" + "Client_" + clientNumber + " request connection with server";
-        try {
-            outToServer.writeBytes(sentence + '\n');
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void reCheckConnectionMessage(BufferedReader inFromServer) {
-
     }
 
     private void getFileInfoList(int clientNumber) {
@@ -145,8 +111,5 @@ public class TCPClient extends Thread {
                     }
                 }
         );
-
-    }
-*/
-
+    }*/
 }

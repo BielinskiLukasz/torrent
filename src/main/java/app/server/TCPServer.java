@@ -14,20 +14,21 @@ import java.util.Set;
 public class TCPServer extends Thread {
 
     private List<FileInfo> fileInfoList;
+    private List<String> fileList;
     private Set<Integer> userList;
 
     public TCPServer() {
         userList = new HashSet<>();
+        fileList = new ArrayList<>();
         fileInfoList = new ArrayList<>();
 
         System.out.println("TCPServer: create server"); // TODO debug log
     }
 
     public void run() {
-        ServerSocket welcomeSocket = null;
-
         System.out.println("TCPServer: run"); // TODO debug log
 
+        ServerSocket welcomeSocket = null;
         try {
             welcomeSocket = new ServerSocket(Config.PORT_NR);
         } catch (IOException e) {
@@ -56,5 +57,9 @@ public class TCPServer extends Thread {
 
     void addClient(int clientNumber) {
         userList.add(clientNumber);
+    }
+
+    Set<Integer> getUserList() {
+        return userList;
     }
 }

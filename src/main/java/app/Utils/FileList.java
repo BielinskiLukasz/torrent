@@ -15,9 +15,7 @@ class FileList {
         for (File listOfFile : listOfFiles) {
             if (listOfFile.isFile()) {
                 directoryFileList.add(listOfFile.getName());
-            } /*else if (listOfFile.isDirectory()) {
-                System.out.println("Directory " + listOfFile.getName());
-            }*/ //Inner dirs are omitted
+            }
         }
         return directoryFileList;
     }
@@ -56,5 +54,4 @@ class FileList {
     static FileInfo unpackFileInfo(String packedFileInfo) {
         return new FileInfo(packedFileInfo);
     }
-
 }

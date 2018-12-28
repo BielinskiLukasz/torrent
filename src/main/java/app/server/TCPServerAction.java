@@ -18,36 +18,24 @@ class TCPServerAction {
         }
 
         String command = ActionUtils.getCommand(clientSentence);
-        String response;
 
         switch (CommandServer.valueOf(command)) {
             case CONNECT:
-                String message = ActionUtils.getMessage(clientSentence);
-                int clientNumber = ActionUtils.getClientNumber(clientSentence);
-                System.out.println(command + " input: " + message); // TODO debug log
-
-                server.addClient(clientNumber);
-
-                response = "Hello client " + clientNumber;
-                System.out.println(command + " output: " + response); // TODO debug log
-
-                try {
-                    outToClient.writeBytes(response + "\n");
-                } catch (IOException e) {
-                    System.out.println("TCPClientAction - write to server " + e);
-                    e.printStackTrace();
-                }
+                connect(server, clientSentence, outToClient);
                 break;
-            default:
-                response = '"' + command + '"' + " command is not supported yet";
-                System.out.println(command + " output: " + response); // TODO debug log
 
-                try {
-                    outToClient.writeBytes(response + "\n");
-                } catch (IOException e) {
-                    System.out.println("TCPClientAction - write to server " + e);
-                    e.printStackTrace();
-                }
+            case FILES_LIST:
+                System.out.println(command + " input: " + "no message"); // TODO debug log
+
+                server.getUserList().forEach(
+                        userNumber -> {
+
+                        }
+                );
+                break;
+
+            default:
+                sendNotSupportedCommandMessage(outToClient, command);
                 break;
         }
 
@@ -103,7 +91,37 @@ class TCPServerAction {
                         }
                 );
             }
-
         }*/
+    }
+
+    private static void connect(TCPServer server, String clientSentence, DataOutputStream outToClient) {
+        String command = ActionUtils.getCommand(clientSentence);
+        String message = ActionUtils.getMessage(clientSentence);
+        int clientNumber = ActionUtils.getClientNumber(clientSentence);
+        System.out.println(command + " input: " + message); // TODO debug log
+
+        server.addClient(clientNumber);
+
+        String response = "Hello client " + clientNumber;
+        System.out.println(command + " output: " + response); // TODO debug log
+
+        try {
+            outToClient.writeBytes(response + "\n");
+        } catch (IOException e) {
+            System.out.println("TCPClientAction - write to server " + e);
+            e.printStackTrace();
+        }
+    }
+
+    private static void sendNotSupportedCommandMessage(DataOutputStream outToClient, String command) {
+        String response = '"' + command + '"' + " command is not supported yet";
+        System.out.println(command + " output: " + response); // TODO debug log
+
+        try {
+            outToClient.writeBytes(response + "\n");
+        } catch (IOException e) {
+            System.out.println("TCPClientAction - write to server " + e);
+            e.printStackTrace();
+        }
     }
 }

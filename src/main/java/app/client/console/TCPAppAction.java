@@ -13,23 +13,24 @@ import java.net.Socket;
 class TCPAppAction {
 
     static void perform(int clientNumber, String userSentence) {
-        Socket connectionSocket;
-        DataOutputStream outToServer = null;
-        BufferedReader inFromServer = null;
-        try {
-            connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
-            outToServer = new DataOutputStream(connectionSocket.getOutputStream());
-            inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-        } catch (IOException e) {
-            System.out.println("TCPAppAction - creating socket, outputStream and inputBufferedReader " + e);
-            e.printStackTrace();
-        }
 
         String command = ActionUtils.getCommand(userSentence);
 
         switch (getCommandApp(command)) {
             case FILES_LIST:
-                System.out.println(command + " output: "); // TODO debug log
+                Socket connectionSocket;
+                DataOutputStream outToServer = null;
+                BufferedReader inFromServer = null;
+                try {
+                    connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
+                    outToServer = new DataOutputStream(connectionSocket.getOutputStream());
+                    inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+                } catch (IOException e) {
+                    System.out.println("TCPAppAction - creating socket, outputStream and inputBufferedReader " + e);
+                    e.printStackTrace();
+                }
+
+                System.out.println(command + " output: " + "no message"); // TODO debug log
                 try {
                     outToServer.writeBytes(CommandServer.FILES_LIST + "\n");
                 } catch (IOException e) {
@@ -46,8 +47,10 @@ class TCPAppAction {
                 }
                 System.out.println(command + " input: " + response); // TODO debug log
                 break;
+
             case EMPTY_COMMAND:
                 break;
+
             case UNSUPPORTED_COMMAND:
             default:
                 System.out.println('"' + command + '"' + " command is not supported"); // TODO debug log
@@ -66,8 +69,10 @@ class TCPAppAction {
             case "files_list":
             case "Files_list":
                 return CommandApp.FILES_LIST;
+
             case "":
                 return CommandApp.EMPTY_COMMAND;
+
             default:
                 return CommandApp.UNSUPPORTED_COMMAND;
         }
