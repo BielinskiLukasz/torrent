@@ -1,4 +1,4 @@
-package app;
+package app.server;
 
 public enum CommandServer {
 

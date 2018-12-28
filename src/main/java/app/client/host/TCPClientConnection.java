@@ -1,4 +1,8 @@
-package app;
+package app.client.host;
+
+import app.Utils.Config;
+import app.client.TCPClient;
+import app.client.console.CommandApp;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,7 +14,7 @@ public class TCPClientConnection extends Thread {
 
     private TCPClient client;
 
-    TCPClientConnection(TCPClient tcpClient) {
+    public TCPClientConnection(TCPClient tcpClient) {
         this.client = tcpClient;
     }
 
@@ -20,7 +24,7 @@ public class TCPClientConnection extends Thread {
         System.out.println("TCPClientConnection: run"); // TODO debug log <-- not visible
 
         try {
-            hostServerSocket = new ServerSocket(Config.PORT_NR + client.clientNumber);
+            hostServerSocket = new ServerSocket(Config.PORT_NR + client.getClientNumber());
             connectWithServer();
         } catch (IOException e) {
             System.out.println("TCPClientConnection - client initiation " + e);
@@ -38,7 +42,7 @@ public class TCPClientConnection extends Thread {
                     inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                     clientSentence = inFromServer.readLine();
 
-                    TCPClientAction.perform(client.clientNumber, connectionSocket, clientSentence);
+                    TCPClientAction.perform(client.getClientNumber(), connectionSocket, clientSentence);
                 }
             } catch (IOException e) {
                 System.out.println("TCPClientConnection - read line from server " + e);
@@ -66,8 +70,8 @@ public class TCPClientConnection extends Thread {
         }
 
         // TODO implement adding user, files on server side !!!
-        String helloMessage = CommandApp.CONNECT + Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.clientNumber;
-        TCPClientAction.perform(client.clientNumber, hostClientSocket, helloMessage);
+        String helloMessage = CommandApp.CONNECT + Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.getClientNumber();
+        TCPClientAction.perform(client.getClientNumber(), hostClientSocket, helloMessage);
 
         try {
             hostClientSocket.close();

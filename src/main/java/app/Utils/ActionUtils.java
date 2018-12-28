@@ -1,18 +1,18 @@
-package app;
+package app.Utils;
 
-class ActionUtils {
+public class ActionUtils {
 
-    static String getCommand(String clientSentence) {
+    public static String getCommand(String clientSentence) {
         String[] sentences = clientSentence.split("\\" + Config.SENTENCE_SPLITS_CHAR);
         return sentences[0];
     }
 
-    static String getMessage(String clientSentence) {
+    public static String getMessage(String clientSentence) {
         String[] sentences = clientSentence.split("\\" + Config.SENTENCE_SPLITS_CHAR);
         return sentences[1];
     }
 
-    static int getClientNumber(String clientSentence) {
+    public static int getClientNumber(String clientSentence) {
         String[] sentences = clientSentence.split("\\" + Config.SENTENCE_SPLITS_CHAR);
         return Integer.parseInt(sentences[2]);
     }

@@ -1,4 +1,8 @@
-package app;
+package app.client;
+
+import app.Utils.FileInfo;
+import app.client.console.TCPClientApp;
+import app.client.host.TCPClientConnection;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -7,7 +11,7 @@ import java.util.List;
 
 public class TCPClient extends Thread {
 
-    int clientNumber;
+    private int clientNumber;
     private static List<FileInfo> clientFileInfoList;
 
     private DataOutputStream outToServer;
@@ -53,6 +57,10 @@ public class TCPClient extends Thread {
 
         perform(sentence);*/
 
+    }
+
+    public int getClientNumber() {
+        return clientNumber;
     }
 /*
 

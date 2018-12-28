@@ -1,4 +1,7 @@
-package app;
+package app.server;
+
+import app.Utils.ActionUtils;
+import app.client.host.CommandClient;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

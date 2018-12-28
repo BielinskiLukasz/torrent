@@ -1,6 +1,6 @@
 package testApp;
 
-import app.TCPServer;
+import app.server.TCPServer;
 
 public class TORrentServer {
 

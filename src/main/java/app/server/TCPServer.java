@@ -1,4 +1,7 @@
-package app;
+package app.server;
+
+import app.Utils.Config;
+import app.Utils.FileInfo;
 
 import java.io.IOException;
 import java.net.ServerSocket;

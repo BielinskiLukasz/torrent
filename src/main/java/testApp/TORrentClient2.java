@@ -1,6 +1,6 @@
 package testApp;
 
-import app.TCPClient;
+import app.client.TCPClient;
 
 public class TORrentClient2 {
 

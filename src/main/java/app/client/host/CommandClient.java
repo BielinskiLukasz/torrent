@@ -1,4 +1,4 @@
-package app;
+package app.client.host;
 
 public enum CommandClient {
 

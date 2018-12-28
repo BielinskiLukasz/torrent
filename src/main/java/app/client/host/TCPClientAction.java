@@ -1,4 +1,8 @@
-package app;
+package app.client.host;
+
+import app.Utils.ActionUtils;
+import app.Utils.Config;
+import app.server.CommandServer;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

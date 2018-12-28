@@ -1,4 +1,4 @@
-package app;
+package app.client.console;
 
 public enum CommandApp {
 

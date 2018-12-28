@@ -1,4 +1,4 @@
-package app;
+package app.client.console;
 
 class TCPClientAppAction {
 

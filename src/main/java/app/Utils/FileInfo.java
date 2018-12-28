@@ -1,4 +1,4 @@
-package app;
+package app.Utils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 
-class FileInfo {
+public class FileInfo {
 
     int clientId;
     String name;
