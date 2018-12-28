@@ -59,15 +59,12 @@ class TCPAppAction {
     }
 
     private static CommandApp getCommandApp(String command) {
-        switch (command) {
+        switch (command.trim().toUpperCase()) {
             case "LIST":
-            case "list":
-            case "List":
+            case "FILES":
             case "FILES_LIST":
-            case "filesList":
-            case "FilesList":
-            case "files_list":
-            case "Files_list":
+            case "FILES LIST":
+            case "FILESLIST":
                 return CommandApp.FILES_LIST;
 
             case "":

@@ -20,6 +20,28 @@ class TCPClientAction {
                 connect(clientNumber, connectionSocket, clientSentence);
                 break;
 
+            case FILES_LIST:
+                DataOutputStream outToServer = null;
+                try {
+                    outToServer = new DataOutputStream(connectionSocket.getOutputStream());
+                } catch (IOException e) {
+                    System.out.println("TCPClientAction - creating outputStream and inputBufferedReader " + e);
+                    e.printStackTrace();
+                }
+                System.out.println(command + " input: " + clientSentence); // TODO debug log
+
+//                String command = ActionUtils.getCommand(clientSentence);
+                String response = "response"; // TODO test
+                try {
+                    outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + response + "\n");
+                } catch (IOException e) {
+                    System.out.println("TCPClientAction - write to server " + e);
+                    e.printStackTrace();
+                }
+                System.out.println(command + " input: " + response); // TODO debug log
+
+                break;
+
             default:
                 System.out.println('"' + command + '"' + " command is not supported yet"); // TODO debug log
                 break;
