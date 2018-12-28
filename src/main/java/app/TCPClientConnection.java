@@ -1,7 +1,6 @@
 package app;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
@@ -51,15 +50,11 @@ public class TCPClientConnection extends Thread {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-//            System.out.println("TCPClientConnection: while..."); // TODO debug log <-- not visible
         }
     }
 
     private void connectWithServer() {
         Socket hostClientSocket = null;
-        DataOutputStream outToServer = null;
-        BufferedReader inFromServer = null;
 
         System.out.println("TCPClientConnection: connectWithServer"); // TODO debug log
 
@@ -71,13 +66,8 @@ public class TCPClientConnection extends Thread {
         }
 
         // TODO implement adding user, files on server side !!!
-        String helloMessage = Command.CONNECT + Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.clientNumber;
-        try {
-            TCPClientAction.perform(client.clientNumber, hostClientSocket, helloMessage);
-        } catch (IOException e) {
-            System.out.println("TCPClientConnection - perform INIT_CONNECTION " + e);
-            e.printStackTrace();
-        }
+        String helloMessage = CommandApp.CONNECT + Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.clientNumber;
+        TCPClientAction.perform(client.clientNumber, hostClientSocket, helloMessage);
 
         try {
             hostClientSocket.close();

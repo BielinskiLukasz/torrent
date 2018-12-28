@@ -1,6 +1,6 @@
 package app;
 
-public enum Command {
+public enum CommandApp {
 
     CONNECT,
     SEND_FILES_LIST,

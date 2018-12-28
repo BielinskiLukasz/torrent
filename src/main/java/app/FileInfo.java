@@ -22,22 +22,24 @@ class FileInfo {
         try {
             data = Files.readAllBytes(filePath);
         } catch (IOException e) {
+            System.out.println("FileInfo - read file bytes " + e);
             e.printStackTrace();
         }
 
         try {
             this.md5 = MD5Sum.md5(data);
         } catch (NoSuchAlgorithmException e) {
+            System.out.println("FileInfo - calculate md5 sum " + e);
             e.printStackTrace();
         }
 
     }
 
     FileInfo(String data) {
-        String[] splitedData = data.split("\\|");
+        String[] splittedData = data.split("\\|");
 
-        this.clientId = Integer.parseInt(splitedData[0]);
-        this.name = splitedData[1];
-        this.md5 = splitedData[2];
+        this.clientId = Integer.parseInt(splittedData[0]);
+        this.name = splittedData[1];
+        this.md5 = splittedData[2];
     }
 }

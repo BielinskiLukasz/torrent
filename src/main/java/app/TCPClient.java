@@ -15,7 +15,6 @@ public class TCPClient extends Thread {
     private BufferedReader inFromServer;
     private BufferedReader userCommand;
     private Socket clientSocket;
-    private String sentence;
 
     public TCPClient(int clientNumber) {
 
@@ -59,7 +58,7 @@ public class TCPClient extends Thread {
 
     void perform(String command) {
 
-        switch (Command.valueOf(command)) {
+        switch (CommandApp.valueOf(command)) {
             case CONNECT:
                 checkConnectionMessage(clientNumber, outToServer);
                 reCheckConnectionMessage(inFromServer);
@@ -100,7 +99,7 @@ public class TCPClient extends Thread {
     }
 
     private void getServerFileList(DataOutputStream outToServer) {
-        String sentence = Command.REQUEST_FILES_LIST.name();
+        String sentence = CommandApp.REQUEST_FILES_LIST.name();
         try {
             outToServer.writeBytes(sentence + '\n');
         } catch (IOException e) {
@@ -109,7 +108,7 @@ public class TCPClient extends Thread {
     }
 
     private void checkConnectionMessage(int clientNumber, DataOutputStream outToServer) {
-        String sentence = Command.CONNECT + "*" + "Client_" + clientNumber + " request connection with server";
+        String sentence = CommandApp.CONNECT + "*" + "Client_" + clientNumber + " request connection with server";
         try {
             outToServer.writeBytes(sentence + '\n');
         } catch (IOException e) {
@@ -130,7 +129,7 @@ public class TCPClient extends Thread {
 
         readyToSendList.forEach(
                 fileData -> {
-                    fileData = Command.SEND_FILES_LIST + "*" + fileData;
+                    fileData = CommandApp.SEND_FILES_LIST + "*" + fileData;
                     try {
                         outToServer.writeBytes(fileData + '\n');
                     } catch (IOException e) {

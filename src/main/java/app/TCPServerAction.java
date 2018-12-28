@@ -10,7 +10,7 @@ class TCPServerAction {
         DataOutputStream outToClient;
 
         String command = ActionUtils.getCommand(clientSentence);
-        System.out.println("Command: " + command);
+        System.out.println("CommandApp: " + command);
 
         try {
             outToClient = new DataOutputStream(connectionSocket.getOutputStream());
@@ -33,11 +33,11 @@ class TCPServerAction {
             String[] sentences = clientSentence.split("\\*");
             String command = sentences[0];
 
-            if (!command.equals(Command.REQUEST_FILES_LIST.name())) {
+            if (!command.equals(CommandApp.REQUEST_FILES_LIST.name())) {
                 clientSentence = sentences[1];
             }
 
-            if (command.equals(Command.CONNECT.name())) {
+            if (command.equals(CommandApp.CONNECT.name())) {
                 clientSentence += " - connected";
 
                 responseClientSentence = clientSentence + '\n';
@@ -48,11 +48,11 @@ class TCPServerAction {
                 }
             }
 
-            if (command.equals(Command.SEND_FILES_LIST.name())) {
+            if (command.equals(CommandApp.SEND_FILES_LIST.name())) {
                 server.fileInfoList.add(FileList.unpackFileInfo(clientSentence));
             }
 
-            if (command.equals(Command.REQUEST_FILES_LIST.name())) {
+            if (command.equals(CommandApp.REQUEST_FILES_LIST.name())) {
                 try {
                     outToClient.writeBytes("" + server.fileInfoList.size() + '\n'); // Send list size
                 } catch (IOException e) {
@@ -63,7 +63,7 @@ class TCPServerAction {
                 DataOutputStream finalOutToClient = outToClient;
                 readyToSendList.forEach(
                         fileData -> {
-                            fileData = Command.REQUEST_FILES_LIST + "*" + fileData;
+                            fileData = CommandApp.REQUEST_FILES_LIST + "*" + fileData;
                             try {
                                 finalOutToClient.writeBytes(fileData + '\n');
                             } catch (IOException e) {
