@@ -2,7 +2,6 @@ package app.client.host;
 
 import app.Utils.Config;
 import app.client.TCPClient;
-import app.client.console.CommandApp;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -69,8 +68,8 @@ public class TCPClientConnection extends Thread {
             e.printStackTrace();
         }
 
-        // TODO implement adding user, files on server side !!!
-        String helloMessage = CommandApp.CONNECT + Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.getClientNumber();
+        String helloMessage = CommandClient.CONNECT + Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " +
+                client.getClientNumber();
         TCPClientAction.perform(client.getClientNumber(), hostClientSocket, helloMessage);
 
         try {

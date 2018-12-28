@@ -25,7 +25,7 @@ public class TCPClientApp extends Thread {
                 inFromUser = new BufferedReader(new InputStreamReader(System.in));
                 userSentence = inFromUser.readLine();
 
-                TCPClientAppAction.perform(client.getClientNumber(), userSentence);
+                TCPAppAction.perform(client.getClientNumber(), userSentence);
             } catch (IOException e) {
                 System.out.println("TCPClientApp - rea and perform user command " + e);
                 e.printStackTrace();
