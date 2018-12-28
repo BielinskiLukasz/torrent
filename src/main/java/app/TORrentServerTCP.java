@@ -1,14 +1,11 @@
-package testApp;
+package app;
 
 import app.server.TCPServer;
 
-public class TORrentServer {
+public class TORrentServerTCP {
 
     public static void main(String[] args) {
-
         TCPServer server = new TCPServer();
         server.start();
-
     }
-
 }

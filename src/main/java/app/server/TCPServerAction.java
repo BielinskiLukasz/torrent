@@ -25,15 +25,20 @@ class TCPServerAction {
                 server.getUserList().forEach(
                         userNumber -> {
                             Socket userSocket = null;
-                            DataOutputStream outToClient = null;
-                            BufferedReader inFromClient = null;
                             try {
                                 userSocket = new Socket(Config.HOST_IP, Config.PORT_NR + userNumber);
-                                outToClient = new DataOutputStream(userSocket.getOutputStream());
-                                inFromClient = new BufferedReader(new InputStreamReader(userSocket.getInputStream()));
                             } catch (IOException e) {
                                 System.out.println(
-                                        "TCPServerAction - creating socket, outputStream and inputBufferedReader " + e);
+                                        "TCPServerAction - creating socket " + e);
+                                e.printStackTrace();
+                            }
+
+                            DataOutputStream outToClient = null;
+                            try {
+                                outToClient = new DataOutputStream(userSocket.getOutputStream());
+                            } catch (IOException e) {
+                                System.out.println(
+                                        "TCPServerAction - creating dataOutputStream " + e);
                                 e.printStackTrace();
                             }
 
@@ -42,6 +47,15 @@ class TCPServerAction {
                                 outToClient.writeBytes(command + "\n");
                             } catch (IOException e) {
                                 System.out.println("TCPServerAction - write to client " + e);
+                                e.printStackTrace();
+                            }
+
+                            BufferedReader inFromClient = null;
+                            try {
+                                inFromClient = new BufferedReader(new InputStreamReader(userSocket.getInputStream()));
+                            } catch (IOException e) {
+                                System.out.println(
+                                        "TCPServerAction - creating inputBufferedReader " + e);
                                 e.printStackTrace();
                             }
 
