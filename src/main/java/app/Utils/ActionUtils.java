@@ -14,6 +14,10 @@ public class ActionUtils {
         return Integer.parseInt(splitSentence(clientSentence)[2]);
     }
 
+    public static int getListSize(String response) {
+        return Integer.parseInt(splitSentence(response)[1]);
+    }
+
     private static String[] splitSentence(String clientSentence) {
         return clientSentence.split("\\" + Config.SENTENCE_SPLITS_CHAR);
     }

@@ -62,4 +62,8 @@ public class TCPServer extends Thread {
     Set<Integer> getUserList() {
         return userList;
     }
+
+    void setFileList(List<String> fileList) {
+        this.fileList = fileList;
+    }
 }

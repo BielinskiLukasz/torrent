@@ -18,7 +18,7 @@ public class TCPClientConnection extends Thread {
     }
 
     public void run() {
-        System.out.println("TCPClientConnection: run"); // TODO debug log <-- not visible
+        System.out.println("TCPClientConnection: run"); // TODO debug log
 
         ServerSocket hostServerSocket = null;
         try {

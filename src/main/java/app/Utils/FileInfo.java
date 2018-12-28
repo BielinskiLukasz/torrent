@@ -32,7 +32,6 @@ public class FileInfo {
             System.out.println("FileInfo - calculate md5 sum " + e);
             e.printStackTrace();
         }
-
     }
 
     FileInfo(String data) {

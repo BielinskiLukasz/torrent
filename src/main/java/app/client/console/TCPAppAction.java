@@ -13,9 +13,9 @@ class TCPAppAction {
 
     static void perform(int clientNumber, String userSentence) {
 
-        String command = ActionUtils.getCommand(userSentence);
+        String command = getCommandAppName(ActionUtils.getCommand(userSentence));
 
-        switch (getCommandApp(command)) {
+        switch (CommandApp.valueOf(command)) {
             case FILES_LIST:
                 Socket connectionSocket = null;
                 try {
@@ -57,6 +57,19 @@ class TCPAppAction {
                     e.printStackTrace();
                 }
                 System.out.println(command + " input: " + response); // TODO debug log
+
+                int serverFileListSize = ActionUtils.getListSize(response);
+                for (int i = 0; i < serverFileListSize; i++) {
+                    try {
+                        System.out.println(
+                                inFromServer.readLine().replaceAll("\\|", " ")
+                        );
+                    } catch (IOException e) {
+                        System.out.println("TCPServerAction - read from client (specific clientFile) " + e);
+                        e.printStackTrace();
+                    }
+                }
+
                 break;
 
             case CLOSE:
@@ -68,12 +81,12 @@ class TCPAppAction {
 
             case UNSUPPORTED_COMMAND:
             default:
-                System.out.println('"' + command + '"' + " command is not supported"); // TODO debug log
+                System.out.println("command is not supported"); // TODO debug log
                 break;
         }
     }
 
-    private static CommandApp getCommandApp(String command) {
+    private static String getCommandAppName(String command) {
         switch (command.trim().toUpperCase()) {
             case "LIST":
             case "FILES":
@@ -83,18 +96,18 @@ class TCPAppAction {
             case "FILE_LIST":
             case "FILE LIST":
             case "FILELIST":
-                return CommandApp.FILES_LIST;
+                return CommandApp.FILES_LIST.name();
 
             case "CLOSE":
             case "EXIT":
             case "QUIT":
-                return CommandApp.CLOSE;
+                return CommandApp.CLOSE.name();
 
             case "":
-                return CommandApp.EMPTY_COMMAND;
+                return CommandApp.EMPTY_COMMAND.name();
 
             default:
-                return CommandApp.UNSUPPORTED_COMMAND;
+                return CommandApp.UNSUPPORTED_COMMAND.name();
         }
     }
 }

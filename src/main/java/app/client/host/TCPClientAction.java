@@ -2,12 +2,14 @@ package app.client.host;
 
 import app.Utils.ActionUtils;
 import app.Utils.Config;
+import app.Utils.FileList;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.List;
 
 class TCPClientAction {
 
@@ -30,15 +32,33 @@ class TCPClientAction {
                 }
                 System.out.println(command + " input: " + clientSentence); // TODO debug log
 
+                // TODO implement getting file list
+                List<String> clientFileList = FileList.packFileInfoList(
+                        FileList.getFileInfoList(clientNumber)
+                );
+
 //                String command = ActionUtils.getCommand(clientSentence);
-                String response = "response"; // TODO test
+                String response = String.valueOf(clientFileList.size()); // TODO rename string - size of list ???
                 try {
                     outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + response + "\n");
                 } catch (IOException e) {
-                    System.out.println("TCPClientAction - write to server " + e);
+                    System.out.println("TCPClientAction - write to server (clientFileList size) " + e);
                     e.printStackTrace();
                 }
                 System.out.println(command + " input: " + response); // TODO debug log
+
+                DataOutputStream finalOutToServer = outToServer;
+                clientFileList.forEach(
+                        fileData -> {
+                            try {
+                                finalOutToServer.writeBytes(fileData + "\n");
+                            } catch (IOException e) {
+                                System.out.println("TCPClientAction - write to server (specific clientFile)" + e);
+                                e.printStackTrace();
+                            }
+                            System.out.println(command + " input: " + fileData); // TODO debug log
+                        }
+                );
 
                 break;
 
@@ -84,5 +104,7 @@ class TCPClientAction {
             e.printStackTrace();
         }
         System.out.println(command + " input: " + response); // TODO debug log
+
+        System.out.println("Client " + clientNumber + " has connected to the server");
     }
 }

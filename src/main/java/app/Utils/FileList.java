@@ -4,14 +4,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-class FileList {
+public class FileList {
 
     private static List<String> getFileList(String directoryPath) {
         List<String> directoryFileList = new ArrayList<>();
         File folder = new File(directoryPath);
         File[] listOfFiles = folder.listFiles();
 
-        assert listOfFiles != null;
         for (File listOfFile : listOfFiles) {
             if (listOfFile.isFile()) {
                 directoryFileList.add(listOfFile.getName());
@@ -20,7 +19,7 @@ class FileList {
         return directoryFileList;
     }
 
-    static List<FileInfo> getFileInfoList(int clientNumber) {
+    public static List<FileInfo> getFileInfoList(int clientNumber) {
         List<String> clientFileNameList = getFileList(Config.BASIC_PATH + clientNumber);
 
         List<FileInfo> clientFileInfoList = new ArrayList<>();
@@ -31,7 +30,7 @@ class FileList {
         return clientFileInfoList;
     }
 
-    static List<String> packFileInfoList(List<FileInfo> clientFileInfoList) {
+    public static List<String> packFileInfoList(List<FileInfo> clientFileInfoList) {
         List<String> readyToSendList = new ArrayList<>();
 
         clientFileInfoList.forEach(
@@ -41,7 +40,7 @@ class FileList {
         return readyToSendList;
     }
 
-    static List<FileInfo> unpackFileInfoList(List<String> packedList) {
+    /*static List<FileInfo> unpackFileInfoList(List<String> packedList) {
         List<FileInfo> unpackList = new ArrayList<>();
 
         packedList.forEach(
@@ -49,7 +48,7 @@ class FileList {
         );
 
         return unpackList;
-    }
+    }*/
 
     static FileInfo unpackFileInfo(String packedFileInfo) {
         return new FileInfo(packedFileInfo);

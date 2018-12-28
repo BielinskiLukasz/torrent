@@ -8,10 +8,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 class TCPServerAction {
 
-    static void perform(TCPServer server, Socket connectionSocket, String clientSentence) { // TODO refactor method
+    static void perform(TCPServer server, Socket connectionSocket, String clientSentence) {
         String command = ActionUtils.getCommand(clientSentence);
 
         switch (CommandServer.valueOf(command)) {
@@ -21,6 +23,8 @@ class TCPServerAction {
 
             case FILES_LIST:
                 System.out.println(command + " input: " + "no message"); // TODO debug log
+
+                List<String> serverFileList = new ArrayList<>();
 
                 server.getUserList().forEach(
                         userNumber -> {
@@ -63,12 +67,23 @@ class TCPServerAction {
                             try {
                                 response = inFromClient.readLine();
                             } catch (IOException e) {
-                                System.out.println("TCPServerAction - read from client " + e);
+                                System.out.println("TCPServerAction - read from client (clientFileList size) " + e);
                                 e.printStackTrace();
                             }
                             System.out.println(command + " input: " + response); // TODO debug log
 
                             // TODO implement action adding files to fileList
+                            int clientFileListSize = ActionUtils.getListSize(response);
+                            for (int i = 0; i < clientFileListSize; i++) {
+                                try {
+                                    serverFileList.add(
+                                            inFromClient.readLine()
+                                    );
+                                } catch (IOException e) {
+                                    System.out.println("TCPServerAction - read from client (specific clientFile) " + e);
+                                    e.printStackTrace();
+                                }
+                            }
 
                             try {
                                 userSocket.close();
@@ -77,6 +92,8 @@ class TCPServerAction {
                             }
                         }
                 );
+
+                server.setFileList(serverFileList);
 
                 // TODO implement sending fileList to client (who asks)
                 DataOutputStream outToClient = null;
@@ -87,15 +104,27 @@ class TCPServerAction {
                     e.printStackTrace();
                 }
 
-                String response = "test response from server (filelist)"; // TODO test
+                String response = String.valueOf(serverFileList.size()); // TODO rename string - size of list ???
                 System.out.println(command + " output: " + response); // TODO debug log
-
                 try {
-                    outToClient.writeBytes(response + "\n");
+                    outToClient.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + response + "\n");
                 } catch (IOException e) {
                     System.out.println("TCPClientAction - write to server " + e);
                     e.printStackTrace();
                 }
+
+                DataOutputStream finalOutToServer = outToClient;
+                serverFileList.forEach(
+                        fileData -> {
+                            try {
+                                finalOutToServer.writeBytes(fileData + "\n");
+                            } catch (IOException e) {
+                                System.out.println("TCPClientAction - write to server (specific clientFile)" + e);
+                                e.printStackTrace();
+                            }
+                            System.out.println(command + " input: " + fileData); // TODO debug log
+                        }
+                );
 
                 break;
 
@@ -184,6 +213,8 @@ class TCPServerAction {
             System.out.println("TCPClientAction - write to server " + e);
             e.printStackTrace();
         }
+
+        System.out.println("Connection to client " + clientNumber + " was detected");
     }
 
     private static void sendNotSupportedCommandMessage(Socket connectionSocket, String command) {
