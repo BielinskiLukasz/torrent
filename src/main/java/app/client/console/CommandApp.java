@@ -9,5 +9,6 @@ public enum CommandApp {
     REPUSH,
     MANY_PULL,
     CLOSE,
+    EMPTY_COMMAND,
     UNSUPPORTED_COMMAND
 }

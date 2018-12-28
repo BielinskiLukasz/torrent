@@ -13,7 +13,7 @@ import java.net.Socket;
 class TCPAppAction {
 
     static void perform(int clientNumber, String userSentence) {
-        Socket connectionSocket = null;
+        Socket connectionSocket;
         DataOutputStream outToServer = null;
         BufferedReader inFromServer = null;
         try {
@@ -46,8 +46,11 @@ class TCPAppAction {
                 }
                 System.out.println(command + " input: " + response); // TODO debug log
                 break;
+            case EMPTY_COMMAND:
+                break;
+            case UNSUPPORTED_COMMAND:
             default:
-                System.out.println(command + " this command is not supported"); // TODO debug log
+                System.out.println('"' + command + '"' + " command is not supported"); // TODO debug log
                 break;
         }
     }
@@ -63,6 +66,8 @@ class TCPAppAction {
             case "files_list":
             case "Files_list":
                 return CommandApp.FILES_LIST;
+            case "":
+                return CommandApp.EMPTY_COMMAND;
             default:
                 return CommandApp.UNSUPPORTED_COMMAND;
         }

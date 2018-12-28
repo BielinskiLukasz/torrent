@@ -46,7 +46,7 @@ class TCPClientAction {
                 System.out.println(command + " input: " + response); // TODO debug log
                 break;
             default:
-                System.out.println(command + " this command is not supported"); // TODO debug log
+                System.out.println('"' + command + '"' + " command is not supported yet"); // TODO debug log
                 break;
         }
     }

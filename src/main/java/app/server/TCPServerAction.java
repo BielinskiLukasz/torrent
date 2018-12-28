@@ -39,7 +39,7 @@ class TCPServerAction {
                 }
                 break;
             default:
-                response = " this command is not supported ";
+                response = '"' + command + '"' + " command is not supported yet";
                 System.out.println(command + " output: " + response); // TODO debug log
 
                 try {
