@@ -42,7 +42,7 @@ public class TCPClientConnection extends Thread {
                     TCPClientAction.perform(client.clientNumber, connectionSocket, clientSentence);
                 }
             } catch (IOException e) {
-                System.out.println("TCPClientConnection - read line " + e);
+                System.out.println("TCPClientConnection - read line from server " + e);
                 e.printStackTrace();
             }
 
@@ -65,26 +65,19 @@ public class TCPClientConnection extends Thread {
 
         try {
             hostClientSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
-            outToServer = new DataOutputStream(hostClientSocket.getOutputStream());
-            inFromServer = new BufferedReader(new InputStreamReader(hostClientSocket.getInputStream()));
-
         } catch (IOException e) {
-            System.out.println("TCPClientConnection - connect with server " + e);
+            System.out.println("TCPClientConnection - creating a socket to initiate the connection " + e);
             e.printStackTrace();
         }
 
-        // TODO implement adding user, files on server side
+        // TODO implement adding user, files on server side !!!
+        String helloMessage = Command.CONNECT + Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.clientNumber;
         try {
-            String helloMessage = Command.CONNECT + Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.clientNumber;
-            System.out.println("Message: " + helloMessage); // TODO debug log
-//            System.out.println(hostClientSocket != null ? hostClientSocket.toString() : null); // TODO debug log
-            outToServer.writeBytes(helloMessage + "\n");
-            String helloResponse = inFromServer.readLine();
-            System.out.println("Response: " + helloResponse); // TODO debug log
+            TCPClientAction.perform(client.clientNumber, hostClientSocket, helloMessage);
         } catch (IOException e) {
-            System.out.println("TCPClientConnection - connect command " + e);
+            System.out.println("TCPClientConnection - perform INIT_CONNECTION " + e);
             e.printStackTrace();
-        } // TODO move it to TCPClientConnectionAction
+        }
 
         try {
             hostClientSocket.close();

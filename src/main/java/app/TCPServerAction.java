@@ -9,7 +9,7 @@ class TCPServerAction {
     static void perform(TCPServer server, Socket connectionSocket, String clientSentence) { // TODO refactor method
         DataOutputStream outToClient;
 
-        String command = getCommand(clientSentence);
+        String command = ActionUtils.getCommand(clientSentence);
         System.out.println("Command: " + command);
 
         try {
@@ -75,10 +75,4 @@ class TCPServerAction {
 
         }*/
     }
-
-    private static String getCommand(String clientSentence) {
-        String[] sentences = clientSentence.split("\\" + Config.SENTENCE_SPLITS_CHAR);
-        return sentences[0];
-    }
-
 }
