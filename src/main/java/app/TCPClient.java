@@ -31,11 +31,11 @@ public class TCPClient extends Thread {
 
     public void run() {
         TCPClientApp app = new TCPClientApp(this);
-        TCPClientConnection connection = new TCPClientConnection(this, app);
+        TCPClientConnection connection = new TCPClientConnection(this);
         app.start();
         connection.start();
 
-        System.out.println("TCPClient - run all"); // TODO debug log <-- not visible
+//        System.out.println("TCPClient - run all"); // TODO debug log <-- not visible
 
         /*try {
             clientSocket = new Socket(Config.HOST_IP, Config.PORT_NR);

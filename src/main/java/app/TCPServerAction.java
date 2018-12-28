@@ -10,10 +10,11 @@ class TCPServerAction {
         DataOutputStream outToClient;
 
         String command = getCommand(clientSentence);
+        System.out.println("Command: " + command);
 
         try {
             outToClient = new DataOutputStream(connectionSocket.getOutputStream());
-            outToClient.writeBytes(command);
+            outToClient.writeBytes(command + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,7 +77,7 @@ class TCPServerAction {
     }
 
     private static String getCommand(String clientSentence) {
-        String[] sentences = clientSentence.split(Config.SENTENCE_SPLITS_CHAR);
+        String[] sentences = clientSentence.split("\\" + Config.SENTENCE_SPLITS_CHAR);
         return sentences[0];
     }
 

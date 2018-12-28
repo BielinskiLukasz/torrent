@@ -10,11 +10,9 @@ import java.net.Socket;
 public class TCPClientConnection extends Thread {
 
     private TCPClient client;
-    private TCPClientApp app;
 
-    TCPClientConnection(TCPClient tcpClient, TCPClientApp tcpClientApp) {
+    TCPClientConnection(TCPClient tcpClient) {
         this.client = tcpClient;
-        this.app = tcpClientApp;
     }
 
     public void run() {
@@ -54,7 +52,7 @@ public class TCPClientConnection extends Thread {
                 e.printStackTrace();
             }
 
-            System.out.println("TCPClientConnection: while..."); // TODO debug log <-- not visible
+//            System.out.println("TCPClientConnection: while..."); // TODO debug log <-- not visible
         }
     }
 
@@ -62,6 +60,8 @@ public class TCPClientConnection extends Thread {
         Socket hostClientSocket = null;
         DataOutputStream outToServer = null;
         BufferedReader inFromServer = null;
+
+        System.out.println("TCPClientConnection: connectWithServer"); // TODO debug log
 
         try {
             hostClientSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
@@ -74,11 +74,13 @@ public class TCPClientConnection extends Thread {
         }
 
         // TODO implement adding user, files on server side
-        String helloMessage = Command.CONNECT + Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.clientNumber;
         try {
-            outToServer.writeBytes(helloMessage);
+            String helloMessage = Command.CONNECT + Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.clientNumber;
+            System.out.println("Message: " + helloMessage); // TODO debug log
+//            System.out.println(hostClientSocket != null ? hostClientSocket.toString() : null); // TODO debug log
+            outToServer.writeBytes(helloMessage + "\n");
             String helloResponse = inFromServer.readLine();
-            app.message = helloMessage;
+            System.out.println("Response: " + helloResponse); // TODO debug log
         } catch (IOException e) {
             System.out.println("TCPClientConnection - connect command " + e);
             e.printStackTrace();
