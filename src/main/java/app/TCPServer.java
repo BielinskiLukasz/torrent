@@ -11,7 +11,7 @@ import java.util.Set;
 public class TCPServer extends Thread {
 
     private List<FileInfo> fileInfoList;
-    private Set<String> userList;
+    private Set<Integer> userList;
 
     public TCPServer() {
         userList = new HashSet<>();
@@ -49,5 +49,9 @@ public class TCPServer extends Thread {
                 e.printStackTrace();
             }
         }
+    }
+
+    void addClient(int clientNumber) {
+        userList.add(clientNumber);
     }
 }

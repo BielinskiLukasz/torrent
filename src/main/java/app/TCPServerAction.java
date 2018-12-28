@@ -23,8 +23,7 @@ class TCPServerAction {
                 int clientNumber = ActionUtils.getClientNumber(clientSentence);
                 System.out.println(command + " input: " + message); // TODO debug log
 
-                // TODO implement
-                System.out.println("Some connection actions");
+                server.addClient(clientNumber);
 
                 String response = "Hello client " + clientNumber;
                 System.out.println(command + " output: " + response); // TODO debug log
