@@ -1,7 +1,6 @@
 package app.server;
 
 import app.Utils.ActionUtils;
-import app.client.host.CommandClient;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -19,8 +18,9 @@ class TCPServerAction {
         }
 
         String command = ActionUtils.getCommand(clientSentence);
+        String response;
 
-        switch (CommandClient.valueOf(command)) {
+        switch (CommandServer.valueOf(command)) {
             case CONNECT:
                 String message = ActionUtils.getMessage(clientSentence);
                 int clientNumber = ActionUtils.getClientNumber(clientSentence);
@@ -28,7 +28,7 @@ class TCPServerAction {
 
                 server.addClient(clientNumber);
 
-                String response = "Hello client " + clientNumber;
+                response = "Hello client " + clientNumber;
                 System.out.println(command + " output: " + response); // TODO debug log
 
                 try {
@@ -39,6 +39,15 @@ class TCPServerAction {
                 }
                 break;
             default:
+                response = " this command is not supported ";
+                System.out.println(command + " output: " + response); // TODO debug log
+
+                try {
+                    outToClient.writeBytes(response + "\n");
+                } catch (IOException e) {
+                    System.out.println("TCPClientAction - write to server " + e);
+                    e.printStackTrace();
+                }
                 break;
         }
 

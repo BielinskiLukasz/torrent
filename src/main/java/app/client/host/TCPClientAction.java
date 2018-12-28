@@ -2,7 +2,6 @@ package app.client.host;
 
 import app.Utils.ActionUtils;
 import app.Utils.Config;
-import app.server.CommandServer;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -30,7 +29,7 @@ class TCPClientAction {
                 String message = ActionUtils.getMessage(clientSentence);
                 System.out.println(command + " output: " + message); // TODO debug log
                 try {
-                    outToServer.writeBytes(CommandServer.CONNECT + Config.SENTENCE_SPLITS_CHAR + message +
+                    outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + message +
                             Config.SENTENCE_SPLITS_CHAR + clientNumber + "\n");
                 } catch (IOException e) {
                     System.out.println("TCPClientAction - write to server " + e);
@@ -47,6 +46,7 @@ class TCPClientAction {
                 System.out.println(command + " input: " + response); // TODO debug log
                 break;
             default:
+                System.out.println(command + " this command is not supported"); // TODO debug log
                 break;
         }
     }

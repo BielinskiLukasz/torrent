@@ -2,6 +2,6 @@ package app.server;
 
 public enum CommandServer {
 
-    CONNECT
-
+    CONNECT,
+    FILES_LIST,
 }
