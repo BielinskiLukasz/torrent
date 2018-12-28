@@ -7,20 +7,40 @@ import java.net.Socket;
 class TCPServerAction {
 
     static void perform(TCPServer server, Socket connectionSocket, String clientSentence) { // TODO refactor method
-        DataOutputStream outToClient;
-
-        String command = ActionUtils.getCommand(clientSentence);
-        System.out.println("CommandApp: " + command);
-
+        DataOutputStream outToClient = null;
         try {
             outToClient = new DataOutputStream(connectionSocket.getOutputStream());
-            outToClient.writeBytes(command + "\n");
         } catch (IOException e) {
+            System.out.println("TCPServerAction - creating outputStream " + e);
             e.printStackTrace();
         }
 
+        String command = ActionUtils.getCommand(clientSentence);
+
+        switch (CommandClient.valueOf(command)) {
+            case CONNECT:
+                String message = ActionUtils.getMessage(clientSentence);
+                int clientNumber = ActionUtils.getClientNumber(clientSentence);
+                System.out.println(command + " input: " + message); // TODO debug log
+
+                // TODO implement
+                System.out.println("Some connection actions");
+
+                String response = "Hello client " + clientNumber;
+                System.out.println(command + " output: " + response); // TODO debug log
+
+                try {
+                    outToClient.writeBytes(response + "\n");
+                } catch (IOException e) {
+                    System.out.println("TCPClientAction - write to server " + e);
+                    e.printStackTrace();
+                }
+                break;
+            default:
+                break;
+        }
+
         /*String responseClientSentence;
-        System.out.println(clientSentence); // TODO test clientSentence
 
         DataOutputStream outToClient = null;
         try {

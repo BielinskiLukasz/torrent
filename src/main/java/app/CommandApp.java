@@ -3,8 +3,7 @@ package app;
 public enum CommandApp {
 
     CONNECT,
-    SEND_FILES_LIST,
-    REQUEST_FILES_LIST,
+    FILES_LIST,
     PULL,
     PUSH,
     REPULL,

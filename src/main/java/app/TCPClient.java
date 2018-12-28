@@ -2,7 +2,6 @@ package app;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class TCPClient extends Thread {
         app.start();
         connection.start();
 
-//        System.out.println("TCPClient - run all"); // TODO debug log <-- not visible
+        System.out.println("TCPClient - run"); // TODO debug log
 
         /*try {
             clientSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
@@ -55,6 +54,7 @@ public class TCPClient extends Thread {
         perform(sentence);*/
 
     }
+/*
 
     void perform(String command) {
 
@@ -139,5 +139,6 @@ public class TCPClient extends Thread {
         );
 
     }
+*/
 
 }

@@ -24,23 +24,23 @@ class TCPClientAction {
         switch (CommandClient.valueOf(command)) {
             case CONNECT:
                 String message = ActionUtils.getMessage(clientSentence);
-                System.out.println(command + " message: " + message); // TODO debug log
-//                System.out.println(connectionSocket.toString()); // TODO debug log
+                System.out.println(command + " output: " + message); // TODO debug log
                 try {
-                    outToServer.writeBytes(CommandServer.CONNECT + Config.SENTENCE_SPLITS_CHAR + message + "\n");
+                    outToServer.writeBytes(CommandServer.CONNECT + Config.SENTENCE_SPLITS_CHAR + message +
+                            Config.SENTENCE_SPLITS_CHAR + clientNumber + "\n");
                 } catch (IOException e) {
                     System.out.println("TCPClientAction - write to server " + e);
                     e.printStackTrace();
                 }
 
-                String helloResponse = null;
+                String response = null;
                 try {
-                    helloResponse = inFromServer.readLine();
+                    response = inFromServer.readLine();
                 } catch (IOException e) {
                     System.out.println("TCPClientAction - read from server " + e);
                     e.printStackTrace();
                 }
-                System.out.println(command + " response: " + helloResponse); // TODO debug log
+                System.out.println(command + " input: " + response); // TODO debug log
                 break;
             default:
                 break;

@@ -4,15 +4,17 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class TCPServer extends Thread {
 
     private List<FileInfo> fileInfoList;
-    private List<String> userList;
+    private Set<String> userList;
 
     public TCPServer() {
-        userList = new ArrayList<>();
+        userList = new HashSet<>();
         fileInfoList = new ArrayList<>();
 
         System.out.println("TCPServer: create server"); // TODO debug log
