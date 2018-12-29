@@ -1,8 +1,9 @@
-package app.client.host;
+package app.client.host.multihost;
 
 import app.Utils.ActionUtils;
 import app.Utils.FileList;
 import app.Utils.Logger;
+import app.client.host.CommandClient;
 import app.config.Config;
 
 import java.io.BufferedReader;
@@ -12,7 +13,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.List;
 
-public class TCPClientAction {
+public class TCPClientActionMH {
 
     public static void perform(int clientNumber, Socket connectionSocket, String clientSentence) {
 
@@ -38,7 +39,7 @@ public class TCPClientAction {
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPClientAction - creating dataOutputStream " + e);
+            System.out.println("TCPClientActionMH - creating dataOutputStream " + e);
             e.printStackTrace();
         }
 
@@ -49,7 +50,7 @@ public class TCPClientAction {
             outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + clientNumber +
                     Config.SENTENCE_SPLITS_CHAR + message + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientAction - write to server " + e);
+            System.out.println("TCPClientActionMH - write to server " + e);
             e.printStackTrace();
         }
 
@@ -57,7 +58,7 @@ public class TCPClientAction {
         try {
             inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
-            System.out.println("TCPClientAction - creating inputBufferedReader " + e);
+            System.out.println("TCPClientActionMH - creating inputBufferedReader " + e);
             e.printStackTrace();
         }
 
@@ -65,7 +66,7 @@ public class TCPClientAction {
         try {
             response = inFromServer.readLine();
         } catch (IOException e) {
-            System.out.println("TCPClientAction - read from server " + e);
+            System.out.println("TCPClientActionMH - read from server " + e);
             e.printStackTrace();
         }
         Logger.clientDebugLog(command + " input: " + response);
@@ -81,7 +82,7 @@ public class TCPClientAction {
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPClientAction - creating dataOutputStream " + e);
+            System.out.println("TCPClientActionMH - creating dataOutputStream " + e);
             e.printStackTrace();
         }
         Logger.clientDebugLog(command + " input: " + clientSentence);
@@ -94,7 +95,7 @@ public class TCPClientAction {
         try {
             outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + response + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientAction - write to server (clientFileList size) " + e);
+            System.out.println("TCPClientActionMH - write to server (clientFileList size) " + e);
             e.printStackTrace();
         }
         Logger.clientDebugLog(command + " input: " + response);
@@ -105,7 +106,7 @@ public class TCPClientAction {
                     try {
                         finalOutToServer.writeBytes(fileData + "\n");
                     } catch (IOException e) {
-                        System.out.println("TCPClientAction - write to server (specific clientFile)" + e);
+                        System.out.println("TCPClientActionMH - write to server (specific clientFile)" + e);
                         e.printStackTrace();
                     }
                     Logger.clientDebugLog(command + " input: " + fileData);

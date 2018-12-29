@@ -2,7 +2,6 @@ package app.client.host.multihost;
 
 import app.Utils.Logger;
 import app.client.host.CommandClient;
-import app.client.host.TCPClientAction;
 import app.config.Config;
 
 import java.io.BufferedReader;
@@ -42,7 +41,7 @@ public class TCPClientConnectionMH extends Thread {
                     inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                     clientSentence = inFromServer.readLine();
 
-                    TCPClientAction.perform(client.getClientNumber(), connectionSocket, clientSentence);
+                    TCPClientActionMH.perform(client.getClientNumber(), connectionSocket, clientSentence);
                 }
             } catch (IOException e) {
                 System.out.println("TCPClientConnectionMH - read line from server " + e);
@@ -70,7 +69,7 @@ public class TCPClientConnectionMH extends Thread {
 
         String helloMessage = CommandClient.CONNECT + Config.SENTENCE_SPLITS_CHAR + client.getClientNumber() +
                 Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.getClientNumber();
-        TCPClientAction.perform(client.getClientNumber(), hostClientSocket, helloMessage);
+        TCPClientActionMH.perform(client.getClientNumber(), hostClientSocket, helloMessage);
 
         try {
             hostClientSocket.close();

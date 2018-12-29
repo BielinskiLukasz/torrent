@@ -10,11 +10,11 @@ public class TCPClientH2H extends Thread {
     public TCPClientH2H(int clientNumber) {
         this.clientNumber = clientNumber;
 
-        Logger.clientDebugLog("TCPClientMH: create client");
+        Logger.clientDebugLog("TCPClientH2H: create client");
     }
 
     public void run() {
-        Logger.clientDebugLog("TCPClientMH - run");
+        Logger.clientDebugLog("TCPClientH2H - run");
 
         TCPClientAppH2H app = new TCPClientAppH2H(this);
         TCPClientConnectionH2H connection = new TCPClientConnectionH2H(this);

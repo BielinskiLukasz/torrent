@@ -57,7 +57,7 @@ class TCPServerAction {
         try {
             outToClient.writeBytes(response + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientAction - write to server " + e);
+            System.out.println("TCPClientActionMH - write to server " + e);
             e.printStackTrace();
         }
 
@@ -154,7 +154,7 @@ class TCPServerAction {
         try {
             outToClient.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + response + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientAction - write to server " + e);
+            System.out.println("TCPClientActionMH - write to server " + e);
             e.printStackTrace();
         }
 
@@ -164,7 +164,7 @@ class TCPServerAction {
                     try {
                         finalOutToServer.writeBytes(fileData + "\n");
                     } catch (IOException e) {
-                        System.out.println("TCPClientAction - write to server (specific clientFile)" + e);
+                        System.out.println("TCPClientActionMH - write to server (specific clientFile)" + e);
                         e.printStackTrace();
                     }
                     Logger.serverDebugLog(command + " input: " + fileData);
@@ -196,7 +196,7 @@ class TCPServerAction {
         try {
             outToClient.writeBytes(response + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientAction - write to server " + e);
+            System.out.println("TCPClientActionMH - write to server " + e);
             e.printStackTrace();
         }
 
@@ -220,7 +220,7 @@ class TCPServerAction {
         try {
             outToClient.writeBytes(response + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientAction - write to server " + e);
+            System.out.println("TCPClientActionMH - write to server " + e);
             e.printStackTrace();
         }
 

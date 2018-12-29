@@ -1,7 +1,8 @@
-package app.client.console;
+package app.client.console.multihost;
 
 import app.Utils.ActionUtils;
 import app.Utils.Logger;
+import app.client.console.CommandApp;
 import app.config.Config;
 
 import java.io.BufferedReader;
@@ -10,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-public class TCPAppAction {
+public class TCPAppActionMH {
 
     public static void perform(int clientNumber, String userSentence) {
         String command = getCommandAppName(ActionUtils.getCommand(userSentence));
@@ -47,7 +48,7 @@ public class TCPAppAction {
         try {
             connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
         } catch (IOException e) {
-            System.out.println("TCPAppAction - creating socket " + e);
+            System.out.println("TCPAppActionMH - creating socket " + e);
             e.printStackTrace();
         }
 
@@ -55,7 +56,7 @@ public class TCPAppAction {
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPAppAction - creating dataOutputStream " + e);
+            System.out.println("TCPAppActionMH - creating dataOutputStream " + e);
             e.printStackTrace();
         }
 
@@ -63,7 +64,7 @@ public class TCPAppAction {
         try {
             outToServer.writeBytes(command + "\n");
         } catch (IOException e) {
-            System.out.println("TCPAppAction - write to server " + e);
+            System.out.println("TCPAppActionMH - write to server " + e);
             e.printStackTrace();
         }
 
@@ -71,7 +72,7 @@ public class TCPAppAction {
         try {
             inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
-            System.out.println("TCPAppAction - creating inputBufferedReader " + e);
+            System.out.println("TCPAppActionMH - creating inputBufferedReader " + e);
             e.printStackTrace();
         }
 
@@ -79,7 +80,7 @@ public class TCPAppAction {
         try {
             response = inFromServer.readLine();
         } catch (IOException e) {
-            System.out.println("TCPAppAction - read from server " + e);
+            System.out.println("TCPAppActionMH - read from server " + e);
             e.printStackTrace();
         }
         Logger.appDebugLog(command + " input: " + response);
@@ -99,7 +100,7 @@ public class TCPAppAction {
         try {
             connectionSocket.close();
         } catch (IOException e) {
-            System.out.println("TCPAppAction - closing socket " + e);
+            System.out.println("TCPAppActionMH - closing socket " + e);
             e.printStackTrace();
         }
 
@@ -113,7 +114,7 @@ public class TCPAppAction {
         try {
             connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
         } catch (IOException e) {
-            System.out.println("TCPAppAction - creating socket " + e);
+            System.out.println("TCPAppActionMH - creating socket " + e);
             e.printStackTrace();
         }
 
@@ -121,7 +122,7 @@ public class TCPAppAction {
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPAppAction - creating dataOutputStream " + e);
+            System.out.println("TCPAppActionMH - creating dataOutputStream " + e);
             e.printStackTrace();
         }
 
@@ -129,7 +130,7 @@ public class TCPAppAction {
         try {
             outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + clientNumber + "\n");
         } catch (IOException e) {
-            System.out.println("TCPAppAction - write to server " + e);
+            System.out.println("TCPAppActionMH - write to server " + e);
             e.printStackTrace();
         }
 
@@ -137,7 +138,7 @@ public class TCPAppAction {
         try {
             inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
-            System.out.println("TCPAppAction - creating inputBufferedReader " + e);
+            System.out.println("TCPAppActionMH - creating inputBufferedReader " + e);
             e.printStackTrace();
         }
 
@@ -145,7 +146,7 @@ public class TCPAppAction {
         try {
             response = inFromServer.readLine();
         } catch (IOException e) {
-            System.out.println("TCPAppAction - read from server " + e);
+            System.out.println("TCPAppActionMH - read from server " + e);
             e.printStackTrace();
         }
         Logger.appDebugLog(command + " input: " + response);
@@ -153,7 +154,7 @@ public class TCPAppAction {
         try {
             connectionSocket.close();
         } catch (IOException e) {
-            System.out.println("TCPAppAction - closing socket " + e);
+            System.out.println("TCPAppActionMH - closing socket " + e);
             e.printStackTrace();
         }
 

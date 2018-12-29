@@ -1,7 +1,6 @@
 package app.client.console.multihost;
 
 import app.Utils.Logger;
-import app.client.console.TCPAppAction;
 import app.client.host.multihost.TCPClientMH;
 import app.config.Config;
 
@@ -28,7 +27,7 @@ public class TCPClientAppMH extends Thread {
                 inFromUser = new BufferedReader(new InputStreamReader(System.in));
                 userSentence = inFromUser.readLine();
 
-                TCPAppAction.perform(client.getClientNumber(), userSentence);
+                TCPAppActionMH.perform(client.getClientNumber(), userSentence);
             } catch (IOException e) {
                 System.out.println("TCPClientAppMH - read and perform user command " + e);
                 e.printStackTrace();

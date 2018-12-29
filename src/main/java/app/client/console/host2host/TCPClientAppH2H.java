@@ -1,7 +1,6 @@
 package app.client.console.host2host;
 
 import app.Utils.Logger;
-import app.client.console.TCPAppAction;
 import app.client.host.host2host.TCPClientH2H;
 import app.config.Config;
 
@@ -13,12 +12,12 @@ public class TCPClientAppH2H extends Thread {
 
     private TCPClientH2H client;
 
-    public TCPClientAppH2H(TCPClientH2H tcpClientMH) {
-        this.client = tcpClientMH;
+    public TCPClientAppH2H(TCPClientH2H tcpClientH2H) {
+        this.client = tcpClientH2H;
     }
 
     public void run() {
-        Logger.appDebugLog("TCPClientAppMH: run");
+        Logger.appDebugLog("TCPClientAppH2H: run");
 
         BufferedReader inFromUser;
         String userSentence;
@@ -28,9 +27,9 @@ public class TCPClientAppH2H extends Thread {
                 inFromUser = new BufferedReader(new InputStreamReader(System.in));
                 userSentence = inFromUser.readLine();
 
-                TCPAppAction.perform(client.getClientNumber(), userSentence);
+                TCPAppActionH2H.perform(client.getClientNumber(), userSentence);
             } catch (IOException e) {
-                System.out.println("TCPClientAppMH - read and perform user command " + e);
+                System.out.println("TCPClientAppH2H - read and perform user command " + e);
                 e.printStackTrace();
                 this.interrupt();
             }
