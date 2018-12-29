@@ -1,8 +1,8 @@
 package app.client.console.multiHost;
 
-import app.Utils.Logger;
 import app.client.host.multiHost.TCPClientMH;
 import app.config.Config;
+import app.utils.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;

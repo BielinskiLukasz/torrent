@@ -1,8 +1,8 @@
 package app.client.console.host2host;
 
-import app.Utils.Logger;
 import app.client.host.host2host.TCPClientH2H;
 import app.config.Config;
+import app.utils.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;

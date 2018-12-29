@@ -1,4 +1,4 @@
-package app.Utils;
+package app.utils;
 
 public class Logger {
 

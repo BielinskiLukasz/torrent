@@ -1,8 +1,8 @@
 package app.server;
 
-import app.Utils.ActionUtils;
-import app.Utils.Logger;
 import app.config.Config;
+import app.utils.ActionUtils;
+import app.utils.Logger;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

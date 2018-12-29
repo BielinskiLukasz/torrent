@@ -1,9 +1,9 @@
 package app.client.host.host2host;
 
-import app.Utils.Logger;
 import app.client.host.ClientCommand;
 import app.client.host.multiHost.TCPClientActionMH;
 import app.config.Config;
+import app.utils.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;

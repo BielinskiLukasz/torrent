@@ -1,8 +1,8 @@
 package app.client.host.host2host;
 
-import app.Utils.Logger;
 import app.client.console.host2host.TCPConsoleConnectionH2H;
 import app.config.Config;
+import app.utils.Logger;
 
 public class TCPClientH2H extends Thread {
 
