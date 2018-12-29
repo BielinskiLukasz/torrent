@@ -1,18 +1,18 @@
 package testApp;
 
-import app.client.TCPClient;
+import app.client.host.multihost.TCPClientMH;
 import app.server.TCPServer;
 
 public class TORrentTestTCP {
 
     public static void main(String[] args) {
         TCPServer server = new TCPServer();
-        TCPClient client1 = new TCPClient(1);
-        TCPClient client2 = new TCPClient(2);
-        TCPClient client3 = new TCPClient(3);
-        TCPClient client4 = new TCPClient(4);
-        TCPClient client5 = new TCPClient(5);
-        TCPClient client6 = new TCPClient(6);
+        TCPClientMH client1 = new TCPClientMH(1);
+        TCPClientMH client2 = new TCPClientMH(2);
+        TCPClientMH client3 = new TCPClientMH(3);
+        TCPClientMH client4 = new TCPClientMH(4);
+        TCPClientMH client5 = new TCPClientMH(5);
+        TCPClientMH client6 = new TCPClientMH(6);
 
         server.start();
         client1.start();

@@ -1,11 +1,11 @@
 package app;
 
-import app.client.TCPClient;
+import app.client.host.multihost.TCPClientMH;
 
 public class TORrentClientTCP {
 
     public static void main(String[] args) {
-        TCPClient client = new TCPClient(Integer.parseInt(args[0]));
+        TCPClientMH client = new TCPClientMH(Integer.parseInt(args[0]));
         client.start();
     }
 }

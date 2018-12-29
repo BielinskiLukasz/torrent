@@ -17,8 +17,14 @@ Istrukcja:
 - tylko pliki znajdujące się bezpośrednio w domyślnym folderze są widoczne (foldery znajdujące się w domyślnym folderze są pomijane)
 
 **Dostępne zapytania:**
+
 - list
-- TODO
+
+wyświetla listę dostępnych do pobrania plików jako listę zawierającą: numer klienta udostępniającego dany plik, nazwę pliku, sumę md5 pliku
+
+- pull
+
+pobiera wybrany plik
 
 Parametry zapytań:
 - TODO
@@ -31,13 +37,10 @@ np.
 - list
 - TODO
 
-TODO: Jeżeli nie sprecyzowano hosta to zostanie on wybrany automatycznie
-
 ***CONFIG***
 - _config/Config.java_ - konfiguracja ścieżek i zmiennych globalnych
 - _utils/Logger.java_ - konfiguracja wyświetlania logów
 
-****
 ****
 
 Instructions:
@@ -65,8 +68,6 @@ query parameters:
 e.g.
 - list
 - TODO
-
-TODO: If no host is specified, then first available host from known will be chosen to connect to.
 
 ***CONFIG***
 - _config/Config.java_ - specifies all env variables

@@ -12,9 +12,9 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.List;
 
-class TCPClientAction {
+public class TCPClientAction {
 
-    static void perform(int clientNumber, Socket connectionSocket, String clientSentence) {
+    public static void perform(int clientNumber, Socket connectionSocket, String clientSentence) {
 
         String command = ActionUtils.getCommand(clientSentence);
 

@@ -12,6 +12,10 @@ public class ActionUtils {
         return splitSentence(clientSentence)[2];
     }
 
+    public static String getFileName(String clientSentence) {
+        return splitSentence(clientSentence)[2];
+    }
+
     public static int getClientNumber(String clientSentence) {
         return Integer.parseInt(splitSentence(clientSentence)[1]);
     }

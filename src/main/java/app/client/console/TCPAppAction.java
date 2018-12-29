@@ -10,14 +10,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-class TCPAppAction {
+public class TCPAppAction {
 
-    static void perform(int clientNumber, String userSentence) {
+    public static void perform(int clientNumber, String userSentence) {
         String command = getCommandAppName(ActionUtils.getCommand(userSentence));
 
         switch (CommandApp.valueOf(command)) {
             case FILE_LIST:
                 getFileList(command);
+                break;
+            case PULL:
+                pull(userSentence);
                 break;
             case CLOSE:
                 close(clientNumber, command);
@@ -29,6 +32,12 @@ class TCPAppAction {
                 Logger.appLog("command is not supported");
                 break;
         }
+    }
+
+    private static void pull(String userSentence) {
+        Logger.appDebugLog("fire pull");
+
+
     }
 
     private static void getFileList(String command) {
@@ -156,6 +165,7 @@ class TCPAppAction {
             case "L":
             case "LIST":
             case "FILES":
+            case "FL":
             case "FILE_LIST":
             case "FILES LIST":
             case "FILESLIST":
@@ -163,15 +173,23 @@ class TCPAppAction {
             case "FILE LIST":
             case "FILELIST":
                 return CommandApp.FILE_LIST.name();
-
+            case "C":
             case "CLOSE":
+            case "E":
             case "EXIT":
+            case "Q":
             case "QUIT":
                 return CommandApp.CLOSE.name();
-
+            case "PULL":
+            case "D":
+            case "DOWNLOAD":
+                return CommandApp.PULL.name();
+            case "PUSH":
+            case "U":
+            case "UPLOAD":
+                return CommandApp.PUSH.name();
             case "":
                 return CommandApp.EMPTY_COMMAND.name();
-
             default:
                 return CommandApp.UNSUPPORTED_COMMAND.name();
         }
