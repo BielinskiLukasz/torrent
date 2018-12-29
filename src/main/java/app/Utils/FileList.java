@@ -40,7 +40,7 @@ public class FileList {
         return readyToSendList;
     }
 
-    /*static List<FileInfo> unpackFileInfoList(List<String> packedList) {
+    static List<FileInfo> unpackFileInfoList(List<String> packedList) {
         List<FileInfo> unpackList = new ArrayList<>();
 
         packedList.forEach(
@@ -48,7 +48,7 @@ public class FileList {
         );
 
         return unpackList;
-    }*/
+    }
 
     static FileInfo unpackFileInfo(String packedFileInfo) {
         return new FileInfo(packedFileInfo);

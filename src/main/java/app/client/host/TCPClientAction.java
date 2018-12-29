@@ -3,6 +3,7 @@ package app.client.host;
 import app.Utils.ActionUtils;
 import app.Utils.Config;
 import app.Utils.FileList;
+import app.Utils.Logger;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -22,53 +23,61 @@ class TCPClientAction {
                 connect(clientNumber, connectionSocket, clientSentence);
                 break;
 
-            case FILES_LIST:
-                DataOutputStream outToServer = null;
-                try {
-                    outToServer = new DataOutputStream(connectionSocket.getOutputStream());
-                } catch (IOException e) {
-                    System.out.println("TCPClientAction - creating dataOutputStream " + e);
-                    e.printStackTrace();
-                }
-                System.out.println(command + " input: " + clientSentence); // TODO debug log
-
-                // TODO implement getting file list
-                List<String> clientFileList = FileList.packFileInfoList(
-                        FileList.getFileInfoList(clientNumber)
-                );
-
-//                String command = ActionUtils.getCommand(clientSentence);
-                String response = String.valueOf(clientFileList.size()); // TODO rename string - size of list ???
-                try {
-                    outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + response + "\n");
-                } catch (IOException e) {
-                    System.out.println("TCPClientAction - write to server (clientFileList size) " + e);
-                    e.printStackTrace();
-                }
-                System.out.println(command + " input: " + response); // TODO debug log
-
-                DataOutputStream finalOutToServer = outToServer;
-                clientFileList.forEach(
-                        fileData -> {
-                            try {
-                                finalOutToServer.writeBytes(fileData + "\n");
-                            } catch (IOException e) {
-                                System.out.println("TCPClientAction - write to server (specific clientFile)" + e);
-                                e.printStackTrace();
-                            }
-                            System.out.println(command + " input: " + fileData); // TODO debug log
-                        }
-                );
-
+            case FILE_LIST:
+                getFileList(clientNumber, connectionSocket, clientSentence);
                 break;
 
             default:
-                System.out.println('"' + command + '"' + " command is not supported yet"); // TODO debug log
+                Logger.clientLog('"' + command + '"' + " command is not supported yet");
                 break;
         }
     }
 
+    private static void getFileList(int clientNumber, Socket connectionSocket, String clientSentence) {
+        Logger.clientDebugLog("fire getFileList");
+
+        String command = ActionUtils.getCommand(clientSentence);
+        DataOutputStream outToServer = null;
+        try {
+            outToServer = new DataOutputStream(connectionSocket.getOutputStream());
+        } catch (IOException e) {
+            System.out.println("TCPClientAction - creating dataOutputStream " + e);
+            e.printStackTrace();
+        }
+        Logger.clientDebugLog(command + " input: " + clientSentence);
+
+        List<String> clientFileList = FileList.packFileInfoList(
+                FileList.getFileInfoList(clientNumber)
+        );
+
+        String response = String.valueOf(clientFileList.size());
+        try {
+            outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + response + "\n");
+        } catch (IOException e) {
+            System.out.println("TCPClientAction - write to server (clientFileList size) " + e);
+            e.printStackTrace();
+        }
+        Logger.clientDebugLog(command + " input: " + response);
+
+        DataOutputStream finalOutToServer = outToServer;
+        clientFileList.forEach(
+                fileData -> {
+                    try {
+                        finalOutToServer.writeBytes(fileData + "\n");
+                    } catch (IOException e) {
+                        System.out.println("TCPClientAction - write to server (specific clientFile)" + e);
+                        e.printStackTrace();
+                    }
+                    Logger.clientDebugLog(command + " input: " + fileData);
+                }
+        );
+
+        Logger.clientLog("Client file list sent to server");
+    }
+
     private static void connect(int clientNumber, Socket connectionSocket, String clientSentence) {
+        Logger.clientDebugLog("fire connect");
+
         DataOutputStream outToServer = null;
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
@@ -79,7 +88,7 @@ class TCPClientAction {
 
         String command = ActionUtils.getCommand(clientSentence);
         String message = ActionUtils.getMessage(clientSentence);
-        System.out.println(command + " output: " + message); // TODO debug log
+        Logger.clientDebugLog(command + " output: " + message);
         try {
             outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + message +
                     Config.SENTENCE_SPLITS_CHAR + clientNumber + "\n");
@@ -103,8 +112,8 @@ class TCPClientAction {
             System.out.println("TCPClientAction - read from server " + e);
             e.printStackTrace();
         }
-        System.out.println(command + " input: " + response); // TODO debug log
+        Logger.clientDebugLog(command + " input: " + response);
 
-        System.out.println("Client " + clientNumber + " has connected to the server");
+        Logger.clientLog("Client " + clientNumber + " has connected to the server");
     }
 }

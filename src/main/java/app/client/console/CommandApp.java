@@ -2,7 +2,7 @@ package app.client.console;
 
 public enum CommandApp {
 
-    FILES_LIST,
+    FILE_LIST,
     PULL,
     PUSH,
     REPULL,

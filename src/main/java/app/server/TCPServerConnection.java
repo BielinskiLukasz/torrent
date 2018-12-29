@@ -1,5 +1,7 @@
 package app.server;
 
+import app.Utils.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,11 +16,11 @@ public class TCPServerConnection extends Thread {
         this.server = tcpServer;
         this.connectionSocket = connectionSocket;
 
-        System.out.println("TCPServerConnection: create connection"); // TODO debug log
+        Logger.serverDebugLog("TCPServerConnection: create connection");
     }
 
     public void run() {
-        System.out.println("TCPServerConnection: run"); // TODO debug log
+        Logger.serverDebugLog("TCPServerConnection: run");
 
         BufferedReader inFromClient = null;
         try {

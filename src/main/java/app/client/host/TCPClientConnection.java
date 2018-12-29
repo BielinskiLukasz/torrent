@@ -1,6 +1,7 @@
 package app.client.host;
 
 import app.Utils.Config;
+import app.Utils.Logger;
 import app.client.TCPClient;
 
 import java.io.BufferedReader;
@@ -18,7 +19,7 @@ public class TCPClientConnection extends Thread {
     }
 
     public void run() {
-        System.out.println("TCPClientConnection: run"); // TODO debug log
+        Logger.clientDebugLog("TCPClientConnection: run");
 
         ServerSocket hostServerSocket = null;
         try {
@@ -56,7 +57,7 @@ public class TCPClientConnection extends Thread {
     }
 
     private void connectWithServer() {
-        System.out.println("TCPClientConnection: connectWithServer"); // TODO debug log
+        Logger.clientDebugLog("TCPClientConnection: fire connectWithServer");
 
         Socket hostClientSocket = null;
         try {
@@ -76,5 +77,7 @@ public class TCPClientConnection extends Thread {
             System.out.println("TCPClientConnection - close client socket " + e);
             e.printStackTrace();
         }
+
+        Logger.clientDebugLog("TCPClientConnection: connectWithServer successfully");
     }
 }

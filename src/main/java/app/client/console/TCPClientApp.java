@@ -1,5 +1,6 @@
 package app.client.console;
 
+import app.Utils.Logger;
 import app.client.TCPClient;
 
 import java.io.BufferedReader;
@@ -15,7 +16,7 @@ public class TCPClientApp extends Thread {
     }
 
     public void run() {
-        System.out.println("TCPClientApp: run"); // TODO debug log
+        Logger.appDebugLog("TCPClientApp: run");
 
         BufferedReader inFromUser;
         String userSentence;
@@ -27,7 +28,7 @@ public class TCPClientApp extends Thread {
 
                 TCPAppAction.perform(client.getClientNumber(), userSentence);
             } catch (IOException e) {
-                System.out.println("TCPClientApp - rea and perform user command " + e);
+                System.out.println("TCPClientApp - read and perform user command " + e);
                 e.printStackTrace();
                 this.interrupt();
             }

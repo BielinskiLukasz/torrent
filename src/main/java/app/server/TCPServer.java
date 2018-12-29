@@ -2,6 +2,7 @@ package app.server;
 
 import app.Utils.Config;
 import app.Utils.FileInfo;
+import app.Utils.Logger;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -22,11 +23,11 @@ public class TCPServer extends Thread {
         fileList = new ArrayList<>();
         fileInfoList = new ArrayList<>();
 
-        System.out.println("TCPServer: create server"); // TODO debug log
+        Logger.serverDebugLog("TCPServer: create server");
     }
 
     public void run() {
-        System.out.println("TCPServer: run"); // TODO debug log
+        Logger.serverDebugLog("TCPServer: run");
 
         ServerSocket welcomeSocket = null;
         try {
