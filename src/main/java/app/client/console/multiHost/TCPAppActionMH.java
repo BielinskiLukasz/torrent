@@ -1,4 +1,4 @@
-package app.client.console.multihost;
+package app.client.console.multiHost;
 
 import app.Utils.ActionUtils;
 import app.Utils.Logger;

@@ -1,7 +1,7 @@
-package app.client.host.multihost;
+package app.client.host.multiHost;
 
 import app.Utils.Logger;
-import app.client.console.multihost.TCPClientAppMH;
+import app.client.console.multiHost.TCPClientAppMH;
 
 public class TCPClientMH extends Thread {
 

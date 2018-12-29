@@ -2,7 +2,7 @@ package app.client.host.host2host;
 
 import app.Utils.Logger;
 import app.client.host.CommandClient;
-import app.client.host.multihost.TCPClientActionMH;
+import app.client.host.multiHost.TCPClientActionMH;
 import app.config.Config;
 
 import java.io.BufferedReader;

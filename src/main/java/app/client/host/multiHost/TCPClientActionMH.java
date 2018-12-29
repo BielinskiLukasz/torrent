@@ -1,4 +1,4 @@
-package app.client.host.multihost;
+package app.client.host.multiHost;
 
 import app.Utils.ActionUtils;
 import app.Utils.FileList;

@@ -1,6 +1,6 @@
 package testApp;
 
-import app.client.host.multihost.TCPClientMH;
+import app.client.host.multiHost.TCPClientMH;
 import app.server.TCPServer;
 
 public class TORrentTestTCP {

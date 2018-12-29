@@ -1,6 +1,6 @@
 package app;
 
-import app.client.host.multihost.TCPClientMH;
+import app.client.host.multiHost.TCPClientMH;
 
 public class TORrentClientTCP {
 

@@ -1,7 +1,7 @@
-package app.client.console.multihost;
+package app.client.console.multiHost;
 
 import app.Utils.Logger;
-import app.client.host.multihost.TCPClientMH;
+import app.client.host.multiHost.TCPClientMH;
 import app.config.Config;
 
 import java.io.BufferedReader;
