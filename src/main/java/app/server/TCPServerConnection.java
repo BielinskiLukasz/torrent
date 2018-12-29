@@ -1,5 +1,6 @@
 package app.server;
 
+import app.Utils.Config;
 import app.Utils.Logger;
 
 import java.io.BufferedReader;
@@ -44,7 +45,7 @@ public class TCPServerConnection extends Thread {
             }
 
             try { // TODO sleep
-                sleep(1000);
+                sleep(Config.MILLISECONDS_OF_CONNECTION_LISTENER_WAITING);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -85,7 +85,6 @@ class TCPServerAction {
                     }
                     Logger.serverDebugLog(command + " input: " + response);
 
-                    // TODO implement action adding files to fileList
                     int clientFileListSize = ActionUtils.getListSize(response);
                     for (int i = 0; i < clientFileListSize; i++) {
                         try {

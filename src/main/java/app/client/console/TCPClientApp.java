@@ -1,5 +1,6 @@
 package app.client.console;
 
+import app.Utils.Config;
 import app.Utils.Logger;
 import app.client.TCPClient;
 
@@ -34,7 +35,7 @@ public class TCPClientApp extends Thread {
             }
 
             try { // TODO sleep
-                sleep(1000);
+                sleep(Config.MILLISECONDS_OF_CONNECTION_LISTENER_WAITING);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

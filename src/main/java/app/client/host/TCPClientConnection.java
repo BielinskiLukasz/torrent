@@ -49,7 +49,7 @@ public class TCPClientConnection extends Thread {
             }
 
             try { // TODO sleep
-                sleep(1000);
+                sleep(Config.MILLISECONDS_OF_CONNECTION_LISTENER_WAITING);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
