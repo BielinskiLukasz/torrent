@@ -13,18 +13,15 @@ import java.net.Socket;
 
 public class TCPAppActionH2H {
 
-    public static void perform(int clientNumber, String userSentence) {
+    public static void perform(int clientNumber, String userSentence, int connectedHostPortNumber) {
         String command = getCommandAppName(ActionUtils.getCommand(userSentence));
 
         switch (CommandApp.valueOf(command)) {
             case FILE_LIST:
-                getFileList(command);
+                getFileList(command, connectedHostPortNumber);
                 break;
             case PULL:
-                pull(userSentence);
-                break;
-            case CLOSE:
-                close(clientNumber, command);
+                pull(userSentence, connectedHostPortNumber);
                 break;
             case EMPTY_COMMAND:
                 break;
@@ -35,18 +32,16 @@ public class TCPAppActionH2H {
         }
     }
 
-    private static void pull(String userSentence) {
-        Logger.appDebugLog("fire pull");
-
+    private static void pull(String userSentence, int connectedHostPortNumber) {
 
     }
 
-    private static void getFileList(String command) {
+    private static void getFileList(String command, int connectedHostPortNumber) {
         Logger.appDebugLog("fire getFileList");
 
         Socket connectionSocket = null;
         try {
-            connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
+            connectionSocket = new Socket(Config.HOST_IP, connectedHostPortNumber);
         } catch (IOException e) {
             System.out.println("TCPAppActionMH - creating socket " + e);
             e.printStackTrace();
@@ -107,60 +102,6 @@ public class TCPAppActionH2H {
         Logger.appLog("Server file list was displayed");
     }
 
-    private static void close(int clientNumber, String command) {
-        Logger.appDebugLog("fire close");
-
-        Socket connectionSocket = null;
-        try {
-            connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
-        } catch (IOException e) {
-            System.out.println("TCPAppActionMH - creating socket " + e);
-            e.printStackTrace();
-        }
-
-        DataOutputStream outToServer = null;
-        try {
-            outToServer = new DataOutputStream(connectionSocket.getOutputStream());
-        } catch (IOException e) {
-            System.out.println("TCPAppActionMH - creating dataOutputStream " + e);
-            e.printStackTrace();
-        }
-
-        Logger.appDebugLog(command + " output: " + clientNumber);
-        try {
-            outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + clientNumber + "\n");
-        } catch (IOException e) {
-            System.out.println("TCPAppActionMH - write to server " + e);
-            e.printStackTrace();
-        }
-
-        BufferedReader inFromServer = null;
-        try {
-            inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-        } catch (IOException e) {
-            System.out.println("TCPAppActionMH - creating inputBufferedReader " + e);
-            e.printStackTrace();
-        }
-
-        String response = null;
-        try {
-            response = inFromServer.readLine();
-        } catch (IOException e) {
-            System.out.println("TCPAppActionMH - read from server " + e);
-            e.printStackTrace();
-        }
-        Logger.appDebugLog(command + " input: " + response);
-
-        try {
-            connectionSocket.close();
-        } catch (IOException e) {
-            System.out.println("TCPAppActionMH - closing socket " + e);
-            e.printStackTrace();
-        }
-
-        Logger.appLog("Connection closed");
-    }
-
     private static String getCommandAppName(String command) {
         switch (command.trim().toUpperCase()) {
             case "L":
@@ -180,7 +121,7 @@ public class TCPAppActionH2H {
             case "EXIT":
             case "Q":
             case "QUIT":
-                return CommandApp.CLOSE.name();
+                return CommandApp.UNSUPPORTED_COMMAND.name();
             case "PULL":
             case "D":
             case "DOWNLOAD":

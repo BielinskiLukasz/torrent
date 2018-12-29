@@ -2,15 +2,25 @@ package app.client.host.host2host;
 
 import app.Utils.Logger;
 import app.client.console.host2host.TCPClientAppH2H;
+import app.config.Config;
 
 public class TCPClientH2H extends Thread {
 
     private int clientNumber;
+    private int connectedClientNumber;
 
     public TCPClientH2H(int clientNumber) {
         this.clientNumber = clientNumber;
+        this.connectedClientNumber = Config.INT_SV;
 
-        Logger.clientDebugLog("TCPClientH2H: create client");
+        Logger.clientDebugLog("TCPClientH2H: create first host");
+    }
+
+    public TCPClientH2H(int clientNumber, int connectedClientNumber) {
+        this.clientNumber = clientNumber;
+        this.connectedClientNumber = connectedClientNumber;
+
+        Logger.clientDebugLog("TCPClientH2H: create first host");
     }
 
     public void run() {
@@ -24,5 +34,13 @@ public class TCPClientH2H extends Thread {
 
     public int getClientNumber() {
         return clientNumber;
+    }
+
+    public int getConnectedClientNumber() {
+        return connectedClientNumber;
+    }
+
+    void setConnectedClientNumber(int connectedClientNumber) {
+        this.connectedClientNumber = connectedClientNumber;
     }
 }

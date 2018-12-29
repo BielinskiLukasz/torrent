@@ -27,7 +27,9 @@ public class TCPClientAppH2H extends Thread {
                 inFromUser = new BufferedReader(new InputStreamReader(System.in));
                 userSentence = inFromUser.readLine();
 
-                TCPAppActionH2H.perform(client.getClientNumber(), userSentence);
+                TCPAppActionH2H.perform(client.getClientNumber(),
+                        userSentence,
+                        Config.PORT_NR + client.getConnectedClientNumber());
             } catch (IOException e) {
                 System.out.println("TCPClientAppH2H - read and perform user command " + e);
                 e.printStackTrace();

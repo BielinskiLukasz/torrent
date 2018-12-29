@@ -10,4 +10,5 @@ public class Config {
 
     public static final int MILLISECONDS_OF_CONNECTION_LISTENER_WAITING = 1000;
 
+    public static final int INT_SV = -1;
 }

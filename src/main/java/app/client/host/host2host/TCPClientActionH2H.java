@@ -15,16 +15,16 @@ import java.util.List;
 
 public class TCPClientActionH2H {
 
-    public static void perform(int clientNumber, Socket connectionSocket, String clientSentence) {
+    public static void perform(TCPClientH2H client, Socket connectionSocket, String clientSentence) {
 
         String command = ActionUtils.getCommand(clientSentence);
 
         switch (CommandClient.valueOf(command)) {
             case CONNECT:
-                connect(clientNumber, connectionSocket, clientSentence);
+                connect(client, connectionSocket, clientSentence);
                 break;
             case FILE_LIST:
-                getFileList(clientNumber, connectionSocket, clientSentence);
+                getFileList(client.getClientNumber(), connectionSocket, clientSentence);
                 break;
             default:
                 Logger.clientLog('"' + command + '"' + " command is not supported yet");
@@ -32,7 +32,7 @@ public class TCPClientActionH2H {
         }
     }
 
-    private static void connect(int clientNumber, Socket connectionSocket, String clientSentence) {
+    private static void connect(TCPClientH2H client, Socket connectionSocket, String clientSentence) {
         Logger.clientDebugLog("fire connect");
 
         DataOutputStream outToServer = null;
@@ -43,14 +43,17 @@ public class TCPClientActionH2H {
             e.printStackTrace();
         }
 
+        int connectedClientNumber = ActionUtils.getClientNumber(clientSentence);
+        client.setConnectedClientNumber(connectedClientNumber);
+
         String command = ActionUtils.getCommand(clientSentence);
         String message = ActionUtils.getMessage(clientSentence);
         Logger.clientDebugLog(command + " output: " + message);
         try {
-            outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + clientNumber +
+            outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + client.getClientNumber() +
                     Config.SENTENCE_SPLITS_CHAR + message + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - write to server " + e);
+            System.out.println("TCPClientActionMH - write to host " + e);
             e.printStackTrace();
         }
 
@@ -66,12 +69,12 @@ public class TCPClientActionH2H {
         try {
             response = inFromServer.readLine();
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - read from server " + e);
+            System.out.println("TCPClientActionMH - read from host " + e);
             e.printStackTrace();
         }
         Logger.clientDebugLog(command + " input: " + response);
 
-        Logger.clientLog("Client " + clientNumber + " has connected to the server");
+        Logger.clientLog("Client " + client.getClientNumber() + " has connected to the host");
     }
 
     private static void getFileList(int clientNumber, Socket connectionSocket, String clientSentence) {

@@ -11,7 +11,7 @@ public enum CommandApp {
     REPULL,
     REPUSH,
     MULTIPLE_PULL,
-    CLOSE,
+    CLOSE, // Not used in h2h version
     EMPTY_COMMAND,
     UNSUPPORTED_COMMAND
 }
