@@ -67,8 +67,8 @@ public class TCPClientConnection extends Thread {
             e.printStackTrace();
         }
 
-        String helloMessage = CommandClient.CONNECT + Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " +
-                client.getClientNumber();
+        String helloMessage = CommandClient.CONNECT + Config.SENTENCE_SPLITS_CHAR + client.getClientNumber() +
+                Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.getClientNumber();
         TCPClientAction.perform(client.getClientNumber(), hostClientSocket, helloMessage);
 
         try {

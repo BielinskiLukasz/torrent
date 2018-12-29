@@ -21,15 +21,47 @@ class TCPServerAction {
             case CONNECT:
                 connect(server, connectionSocket, clientSentence);
                 break;
-
             case FILE_LIST:
                 getFileList(server, connectionSocket, command);
                 break;
-
+            case CLOSE:
+                close(server, connectionSocket, clientSentence);
+                break;
             default:
                 sendNotSupportedCommandMessage(connectionSocket, command);
                 break;
         }
+    }
+
+    private static void connect(TCPServer server, Socket connectionSocket, String clientSentence) {
+        Logger.serverDebugLog("fire connect");
+
+        DataOutputStream outToClient = null;
+        try {
+            outToClient = new DataOutputStream(connectionSocket.getOutputStream());
+        } catch (IOException e) {
+            System.out.println("TCPServerAction - creating outputStream " + e);
+            e.printStackTrace();
+        }
+
+        String command = ActionUtils.getCommand(clientSentence);
+        String message = ActionUtils.getMessage(clientSentence);
+        int clientNumber = ActionUtils.getClientNumber(clientSentence);
+        Logger.serverDebugLog(command + " input: " + message);
+
+        server.addClient(clientNumber);
+
+        String response = "Hello client " + clientNumber;
+        Logger.serverDebugLog(command + " output: " + response);
+
+        try {
+            outToClient.writeBytes(response + "\n");
+        } catch (IOException e) {
+            System.out.println("TCPClientAction - write to server " + e);
+            e.printStackTrace();
+        }
+
+        Logger.serverLog("Connection to client " + clientNumber + " was detected");
     }
 
     private static void getFileList(TCPServer server, Socket connectionSocket, String command) {
@@ -102,6 +134,8 @@ class TCPServerAction {
                     } catch (IOException e) {
                         System.out.println("Error: " + e);
                     }
+
+                    Logger.serverLog("A file list from the client " + userNumber + " was received");
                 }
         );
 
@@ -140,8 +174,8 @@ class TCPServerAction {
         Logger.serverLog("Server file list sent to client ");
     }
 
-    private static void connect(TCPServer server, Socket connectionSocket, String clientSentence) {
-        Logger.serverDebugLog("fire connect");
+    private static void close(TCPServer server, Socket connectionSocket, String clientSentence) {
+        Logger.serverDebugLog("fire close");
 
         DataOutputStream outToClient = null;
         try {
@@ -151,14 +185,12 @@ class TCPServerAction {
             e.printStackTrace();
         }
 
-        String command = ActionUtils.getCommand(clientSentence);
-        String message = ActionUtils.getMessage(clientSentence);
         int clientNumber = ActionUtils.getClientNumber(clientSentence);
-        Logger.serverDebugLog(command + " input: " + message);
 
-        server.addClient(clientNumber);
+        server.removeClient(clientNumber);
 
-        String response = "Hello client " + clientNumber;
+        String command = ActionUtils.getCommand(clientSentence);
+        String response = "Bye client " + clientNumber;
         Logger.serverDebugLog(command + " output: " + response);
 
         try {
@@ -168,7 +200,7 @@ class TCPServerAction {
             e.printStackTrace();
         }
 
-        Logger.serverLog("Connection to client " + clientNumber + " was detected");
+        Logger.serverLog("Connection with client " + clientNumber + " was closed");
     }
 
     private static void sendNotSupportedCommandMessage(Socket connectionSocket, String command) {

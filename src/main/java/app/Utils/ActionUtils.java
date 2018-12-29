@@ -7,11 +7,11 @@ public class ActionUtils {
     }
 
     public static String getMessage(String clientSentence) {
-        return splitSentence(clientSentence)[1];
+        return splitSentence(clientSentence)[2];
     }
 
     public static int getClientNumber(String clientSentence) {
-        return Integer.parseInt(splitSentence(clientSentence)[2]);
+        return Integer.parseInt(splitSentence(clientSentence)[1]);
     }
 
     public static int getListSize(String response) {

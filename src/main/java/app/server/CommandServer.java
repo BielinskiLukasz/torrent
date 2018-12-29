@@ -4,4 +4,5 @@ public enum CommandServer {
 
     CONNECT,
     FILE_LIST,
+    CLOSE
 }

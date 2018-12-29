@@ -22,15 +22,55 @@ class TCPClientAction {
             case CONNECT:
                 connect(clientNumber, connectionSocket, clientSentence);
                 break;
-
             case FILE_LIST:
                 getFileList(clientNumber, connectionSocket, clientSentence);
                 break;
-
             default:
                 Logger.clientLog('"' + command + '"' + " command is not supported yet");
                 break;
         }
+    }
+
+    private static void connect(int clientNumber, Socket connectionSocket, String clientSentence) {
+        Logger.clientDebugLog("fire connect");
+
+        DataOutputStream outToServer = null;
+        try {
+            outToServer = new DataOutputStream(connectionSocket.getOutputStream());
+        } catch (IOException e) {
+            System.out.println("TCPClientAction - creating dataOutputStream " + e);
+            e.printStackTrace();
+        }
+
+        String command = ActionUtils.getCommand(clientSentence);
+        String message = ActionUtils.getMessage(clientSentence);
+        Logger.clientDebugLog(command + " output: " + message);
+        try {
+            outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + clientNumber +
+                    Config.SENTENCE_SPLITS_CHAR + message + "\n");
+        } catch (IOException e) {
+            System.out.println("TCPClientAction - write to server " + e);
+            e.printStackTrace();
+        }
+
+        BufferedReader inFromServer = null;
+        try {
+            inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+        } catch (IOException e) {
+            System.out.println("TCPClientAction - creating inputBufferedReader " + e);
+            e.printStackTrace();
+        }
+
+        String response = null;
+        try {
+            response = inFromServer.readLine();
+        } catch (IOException e) {
+            System.out.println("TCPClientAction - read from server " + e);
+            e.printStackTrace();
+        }
+        Logger.clientDebugLog(command + " input: " + response);
+
+        Logger.clientLog("Client " + clientNumber + " has connected to the server");
     }
 
     private static void getFileList(int clientNumber, Socket connectionSocket, String clientSentence) {
@@ -73,47 +113,5 @@ class TCPClientAction {
         );
 
         Logger.clientLog("Client file list sent to server");
-    }
-
-    private static void connect(int clientNumber, Socket connectionSocket, String clientSentence) {
-        Logger.clientDebugLog("fire connect");
-
-        DataOutputStream outToServer = null;
-        try {
-            outToServer = new DataOutputStream(connectionSocket.getOutputStream());
-        } catch (IOException e) {
-            System.out.println("TCPClientAction - creating dataOutputStream " + e);
-            e.printStackTrace();
-        }
-
-        String command = ActionUtils.getCommand(clientSentence);
-        String message = ActionUtils.getMessage(clientSentence);
-        Logger.clientDebugLog(command + " output: " + message);
-        try {
-            outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + message +
-                    Config.SENTENCE_SPLITS_CHAR + clientNumber + "\n");
-        } catch (IOException e) {
-            System.out.println("TCPClientAction - write to server " + e);
-            e.printStackTrace();
-        }
-
-        BufferedReader inFromServer = null;
-        try {
-            inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-        } catch (IOException e) {
-            System.out.println("TCPClientAction - creating inputBufferedReader " + e);
-            e.printStackTrace();
-        }
-
-        String response = null;
-        try {
-            response = inFromServer.readLine();
-        } catch (IOException e) {
-            System.out.println("TCPClientAction - read from server " + e);
-            e.printStackTrace();
-        }
-        Logger.clientDebugLog(command + " input: " + response);
-
-        Logger.clientLog("Client " + clientNumber + " has connected to the server");
     }
 }

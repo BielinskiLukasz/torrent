@@ -60,6 +60,10 @@ public class TCPServer extends Thread {
         userList.add(clientNumber);
     }
 
+    void removeClient(int clientNumber) {
+        userList.remove(clientNumber);
+    }
+
     Set<Integer> getUserList() {
         return userList;
     }
