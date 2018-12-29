@@ -1,23 +1,23 @@
-package app.client.console.multiHost;
+package app.client.console.host2host;
 
 import app.Utils.Logger;
-import app.client.host.multiHost.TCPClientMH;
+import app.client.host.host2host.TCPClientH2H;
 import app.config.Config;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class TCPClientAppMH extends Thread {
+public class TCPConsoleConnectionH2H extends Thread {
 
-    private TCPClientMH client;
+    private TCPClientH2H client;
 
-    public TCPClientAppMH(TCPClientMH tcpClientMH) {
-        this.client = tcpClientMH;
+    public TCPConsoleConnectionH2H(TCPClientH2H tcpClientH2H) {
+        this.client = tcpClientH2H;
     }
 
     public void run() {
-        Logger.appDebugLog("TCPClientAppMH: run");
+        Logger.appDebugLog("TCPConsoleConnectionH2H: run");
 
         BufferedReader inFromUser;
         String userSentence;
@@ -27,9 +27,11 @@ public class TCPClientAppMH extends Thread {
                 inFromUser = new BufferedReader(new InputStreamReader(System.in));
                 userSentence = inFromUser.readLine();
 
-                TCPAppActionMH.perform(client.getClientNumber(), userSentence);
+                TCPConsoleActionH2H.perform(client.getClientNumber(),
+                        userSentence,
+                        Config.PORT_NR + client.getConnectedClientNumber());
             } catch (IOException e) {
-                System.out.println("TCPClientAppMH - read and perform user command " + e);
+                System.out.println("TCPConsoleConnectionH2H - read and perform user command " + e);
                 e.printStackTrace();
                 this.interrupt();
             }

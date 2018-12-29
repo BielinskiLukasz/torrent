@@ -1,7 +1,7 @@
 package app.client.host.host2host;
 
 import app.Utils.Logger;
-import app.client.console.host2host.TCPClientAppH2H;
+import app.client.console.host2host.TCPConsoleConnectionH2H;
 import app.config.Config;
 
 public class TCPClientH2H extends Thread {
@@ -26,7 +26,7 @@ public class TCPClientH2H extends Thread {
     public void run() {
         Logger.clientDebugLog("TCPClientH2H - run");
 
-        TCPClientAppH2H app = new TCPClientAppH2H(this);
+        TCPConsoleConnectionH2H app = new TCPConsoleConnectionH2H(this);
         TCPClientConnectionH2H connection = new TCPClientConnectionH2H(this);
         app.start();
         connection.start();

@@ -1,6 +1,6 @@
 package app.client.host;
 
-public enum CommandClient {
+public enum ClientCommand {
 
     CONNECT,
     FILE_LIST,

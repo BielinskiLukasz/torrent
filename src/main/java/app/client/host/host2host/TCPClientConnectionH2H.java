@@ -1,7 +1,7 @@
 package app.client.host.host2host;
 
 import app.Utils.Logger;
-import app.client.host.CommandClient;
+import app.client.host.ClientCommand;
 import app.client.host.multiHost.TCPClientActionMH;
 import app.config.Config;
 
@@ -70,7 +70,7 @@ public class TCPClientConnectionH2H extends Thread {
             e.printStackTrace();
         }
 
-        String helloMessage = CommandClient.CONNECT + Config.SENTENCE_SPLITS_CHAR + client.getClientNumber() +
+        String helloMessage = ClientCommand.CONNECT + Config.SENTENCE_SPLITS_CHAR + client.getClientNumber() +
                 Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.getClientNumber();
         TCPClientActionMH.perform(client.getClientNumber(), hostClientSocket, helloMessage);
 

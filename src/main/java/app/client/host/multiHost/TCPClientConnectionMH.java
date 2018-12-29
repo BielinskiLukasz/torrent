@@ -1,7 +1,7 @@
 package app.client.host.multiHost;
 
 import app.Utils.Logger;
-import app.client.host.CommandClient;
+import app.client.host.ClientCommand;
 import app.config.Config;
 
 import java.io.BufferedReader;
@@ -67,7 +67,7 @@ public class TCPClientConnectionMH extends Thread {
             e.printStackTrace();
         }
 
-        String helloMessage = CommandClient.CONNECT + Config.SENTENCE_SPLITS_CHAR + client.getClientNumber() +
+        String helloMessage = ClientCommand.CONNECT + Config.SENTENCE_SPLITS_CHAR + client.getClientNumber() +
                 Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.getClientNumber();
         TCPClientActionMH.perform(client.getClientNumber(), hostClientSocket, helloMessage);
 

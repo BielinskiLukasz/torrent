@@ -1,7 +1,7 @@
 package app.client.host.multiHost;
 
 import app.Utils.Logger;
-import app.client.console.multiHost.TCPClientAppMH;
+import app.client.console.multiHost.TCPConsoleConnectionMH;
 
 public class TCPClientMH extends Thread {
 
@@ -16,7 +16,7 @@ public class TCPClientMH extends Thread {
     public void run() {
         Logger.clientDebugLog("TCPClientMH - run");
 
-        TCPClientAppMH app = new TCPClientAppMH(this);
+        TCPConsoleConnectionMH app = new TCPConsoleConnectionMH(this);
         TCPClientConnectionMH connection = new TCPClientConnectionMH(this);
         app.start();
         connection.start();

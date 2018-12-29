@@ -17,7 +17,7 @@ class TCPServerAction {
     static void perform(TCPServer server, Socket connectionSocket, String clientSentence) {
         String command = ActionUtils.getCommand(clientSentence);
 
-        switch (CommandServer.valueOf(command)) {
+        switch (ServerCommand.valueOf(command)) {
             case CONNECT:
                 connect(server, connectionSocket, clientSentence);
                 break;

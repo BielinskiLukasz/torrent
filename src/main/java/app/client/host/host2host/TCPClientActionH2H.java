@@ -3,7 +3,7 @@ package app.client.host.host2host;
 import app.Utils.ActionUtils;
 import app.Utils.FileList;
 import app.Utils.Logger;
-import app.client.host.CommandClient;
+import app.client.host.ClientCommand;
 import app.config.Config;
 
 import java.io.BufferedReader;
@@ -19,7 +19,7 @@ public class TCPClientActionH2H {
 
         String command = ActionUtils.getCommand(clientSentence);
 
-        switch (CommandClient.valueOf(command)) {
+        switch (ClientCommand.valueOf(command)) {
             case CONNECT:
                 connect(client, connectionSocket, clientSentence);
                 break;
