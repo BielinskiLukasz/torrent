@@ -25,9 +25,12 @@ public class TCPConsoleActionMH {
                 getFileList(command);
                 break;
             case PULL:
-                pull(clientNumber, userSentence); // TODO implement checking client connection with server!
+                pull(clientNumber, userSentence); // TODO BACKLOG implement checking client connection with server!
+                //                                      (trying to download from not connected client throw exception)
                 //                                      and protect against file overwriting
-                //                                      and downloading the file from yourself
+                break;
+            case PUSH:
+                push();
                 break;
             case CLOSE:
                 close(clientNumber, command);
@@ -184,6 +187,17 @@ public class TCPConsoleActionMH {
     }
 
     private static void pull(int clientNumber, String userSentence) {
+
+        // TODO REFACTOR !!!
+        //  split checking that file exist and sending!
+        //  firstly connect with clientB and ask about file existing
+        //  if file doesn't exist clientB send message with boolean FALSE on [2]
+        //  client A read this and print in console some logs
+        //  if file exist clientB send message with boolean TRUE on [2] and start sending file
+        //  client A read this, print in console some logs and start to listening incoming file
+        //  that sounds better to me then my actual solution
+        //  and don't forget about md5 sum check, and deleting file (+ print logs) if don't
+
         Logger.appDebugLog("fire pull");
 
         int sourceClientNumber = ActionUtils.getClientNumber(userSentence);
@@ -278,5 +292,9 @@ public class TCPConsoleActionMH {
 
             Logger.appLog("Finish sending file");
         }
+    }
+
+    private static void push() {
+
     }
 }
