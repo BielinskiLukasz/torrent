@@ -1,9 +1,9 @@
 package app.client.host;
 
 import app.Utils.ActionUtils;
-import app.Utils.Config;
 import app.Utils.FileList;
 import app.Utils.Logger;
+import app.config.Config;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

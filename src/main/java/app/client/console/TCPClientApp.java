@@ -1,8 +1,8 @@
 package app.client.console;
 
-import app.Utils.Config;
 import app.Utils.Logger;
 import app.client.TCPClient;
+import app.config.Config;
 
 import java.io.BufferedReader;
 import java.io.IOException;

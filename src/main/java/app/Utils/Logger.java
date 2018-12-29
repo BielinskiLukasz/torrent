@@ -5,9 +5,7 @@ public class Logger {
     private static final boolean SERVER_LOG_DISPLAY = true;
     private static final boolean CLIENT_LOG_DISPLAY = true;
     private static final boolean APP_LOG_DISPLAY = true;
-    private static final boolean SERVER_DEBUG_LOG_DISPLAY = false;
-    private static final boolean CLIENT_DEBUG_LOG_DISPLAY = false;
-    private static final boolean APP_DEBUG_LOG_DISPLAY = false;
+    private static final boolean DEBUG_LOG_DISPLAY = false;
 
     public static void serverLog(String message) {
         if (SERVER_LOG_DISPLAY)
@@ -25,17 +23,17 @@ public class Logger {
     }
 
     public static void serverDebugLog(String message) {
-        if (SERVER_DEBUG_LOG_DISPLAY)
+        if (DEBUG_LOG_DISPLAY)
             System.out.println("Server: " + message);
     }
 
     public static void clientDebugLog(String message) {
-        if (CLIENT_DEBUG_LOG_DISPLAY)
+        if (DEBUG_LOG_DISPLAY)
             System.out.println("Client: " + message);
     }
 
     public static void appDebugLog(String message) {
-        if (APP_DEBUG_LOG_DISPLAY)
+        if (DEBUG_LOG_DISPLAY)
             System.out.println("App: " + message);
     }
 }

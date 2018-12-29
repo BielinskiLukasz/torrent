@@ -1,4 +1,4 @@
-package app.Utils;
+package app.config;
 
 public class Config {
 

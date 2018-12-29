@@ -1,8 +1,8 @@
 package app.server;
 
-import app.Utils.Config;
 import app.Utils.FileInfo;
 import app.Utils.Logger;
+import app.config.Config;
 
 import java.io.IOException;
 import java.net.ServerSocket;
