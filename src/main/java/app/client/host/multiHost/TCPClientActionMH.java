@@ -8,6 +8,7 @@ import app.config.Config;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
@@ -25,6 +26,69 @@ public class TCPClientActionMH {
                 break;
             case FILE_LIST:
                 getFileList(clientNumber, connectionSocket, clientSentence);
+                break;
+            case PULL:
+
+                Logger.clientDebugLog("fire pull");
+
+                int targetClientNumber = ActionUtils.getClientNumber(clientSentence);
+                String fileName = ActionUtils.getFileName(clientSentence);
+                String response;
+
+                DataOutputStream outToServer = null;
+                try {
+                    outToServer = new DataOutputStream(connectionSocket.getOutputStream());
+                } catch (IOException e) {
+                    System.out.println("TCPClientActionMH - creating dataOutputStream " + e);
+                    e.printStackTrace();
+                }
+
+                File file = new File(Config.BASIC_PATH + clientNumber + "//" + fileName);
+                if (file.exists()) {
+
+                    response = "Sending file " + fileName + " started";
+                    try {
+                        outToServer.writeBytes(response + "\n");
+                    } catch (IOException e) {
+                        System.out.println("TCPClientActionMH - write to client " + e);
+                        e.printStackTrace();
+                    }
+
+                    // TODO implements sending file
+
+
+                    response = "Sending file " + fileName + " finished";
+                    try {
+                        outToServer.writeBytes(response + "\n");
+                    } catch (IOException e) {
+                        System.out.println("TCPClientActionMH - write to client " + e);
+                        e.printStackTrace();
+                    }
+
+                    Logger.clientLog("Send file " + fileName + " to client " + targetClientNumber);
+
+                } else {
+
+                    response = "Client " + targetClientNumber + " doesn't share file " + fileName;
+                    try {
+                        outToServer.writeBytes(response + "\n");
+                    } catch (IOException e) {
+                        System.out.println("TCPClientActionMH - write to client " + e);
+                        e.printStackTrace();
+                    }
+
+                    // TODO something that close waiting for file
+
+
+                    response = "Check the correctness of the file name and client number";
+                    try {
+                        outToServer.writeBytes(response + "\n");
+                    } catch (IOException e) {
+                        System.out.println("TCPClientActionMH - write to client " + e);
+                        e.printStackTrace();
+                    }
+                }
+
                 break;
             default:
                 Logger.clientLog('"' + command + '"' + " command is not supported yet");

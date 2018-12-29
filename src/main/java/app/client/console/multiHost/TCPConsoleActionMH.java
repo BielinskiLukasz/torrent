@@ -21,7 +21,7 @@ public class TCPConsoleActionMH {
                 getFileList(command);
                 break;
             case PULL:
-                pull(userSentence);
+                pull(clientNumber, userSentence); // TODO implement checking client connection with server!
                 break;
             case CLOSE:
                 close(clientNumber, command);
@@ -35,11 +35,77 @@ public class TCPConsoleActionMH {
         }
     }
 
-    private static void pull(String userSentence) {
+    private static void pull(int clientNumber, String userSentence) {
         Logger.appDebugLog("fire pull");
 
+        int sourceClientNumber = ActionUtils.getClientNumber(userSentence);
+
+        Socket connectionSocket = null;
+        try {
+            connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR + sourceClientNumber);
+        } catch (IOException e) {
+            System.out.println("TCPConsoleActionMH - creating socket " + e);
+            e.printStackTrace();
+        }
+
+        DataOutputStream outToClient = null;
+        try {
+            outToClient = new DataOutputStream(connectionSocket.getOutputStream());
+        } catch (IOException e) {
+            System.out.println("TCPConsoleActionMH - creating dataOutputStream " + e);
+            e.printStackTrace();
+        }
+
+        String command = ActionUtils.getCommand(userSentence);
+        String fileName = ActionUtils.getFileName(userSentence);
+
+        Logger.appDebugLog(command + " output: " + "no message");
+        try {
+            outToClient.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + clientNumber +
+                    Config.SENTENCE_SPLITS_CHAR + fileName + "\n");
+        } catch (IOException e) {
+            System.out.println("TCPConsoleActionMH - write to server " + e);
+            e.printStackTrace();
+        }
+
+        BufferedReader inFromClient = null;
+        try {
+            inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+        } catch (IOException e) {
+            System.out.println("TCPConsoleActionMH - creating inputBufferedReader " + e);
+            e.printStackTrace();
+        }
+
+        String response = null;
+        try {
+            response = inFromClient.readLine();
+        } catch (IOException e) {
+            System.out.println("TCPConsoleActionMH - read from server " + e);
+            e.printStackTrace();
+        }
+        Logger.appDebugLog(command + " input: " + response);
+
+        Logger.appLog(response);
+
+        // TODO implement getting file
 
 
+        try {
+            response = inFromClient.readLine();
+        } catch (IOException e) {
+            System.out.println("TCPConsoleActionMH - read from server " + e);
+            e.printStackTrace();
+        }
+        Logger.appDebugLog(command + " input: " + response);
+
+        try {
+            connectionSocket.close();
+        } catch (IOException e) {
+            System.out.println("TCPConsoleActionMH - closing socket " + e);
+            e.printStackTrace();
+        }
+
+        Logger.appLog(response);
     }
 
     private static void getFileList(String command) {
