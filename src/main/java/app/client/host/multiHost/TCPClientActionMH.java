@@ -52,7 +52,6 @@ public class TCPClientActionMH {
         try {
             outputStream = connectionSocket.getOutputStream();
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - creating outputStream " + e);
             e.printStackTrace();
         }
 
@@ -60,7 +59,6 @@ public class TCPClientActionMH {
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - creating dataOutputStream " + e);
             e.printStackTrace();
         }
 
@@ -71,16 +69,13 @@ public class TCPClientActionMH {
             try {
                 outToServer.writeBytes(response + "\n");
             } catch (IOException e) {
-                System.out.println("TCPClientActionMH - write to client " + e);
                 e.printStackTrace();
             }
 
-            // TODO implements sending file
             FileInputStream fileInputStream = null;
             try {
                 fileInputStream = new FileInputStream(file);
             } catch (FileNotFoundException e) {
-                // TODO remove sout in catch brackets or add another one here
                 e.printStackTrace();
             }
 
@@ -91,21 +86,18 @@ public class TCPClientActionMH {
                     outputStream.write(buffer, 0, count);
                 }
             } catch (IOException e) {
-                // TODO remove sout in catch brackets or add another one here
                 e.printStackTrace();
             }
 
             try {
                 outputStream.close();
             } catch (IOException e) {
-                // TODO remove sout in catch brackets or add another one here
                 e.printStackTrace();
             }
 
             try {
                 fileInputStream.close();
             } catch (IOException e) {
-                // TODO remove sout in catch brackets or add another one here
                 e.printStackTrace();
             }
 
@@ -118,15 +110,11 @@ public class TCPClientActionMH {
             try {
                 outToServer.writeBytes(response + "\n");
             } catch (IOException e) {
-                System.out.println("TCPClientActionMH - write to client " + e);
                 e.printStackTrace();
             }
 
-            // TODO something that close waiting for file
             try {
-//                        byte[] buffer = "fake".getBytes(); // TODO correct that !?
-//                        file = null; //TODO TEST -> IS IT NEEDED?
-                byte[] buffer = new byte[Config.BUFFER_SIZE_IN_BYTES]; // TODO correct that !?
+                byte[] buffer = new byte[Config.BUFFER_SIZE_IN_BYTES];
                 outputStream.write(buffer);
             } catch (IOException e) {
                 System.out.println("Error: " + e);
@@ -136,10 +124,9 @@ public class TCPClientActionMH {
             try {
                 outputStream.close();
             } catch (IOException e) {
-                // TODO remove sout in catch brackets or add another one here
                 e.printStackTrace();
             }
-            Logger.clientDebugLog(command + " close outputStream"); // TODO close connection is needed to close file sending...
+            Logger.clientDebugLog(command + " close outputStream");
         }
 
         Logger.clientDebugLog(command + " sending sequence ended");
@@ -152,7 +139,6 @@ public class TCPClientActionMH {
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - creating dataOutputStream " + e);
             e.printStackTrace();
         }
 
@@ -163,7 +149,6 @@ public class TCPClientActionMH {
             outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + clientNumber +
                     Config.SENTENCE_SPLITS_CHAR + message + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - write to server " + e);
             e.printStackTrace();
         }
 
@@ -171,7 +156,6 @@ public class TCPClientActionMH {
         try {
             inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - creating inputBufferedReader " + e);
             e.printStackTrace();
         }
 
@@ -179,7 +163,6 @@ public class TCPClientActionMH {
         try {
             response = inFromServer.readLine();
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - read from server " + e);
             e.printStackTrace();
         }
         Logger.clientDebugLog(command + " input: " + response);
@@ -195,7 +178,6 @@ public class TCPClientActionMH {
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - creating dataOutputStream " + e);
             e.printStackTrace();
         }
         Logger.clientDebugLog(command + " input: " + clientSentence);
@@ -208,7 +190,6 @@ public class TCPClientActionMH {
         try {
             outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + response + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - write to server (clientFileList size) " + e);
             e.printStackTrace();
         }
         Logger.clientDebugLog(command + " input: " + response);
@@ -219,7 +200,6 @@ public class TCPClientActionMH {
                     try {
                         finalOutToServer.writeBytes(fileData + "\n");
                     } catch (IOException e) {
-                        System.out.println("TCPClientActionMH - write to server (specific clientFile)" + e);
                         e.printStackTrace();
                     }
                     Logger.clientDebugLog(command + " input: " + fileData);

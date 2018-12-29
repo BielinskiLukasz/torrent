@@ -55,7 +55,6 @@ public class TCPConsoleActionMH {
             try {
                 connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR + sourceClientNumber);
             } catch (IOException e) {
-                System.out.println("TCPConsoleActionMH - creating socket " + e);
                 e.printStackTrace();
             }
 
@@ -63,7 +62,6 @@ public class TCPConsoleActionMH {
             try {
                 outToClient = new DataOutputStream(connectionSocket.getOutputStream());
             } catch (IOException e) {
-                System.out.println("TCPConsoleActionMH - creating dataOutputStream " + e);
                 e.printStackTrace();
             }
 
@@ -75,7 +73,6 @@ public class TCPConsoleActionMH {
                 outToClient.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + clientNumber +
                         Config.SENTENCE_SPLITS_CHAR + fileName + "\n");
             } catch (IOException e) {
-                System.out.println("TCPConsoleActionMH - write to server " + e);
                 e.printStackTrace();
             }
 
@@ -83,7 +80,6 @@ public class TCPConsoleActionMH {
             try {
                 inputStream = connectionSocket.getInputStream();
             } catch (IOException e) {
-                System.out.println("TCPConsoleActionMH - creating inputStream " + e);
                 e.printStackTrace();
             }
 
@@ -91,7 +87,6 @@ public class TCPConsoleActionMH {
             try {
                 inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
             } catch (IOException e) {
-                System.out.println("TCPConsoleActionMH - creating inputBufferedReader " + e);
                 e.printStackTrace();
             }
 
@@ -99,20 +94,17 @@ public class TCPConsoleActionMH {
             try {
                 response = inFromClient.readLine();
             } catch (IOException e) {
-                System.out.println("TCPConsoleActionMH - read from server " + e);
                 e.printStackTrace();
             }
             Logger.appDebugLog(command + " input: " + response);
 
             Logger.appLog(response);
 
-            // TODO implement getting file
             File file = new File(Config.BASIC_PATH + clientNumber + "//" + fileName);
             FileOutputStream fileOutputStream = null;
             try {
                 fileOutputStream = new FileOutputStream(file);
             } catch (FileNotFoundException e) {
-                // TODO remove sout in catch brackets or add another one here
                 e.printStackTrace();
             }
             Logger.appDebugLog(command + " open fileOutputStream");
@@ -121,19 +113,15 @@ public class TCPConsoleActionMH {
             byte[] buffer = new byte[8192];
             try {
                 while ((count = inputStream.read(buffer)) > 0) {
-                    Logger.appDebugLog(command + " reading file - count " + count);
                     fileOutputStream.write(buffer, 0, count);
-                    Logger.appDebugLog(command + " read file - count " + count);
                 }
             } catch (IOException e) {
-                // TODO remove sout in catch brackets or add another one here
                 e.printStackTrace();
             }
 
             try {
                 fileOutputStream.close();
             } catch (IOException e) {
-                // TODO remove sout in catch brackets or add another one here
                 e.printStackTrace();
             }
             Logger.appDebugLog(command + " close fileOutputStream");
@@ -143,7 +131,6 @@ public class TCPConsoleActionMH {
             try {
                 connectionSocket.close();
             } catch (IOException e) {
-                System.out.println("TCPConsoleActionMH - closing socket " + e);
                 e.printStackTrace();
             }
 
@@ -158,7 +145,6 @@ public class TCPConsoleActionMH {
         try {
             connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - creating socket " + e);
             e.printStackTrace();
         }
 
@@ -166,7 +152,6 @@ public class TCPConsoleActionMH {
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - creating dataOutputStream " + e);
             e.printStackTrace();
         }
 
@@ -174,7 +159,6 @@ public class TCPConsoleActionMH {
         try {
             outToServer.writeBytes(command + "\n");
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - write to server " + e);
             e.printStackTrace();
         }
 
@@ -182,7 +166,6 @@ public class TCPConsoleActionMH {
         try {
             inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - creating inputBufferedReader " + e);
             e.printStackTrace();
         }
 
@@ -190,7 +173,6 @@ public class TCPConsoleActionMH {
         try {
             response = inFromServer.readLine();
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - read from server " + e);
             e.printStackTrace();
         }
         Logger.appDebugLog(command + " input: " + response);
@@ -202,7 +184,6 @@ public class TCPConsoleActionMH {
                         inFromServer.readLine().replaceAll("\\|", " ")
                 );
             } catch (IOException e) {
-                System.out.println("TCPServerAction - read from client (specific clientFile) " + e);
                 e.printStackTrace();
             }
         }
@@ -210,7 +191,6 @@ public class TCPConsoleActionMH {
         try {
             connectionSocket.close();
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - closing socket " + e);
             e.printStackTrace();
         }
 
@@ -224,7 +204,6 @@ public class TCPConsoleActionMH {
         try {
             connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - creating socket " + e);
             e.printStackTrace();
         }
 
@@ -232,7 +211,6 @@ public class TCPConsoleActionMH {
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - creating dataOutputStream " + e);
             e.printStackTrace();
         }
 
@@ -240,7 +218,6 @@ public class TCPConsoleActionMH {
         try {
             outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + clientNumber + "\n");
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - write to server " + e);
             e.printStackTrace();
         }
 
@@ -248,7 +225,6 @@ public class TCPConsoleActionMH {
         try {
             inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - creating inputBufferedReader " + e);
             e.printStackTrace();
         }
 
@@ -256,7 +232,6 @@ public class TCPConsoleActionMH {
         try {
             response = inFromServer.readLine();
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - read from server " + e);
             e.printStackTrace();
         }
         Logger.appDebugLog(command + " input: " + response);
@@ -264,7 +239,6 @@ public class TCPConsoleActionMH {
         try {
             connectionSocket.close();
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - closing socket " + e);
             e.printStackTrace();
         }
 

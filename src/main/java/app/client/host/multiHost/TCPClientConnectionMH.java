@@ -26,7 +26,6 @@ public class TCPClientConnectionMH extends Thread {
             hostServerSocket = new ServerSocket(Config.PORT_NR + client.getClientNumber());
             connectWithServer();
         } catch (IOException e) {
-            System.out.println("TCPClientConnectionMH - client initiation " + e);
             e.printStackTrace();
         }
 
@@ -44,7 +43,6 @@ public class TCPClientConnectionMH extends Thread {
                     TCPClientActionMH.perform(client.getClientNumber(), connectionSocket, clientSentence);
                 }
             } catch (IOException e) {
-                System.out.println("TCPClientConnectionMH - read line from server " + e);
                 e.printStackTrace();
             }
 
@@ -63,7 +61,6 @@ public class TCPClientConnectionMH extends Thread {
         try {
             hostClientSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
         } catch (IOException e) {
-            System.out.println("TCPClientConnectionMH - creating a socket to initiate the connection " + e);
             e.printStackTrace();
         }
 
@@ -74,7 +71,6 @@ public class TCPClientConnectionMH extends Thread {
         try {
             hostClientSocket.close();
         } catch (IOException e) {
-            System.out.println("TCPClientConnectionMH - close client socket " + e);
             e.printStackTrace();
         }
 

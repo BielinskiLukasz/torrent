@@ -31,7 +31,6 @@ public class TCPConsoleConnectionH2H extends Thread {
                         userSentence,
                         Config.PORT_NR + client.getConnectedClientNumber());
             } catch (IOException e) {
-                System.out.println("TCPConsoleConnectionH2H - read and perform user command " + e);
                 e.printStackTrace();
                 this.interrupt();
             }

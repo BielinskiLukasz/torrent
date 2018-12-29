@@ -29,7 +29,6 @@ public class TCPConsoleConnectionMH extends Thread {
 
                 TCPConsoleActionMH.perform(client.getClientNumber(), userSentence);
             } catch (IOException e) {
-                System.out.println("TCPConsoleConnectionMH - read and perform user command " + e);
                 e.printStackTrace();
                 this.interrupt();
             }

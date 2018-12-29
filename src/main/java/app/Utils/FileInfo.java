@@ -24,14 +24,12 @@ public class FileInfo {
         try {
             data = Files.readAllBytes(filePath);
         } catch (IOException e) {
-            System.out.println("FileInfo - read file bytes " + e);
             e.printStackTrace();
         }
 
         try {
             this.md5 = MD5Sum.md5(data);
         } catch (NoSuchAlgorithmException e) {
-            System.out.println("FileInfo - calculate md5 sum " + e);
             e.printStackTrace();
         }
     }

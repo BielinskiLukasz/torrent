@@ -40,7 +40,6 @@ class TCPServerAction {
         try {
             outToClient = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPServerAction - creating outputStream " + e);
             e.printStackTrace();
         }
 
@@ -57,7 +56,6 @@ class TCPServerAction {
         try {
             outToClient.writeBytes(response + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - write to server " + e);
             e.printStackTrace();
         }
 
@@ -77,8 +75,6 @@ class TCPServerAction {
                     try {
                         userSocket = new Socket(Config.HOST_IP, Config.PORT_NR + userNumber);
                     } catch (IOException e) {
-                        System.out.println(
-                                "TCPServerAction - creating socket " + e);
                         e.printStackTrace();
                     }
 
@@ -86,8 +82,6 @@ class TCPServerAction {
                     try {
                         outToClient = new DataOutputStream(userSocket.getOutputStream());
                     } catch (IOException e) {
-                        System.out.println(
-                                "TCPServerAction - creating dataOutputStream " + e);
                         e.printStackTrace();
                     }
 
@@ -95,7 +89,6 @@ class TCPServerAction {
                     try {
                         outToClient.writeBytes(command + "\n");
                     } catch (IOException e) {
-                        System.out.println("TCPServerAction - write to client " + e);
                         e.printStackTrace();
                     }
 
@@ -103,8 +96,6 @@ class TCPServerAction {
                     try {
                         inFromClient = new BufferedReader(new InputStreamReader(userSocket.getInputStream()));
                     } catch (IOException e) {
-                        System.out.println(
-                                "TCPServerAction - creating inputBufferedReader " + e);
                         e.printStackTrace();
                     }
 
@@ -112,7 +103,6 @@ class TCPServerAction {
                     try {
                         response = inFromClient.readLine();
                     } catch (IOException e) {
-                        System.out.println("TCPServerAction - read from client (clientFileList size) " + e);
                         e.printStackTrace();
                     }
                     Logger.serverDebugLog(command + " input: " + response);
@@ -124,7 +114,6 @@ class TCPServerAction {
                                     inFromClient.readLine()
                             );
                         } catch (IOException e) {
-                            System.out.println("TCPServerAction - read from client (specific clientFile) " + e);
                             e.printStackTrace();
                         }
                     }
@@ -132,7 +121,7 @@ class TCPServerAction {
                     try {
                         userSocket.close();
                     } catch (IOException e) {
-                        System.out.println("Error: " + e);
+                        e.printStackTrace();
                     }
 
                     Logger.serverLog("A file list from the client " + userNumber + " was received");
@@ -145,7 +134,6 @@ class TCPServerAction {
         try {
             outToClient = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPServerAction - creating outputStream " + e);
             e.printStackTrace();
         }
 
@@ -154,7 +142,6 @@ class TCPServerAction {
         try {
             outToClient.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + response + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - write to server " + e);
             e.printStackTrace();
         }
 
@@ -164,7 +151,6 @@ class TCPServerAction {
                     try {
                         finalOutToServer.writeBytes(fileData + "\n");
                     } catch (IOException e) {
-                        System.out.println("TCPClientActionMH - write to server (specific clientFile)" + e);
                         e.printStackTrace();
                     }
                     Logger.serverDebugLog(command + " input: " + fileData);
@@ -181,7 +167,6 @@ class TCPServerAction {
         try {
             outToClient = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPServerAction - creating outputStream " + e);
             e.printStackTrace();
         }
 
@@ -196,7 +181,6 @@ class TCPServerAction {
         try {
             outToClient.writeBytes(response + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - write to server " + e);
             e.printStackTrace();
         }
 
@@ -210,7 +194,6 @@ class TCPServerAction {
         try {
             outToClient = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPServerAction - creating outputStream " + e);
             e.printStackTrace();
         }
 
@@ -220,7 +203,6 @@ class TCPServerAction {
         try {
             outToClient.writeBytes(response + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - write to server " + e);
             e.printStackTrace();
         }
 

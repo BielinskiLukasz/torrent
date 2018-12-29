@@ -33,7 +33,6 @@ public class TCPServer extends Thread {
         try {
             welcomeSocket = new ServerSocket(Config.PORT_NR);
         } catch (IOException e) {
-            System.out.println("TCPServer - new ServerSocket " + e);
             e.printStackTrace();
         }
 
@@ -44,7 +43,6 @@ public class TCPServer extends Thread {
                 TCPServerConnection connection = new TCPServerConnection(this, connectionSocket);
                 connection.start();
             } catch (IOException e) {
-                System.out.println("TCPServer - server connection " + e);
                 e.printStackTrace();
             }
 

@@ -43,7 +43,6 @@ public class TCPConsoleActionH2H {
         try {
             connectionSocket = new Socket(Config.HOST_IP, connectedHostPortNumber);
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - creating socket " + e);
             e.printStackTrace();
         }
 
@@ -51,7 +50,6 @@ public class TCPConsoleActionH2H {
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - creating dataOutputStream " + e);
             e.printStackTrace();
         }
 
@@ -59,7 +57,6 @@ public class TCPConsoleActionH2H {
         try {
             outToServer.writeBytes(command + "\n");
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - write to server " + e);
             e.printStackTrace();
         }
 
@@ -67,7 +64,6 @@ public class TCPConsoleActionH2H {
         try {
             inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - creating inputBufferedReader " + e);
             e.printStackTrace();
         }
 
@@ -75,7 +71,6 @@ public class TCPConsoleActionH2H {
         try {
             response = inFromServer.readLine();
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - read from server " + e);
             e.printStackTrace();
         }
         Logger.appDebugLog(command + " input: " + response);
@@ -87,7 +82,6 @@ public class TCPConsoleActionH2H {
                         inFromServer.readLine().replaceAll("\\|", " ")
                 );
             } catch (IOException e) {
-                System.out.println("TCPServerAction - read from client (specific clientFile) " + e);
                 e.printStackTrace();
             }
         }
@@ -95,7 +89,6 @@ public class TCPConsoleActionH2H {
         try {
             connectionSocket.close();
         } catch (IOException e) {
-            System.out.println("TCPConsoleActionMH - closing socket " + e);
             e.printStackTrace();
         }
 

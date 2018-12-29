@@ -29,7 +29,6 @@ public class TCPClientConnectionH2H extends Thread {
                 connectWithHost(client.getClientNumber(), client.getConnectedClientNumber());
             }
         } catch (IOException e) {
-            System.out.println("TCPClientConnectionH2H - client initiation " + e);
             e.printStackTrace();
         }
 
@@ -47,7 +46,6 @@ public class TCPClientConnectionH2H extends Thread {
                     TCPClientActionH2H.perform(client, connectionSocket, clientSentence);
                 }
             } catch (IOException e) {
-                System.out.println("TCPClientConnectionH2H - read line from server " + e);
                 e.printStackTrace();
             }
 
@@ -66,7 +64,6 @@ public class TCPClientConnectionH2H extends Thread {
         try {
             hostClientSocket = new Socket(Config.HOST_IP, Config.PORT_NR + connectedClientNumber);
         } catch (IOException e) {
-            System.out.println("TCPClientConnectionH2H - creating a socket to initiate the connection " + e);
             e.printStackTrace();
         }
 
@@ -77,7 +74,6 @@ public class TCPClientConnectionH2H extends Thread {
         try {
             hostClientSocket.close();
         } catch (IOException e) {
-            System.out.println("TCPClientConnectionH2H - close client socket " + e);
             e.printStackTrace();
         }
 

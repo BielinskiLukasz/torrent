@@ -39,7 +39,6 @@ public class TCPClientActionH2H {
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - creating dataOutputStream " + e);
             e.printStackTrace();
         }
 
@@ -53,7 +52,6 @@ public class TCPClientActionH2H {
             outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + client.getClientNumber() +
                     Config.SENTENCE_SPLITS_CHAR + message + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - write to host " + e);
             e.printStackTrace();
         }
 
@@ -61,7 +59,6 @@ public class TCPClientActionH2H {
         try {
             inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - creating inputBufferedReader " + e);
             e.printStackTrace();
         }
 
@@ -69,7 +66,6 @@ public class TCPClientActionH2H {
         try {
             response = inFromServer.readLine();
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - read from host " + e);
             e.printStackTrace();
         }
         Logger.clientDebugLog(command + " input: " + response);
@@ -85,7 +81,6 @@ public class TCPClientActionH2H {
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - creating dataOutputStream " + e);
             e.printStackTrace();
         }
         Logger.clientDebugLog(command + " input: " + clientSentence);
@@ -98,7 +93,6 @@ public class TCPClientActionH2H {
         try {
             outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + response + "\n");
         } catch (IOException e) {
-            System.out.println("TCPClientActionMH - write to server (clientFileList size) " + e);
             e.printStackTrace();
         }
         Logger.clientDebugLog(command + " input: " + response);
@@ -109,7 +103,6 @@ public class TCPClientActionH2H {
                     try {
                         finalOutToServer.writeBytes(fileData + "\n");
                     } catch (IOException e) {
-                        System.out.println("TCPClientActionMH - write to server (specific clientFile)" + e);
                         e.printStackTrace();
                     }
                     Logger.clientDebugLog(command + " input: " + fileData);
