@@ -1,7 +1,8 @@
-package app.client.host;
+package app.client.host.multihost;
 
 import app.Utils.Logger;
-import app.client.TCPClient;
+import app.client.host.CommandClient;
+import app.client.host.TCPClientAction;
 import app.config.Config;
 
 import java.io.BufferedReader;
@@ -10,23 +11,23 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class TCPClientConnection extends Thread {
+public class TCPClientConnectionMH extends Thread {
 
-    private TCPClient client;
+    private TCPClientMH client;
 
-    public TCPClientConnection(TCPClient tcpClient) {
-        this.client = tcpClient;
+    TCPClientConnectionMH(TCPClientMH tcpClientMH) {
+        this.client = tcpClientMH;
     }
 
     public void run() {
-        Logger.clientDebugLog("TCPClientConnection: run");
+        Logger.clientDebugLog("TCPClientConnectionMH: run");
 
         ServerSocket hostServerSocket = null;
         try {
             hostServerSocket = new ServerSocket(Config.PORT_NR + client.getClientNumber());
             connectWithServer();
         } catch (IOException e) {
-            System.out.println("TCPClientConnection - client initiation " + e);
+            System.out.println("TCPClientConnectionMH - client initiation " + e);
             e.printStackTrace();
         }
 
@@ -44,7 +45,7 @@ public class TCPClientConnection extends Thread {
                     TCPClientAction.perform(client.getClientNumber(), connectionSocket, clientSentence);
                 }
             } catch (IOException e) {
-                System.out.println("TCPClientConnection - read line from server " + e);
+                System.out.println("TCPClientConnectionMH - read line from server " + e);
                 e.printStackTrace();
             }
 
@@ -57,13 +58,13 @@ public class TCPClientConnection extends Thread {
     }
 
     private void connectWithServer() {
-        Logger.clientDebugLog("TCPClientConnection: fire connectWithServer");
+        Logger.clientDebugLog("TCPClientConnectionMH: fire connectWithServer");
 
         Socket hostClientSocket = null;
         try {
             hostClientSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
         } catch (IOException e) {
-            System.out.println("TCPClientConnection - creating a socket to initiate the connection " + e);
+            System.out.println("TCPClientConnectionMH - creating a socket to initiate the connection " + e);
             e.printStackTrace();
         }
 
@@ -74,10 +75,10 @@ public class TCPClientConnection extends Thread {
         try {
             hostClientSocket.close();
         } catch (IOException e) {
-            System.out.println("TCPClientConnection - close client socket " + e);
+            System.out.println("TCPClientConnectionMH - close client socket " + e);
             e.printStackTrace();
         }
 
-        Logger.clientDebugLog("TCPClientConnection: connectWithServer successfully");
+        Logger.clientDebugLog("TCPClientConnectionMH: connectWithServer successfully");
     }
 }
