@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -47,12 +46,13 @@ public class TCPClientActionMH {
     private static void connect(int clientNumber, Socket connectionSocket, String clientSentence) {
         Logger.clientDebugLog("fire connect");
 
-        DataOutputStream outToServer = null;
+        DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
+        /*DataOutputStream outToServer = null;
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         String command = ActionUtils.getCommand(clientSentence);
         String message = ActionUtils.getMessage(clientSentence);
@@ -64,12 +64,13 @@ public class TCPClientActionMH {
             e.printStackTrace();
         }
 
-        BufferedReader inFromServer = null;
+        BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);
+        /*BufferedReader inFromServer = null;
         try {
             inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         String response = null;
         try {
@@ -86,12 +87,15 @@ public class TCPClientActionMH {
         Logger.clientDebugLog("fire getFileList");
 
         String command = ActionUtils.getCommand(clientSentence);
-        DataOutputStream outToServer = null;
+
+        DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
+        /*DataOutputStream outToServer = null;
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
+
         Logger.clientDebugLog(command + " input: " + clientSentence);
 
         List<String> clientFileList = FileList.packFileInfoList(
@@ -136,12 +140,13 @@ public class TCPClientActionMH {
             e.printStackTrace();
         }
 
-        DataOutputStream outToServer = null;
+        DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
+        /*DataOutputStream outToServer = null;
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
         File file = new File(filePath);

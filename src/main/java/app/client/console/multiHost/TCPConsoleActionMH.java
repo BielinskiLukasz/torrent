@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.Socket;
 
 public class TCPConsoleActionMH {
@@ -64,12 +63,13 @@ public class TCPConsoleActionMH {
             e.printStackTrace();
         }*/
 
-        DataOutputStream outToServer = null;
+        DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
+        /*DataOutputStream outToServer = null;
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         Logger.appDebugLog(command + " output: " + "no message");
         try {
@@ -78,12 +78,13 @@ public class TCPConsoleActionMH {
             e.printStackTrace();
         }
 
-        BufferedReader inFromServer = null;
+        BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);
+        /*BufferedReader inFromServer = null;
         try {
             inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         String response = null;
         try {
@@ -134,12 +135,13 @@ public class TCPConsoleActionMH {
                 e.printStackTrace();
             }*/
 
-            DataOutputStream outToClient = null;
+            DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
+            /*DataOutputStream outToClient = null;
             try {
                 outToClient = new DataOutputStream(connectionSocket.getOutputStream());
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             String command = ActionUtils.getConsoleCommand(userSentence);
             String fileName = ActionUtils.getFileName(userSentence);
@@ -159,12 +161,13 @@ public class TCPConsoleActionMH {
                 e.printStackTrace();
             }
 
-            BufferedReader inFromClient = null;
+            BufferedReader inFromClient = ConnectionUtils.getBufferedReader(connectionSocket);
+            /*BufferedReader inFromClient = null;
             try {
                 inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             String response = null;
             try {
@@ -252,12 +255,13 @@ public class TCPConsoleActionMH {
             e.printStackTrace();
         }*/
 
-        DataOutputStream outToServer = null;
+        DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
+        /*DataOutputStream outToServer = null;
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         Logger.appDebugLog(command + " output: " + clientNumber);
         try {
@@ -266,12 +270,13 @@ public class TCPConsoleActionMH {
             e.printStackTrace();
         }
 
-        BufferedReader inFromServer = null;
+        BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);
+        /*BufferedReader inFromServer = null;
         try {
             inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         String response = null;
         try {
