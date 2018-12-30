@@ -140,7 +140,7 @@ class TCPServerAction {
         String response = String.valueOf(serverFileList.size());
         Logger.serverDebugLog(command + " output: " + response);
         try {
-            outToClient.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + response + "\n");
+            outToClient.writeBytes(command + Config.SPLITS_CHAR + response + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }

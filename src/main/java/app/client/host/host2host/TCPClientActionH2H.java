@@ -56,8 +56,8 @@ public class TCPClientActionH2H {
         String message = ActionUtils.getMessage(clientSentence);
         Logger.clientDebugLog(command + " output: " + message);
         try {
-            outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + client.getClientNumber() +
-                    Config.SENTENCE_SPLITS_CHAR + message + "\n");
+            outToServer.writeBytes(command + Config.SPLITS_CHAR + client.getClientNumber() +
+                    Config.SPLITS_CHAR + message + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -98,7 +98,7 @@ public class TCPClientActionH2H {
 
         String response = String.valueOf(clientFileList.size());
         try {
-            outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + response + "\n");
+            outToServer.writeBytes(command + Config.SPLITS_CHAR + response + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -8,7 +8,7 @@ public class Config {
 
     public static final int BUFFER_SIZE_IN_BYTES = 8192;
 
-    public static final String SENTENCE_SPLITS_CHAR = "*";
+    public static final String SPLITS_CHAR = "*";
 
     public static final int MILLISECONDS_OF_CONNECTION_LISTENER_WAITING = 1000;
 

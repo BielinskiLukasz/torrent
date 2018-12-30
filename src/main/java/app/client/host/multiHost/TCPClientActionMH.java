@@ -54,8 +54,8 @@ public class TCPClientActionMH {
         String message = ActionUtils.getMessage(clientSentence);
         Logger.clientDebugLog(command + " output: " + message);
         try {
-            outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + clientNumber +
-                    Config.SENTENCE_SPLITS_CHAR + message + "\n");
+            outToServer.writeBytes(command + Config.SPLITS_CHAR + clientNumber +
+                    Config.SPLITS_CHAR + message + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -96,7 +96,7 @@ public class TCPClientActionMH {
 
         String response = String.valueOf(clientFileList.size());
         try {
-            outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + response + "\n");
+            outToServer.writeBytes(command + Config.SPLITS_CHAR + response + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -140,14 +140,21 @@ public class TCPClientActionMH {
         }
 
         File file = new File(Config.BASIC_PATH + clientNumber + "//" + fileName);
-        if (file.exists()) {
 
+        if (file.exists()) {
             response = "Sending file " + fileName + " started";
-            try {
-                outToServer.writeBytes(response + "\n");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        } else {
+            response = "Client " + clientNumber + " doesn't share file " + fileName +
+                    ". Chceck file name and client number";
+        }
+
+        try {
+            outToServer.writeBytes(command + Config.SPLITS_CHAR + file.exists() + Config.SPLITS_CHAR + response + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (file.exists()) {
 
             FileInputStream fileInputStream = null;
             try {
@@ -167,12 +174,6 @@ public class TCPClientActionMH {
             }
 
             try {
-                outputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
                 fileInputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -180,30 +181,12 @@ public class TCPClientActionMH {
 
             Logger.clientLog("Send file " + fileName + " to client " + targetClientNumber);
 
-        } else {
+        }
 
-            response = "Client " + clientNumber + " doesn't share file " + fileName +
-                    ". Chceck file name and client number";
-            try {
-                outToServer.writeBytes(response + "\n");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                byte[] buffer = new byte[Config.BUFFER_SIZE_IN_BYTES];
-                outputStream.write(buffer);
-            } catch (IOException e) {
-                System.out.println("Error: " + e);
-            }
-            Logger.clientDebugLog(command + " send fake file");
-
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Logger.clientDebugLog(command + " close outputStream");
+        try {
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         Logger.clientDebugLog(command + " sending sequence ended");

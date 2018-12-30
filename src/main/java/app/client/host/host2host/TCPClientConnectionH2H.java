@@ -67,8 +67,8 @@ public class TCPClientConnectionH2H extends Thread {
             e.printStackTrace();
         }
 
-        String helloMessage = ClientCommand.CONNECT + Config.SENTENCE_SPLITS_CHAR + client.getClientNumber() +
-                Config.SENTENCE_SPLITS_CHAR + "Hello, I'm client " + client.getClientNumber();
+        String helloMessage = ClientCommand.CONNECT + Config.SPLITS_CHAR + client.getClientNumber() +
+                Config.SPLITS_CHAR + "Hello, I'm client " + client.getClientNumber();
         TCPClientActionMH.perform(client.getClientNumber(), hostClientSocket, helloMessage);
 
         try {

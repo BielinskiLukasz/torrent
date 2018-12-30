@@ -157,7 +157,7 @@ public class TCPConsoleActionMH {
 
         Logger.appDebugLog(command + " output: " + clientNumber);
         try {
-            outToServer.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + clientNumber + "\n");
+            outToServer.writeBytes(command + Config.SPLITS_CHAR + clientNumber + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -189,14 +189,7 @@ public class TCPConsoleActionMH {
     private static void pull(int clientNumber, String userSentence) {
 
         // TODO REFACTOR !!!
-        //  split checking that file exist and sending!
-        //  firstly connect with clientB and ask about file existing
-        //  if file doesn't exist clientB send message with boolean FALSE on [2]
-        //  client A read this and print in console some logs
-        //  if file exist clientB send message with boolean TRUE on [2] and start sending file
-        //  client A read this, print in console some logs and start to listening incoming file
-        //  that sounds better to me then my actual solution
-        //  and don't forget about md5 sum check, and deleting file (+ print logs) if don't
+        //  md5 sum check, and deleting file (+ print logs) if don't
 
         Logger.appDebugLog("fire pull");
 
@@ -226,8 +219,8 @@ public class TCPConsoleActionMH {
 
             Logger.appDebugLog(command + " output: " + clientNumber + " " + fileName);
             try {
-                outToClient.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + clientNumber +
-                        Config.SENTENCE_SPLITS_CHAR + fileName + "\n");
+                outToClient.writeBytes(command + Config.SPLITS_CHAR + clientNumber +
+                        Config.SPLITS_CHAR + fileName + "\n");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -254,35 +247,43 @@ public class TCPConsoleActionMH {
             }
             Logger.appDebugLog(command + " input: " + response);
 
-            Logger.appLog(response);
+            Boolean fileExist = ActionUtils.getBoolean(response);
 
-            File file = new File(Config.BASIC_PATH + clientNumber + "//" + fileName);
-            FileOutputStream fileOutputStream = null;
-            try {
-                fileOutputStream = new FileOutputStream(file);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            Logger.appDebugLog(command + " open fileOutputStream");
+            String message = ActionUtils.getMessage(response);
 
-            int count;
-            byte[] buffer = new byte[8192];
-            try {
-                while ((count = inputStream.read(buffer)) > 0) {
-                    fileOutputStream.write(buffer, 0, count);
+            Logger.appLog(message);
+            Logger.appLog("" + fileExist);
+
+
+            if (fileExist) {
+
+                File file = new File(Config.BASIC_PATH + clientNumber + "//" + fileName);
+                FileOutputStream fileOutputStream = null;
+                try {
+                    fileOutputStream = new FileOutputStream(file);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                Logger.appDebugLog(command + " open fileOutputStream");
 
-            try {
-                fileOutputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Logger.appDebugLog(command + " close fileOutputStream");
+                int count;
+                byte[] buffer = new byte[8192];
+                try {
+                    while ((count = inputStream.read(buffer)) > 0) {
+                        fileOutputStream.write(buffer, 0, count);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Logger.appDebugLog(command + " close fileOutputStream");
 
-            // TODO implements checking md5 sum (and delete file if aren't correct)
+                // TODO implements checking md5 sum (and delete file if aren't correct)
+            }
 
             try {
                 connectionSocket.close();
@@ -290,7 +291,7 @@ public class TCPConsoleActionMH {
                 e.printStackTrace();
             }
 
-            Logger.appLog("Finish sending file");
+            Logger.appLog("Finished");
         }
     }
 

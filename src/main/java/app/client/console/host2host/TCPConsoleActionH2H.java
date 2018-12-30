@@ -159,8 +159,8 @@ public class TCPConsoleActionH2H {
 
             Logger.appDebugLog(command + " output: " + clientNumber + " " + fileName);
             try {
-                outToClient.writeBytes(command + Config.SENTENCE_SPLITS_CHAR + clientNumber +
-                        Config.SENTENCE_SPLITS_CHAR + fileName + "\n");
+                outToClient.writeBytes(command + Config.SPLITS_CHAR + clientNumber +
+                        Config.SPLITS_CHAR + fileName + "\n");
             } catch (IOException e) {
                 e.printStackTrace();
             }
