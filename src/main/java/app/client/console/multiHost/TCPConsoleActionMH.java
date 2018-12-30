@@ -10,7 +10,6 @@ import app.utils.MD5Sum;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -167,12 +166,13 @@ public class TCPConsoleActionMH {
             }
             Logger.consoleDebugLog(command + " output: " + clientNumber + " " + fileName);*/
 
-            InputStream inputStream = null;
+            InputStream inputStream = ConnectionUtils.getInputStream(connectionSocket);
+            /*InputStream inputStream = null;
             try {
                 inputStream = connectionSocket.getInputStream();
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             BufferedReader inFromClient = ConnectionUtils.getBufferedReader(connectionSocket);
             /*BufferedReader inFromClient = null;
@@ -210,13 +210,14 @@ public class TCPConsoleActionMH {
                 String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
 
                 File file = new File(filePath);
-                FileOutputStream fileOutputStream = null;
+                FileOutputStream fileOutputStream = ConnectionUtils.createFileOutputStream(file);
+                /*FileOutputStream fileOutputStream = null;
                 try {
                     fileOutputStream = new FileOutputStream(file);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-                Logger.consoleDebugLog(command + " open fileOutputStream");
+                Logger.consoleDebugLog(command + " open fileOutputStream");*/
 
                 int count;
                 byte[] buffer = new byte[8192];
@@ -228,12 +229,13 @@ public class TCPConsoleActionMH {
                     e.printStackTrace();
                 }
 
-                try {
+                ConnectionUtils.closeFileOutputStream(fileOutputStream);
+                /*try {
                     fileOutputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Logger.consoleDebugLog(command + " close fileOutputStream");
+                Logger.consoleDebugLog(command + " close fileOutputStream");*/
 
                 if (MD5Sum.check(filePath, fileMD5Sum)) {
                     Logger.consoleLog("File downloaded successfully");

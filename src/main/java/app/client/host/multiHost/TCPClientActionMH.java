@@ -12,7 +12,6 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -135,12 +134,13 @@ public class TCPClientActionMH {
         String fileName = ActionUtils.getFileName(clientSentence);
         String response;
 
-        OutputStream outputStream = null;
+        OutputStream outputStream = ConnectionUtils.getOutputStream(connectionSocket);
+        /*OutputStream outputStream = null;
         try {
             outputStream = connectionSocket.getOutputStream();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
         /*DataOutputStream outToServer = null;
@@ -182,12 +182,13 @@ public class TCPClientActionMH {
                 e.printStackTrace();
             }*/
 
-            FileInputStream fileInputStream = null;
+            FileInputStream fileInputStream = ConnectionUtils.createFileInputStream(file);
+            /*FileInputStream fileInputStream = null;
             try {
                 fileInputStream = new FileInputStream(file);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             int count;
             byte[] buffer = new byte[Config.BUFFER_SIZE_IN_BYTES];
@@ -199,11 +200,7 @@ public class TCPClientActionMH {
                 e.printStackTrace();
             }
 
-            try {
-                fileInputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            ConnectionUtils.closeFileInputStream(fileInputStream);
 
             Logger.clientLog("Send file " + fileName + " to client " + targetClientNumber);
         }
