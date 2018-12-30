@@ -1,5 +1,7 @@
 package app.utils;
 
+import app.config.Config;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -41,5 +43,27 @@ public class ConnectionUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void sendMessageToDataOutputStream(DataOutputStream dataOutputStream, String message, String... furtherPartOfMessage) {
+        if (furtherPartOfMessage.length > 0) {
+            message += createAttachedMessage(furtherPartOfMessage);
+        }
+        try {
+            dataOutputStream.writeBytes(message + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Logger.utilsDebugLog("send: " + message);
+    }
+
+    private static String createAttachedMessage(String[] furtherPartsOfMessage) {
+        StringBuilder attachedMessage = new StringBuilder();
+
+        for (String furtherPartOfMessage : furtherPartsOfMessage) {
+            attachedMessage.append(Config.SPLITS_CHAR).append(furtherPartOfMessage);
+        }
+
+        return attachedMessage.toString();
     }
 }

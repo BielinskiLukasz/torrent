@@ -19,7 +19,7 @@ public class TCPConsoleConnectionH2H extends Thread {
     }
 
     public void run() {
-        Logger.appDebugLog("TCPConsoleConnectionH2H: run");
+        Logger.consoleDebugLog("TCPConsoleConnectionH2H: run");
 
         BufferedReader inFromUser;
         String userSentence;

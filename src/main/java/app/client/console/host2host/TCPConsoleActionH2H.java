@@ -26,7 +26,7 @@ public class TCPConsoleActionH2H {
                 break;
             case UNSUPPORTED_COMMAND:
             default:
-                Logger.appLog("command is not supported");
+                Logger.consoleLog("command is not supported");
                 break;
         }
     }
@@ -67,7 +67,7 @@ public class TCPConsoleActionH2H {
     }
 
     private static void getFileList(String command, int connectedHostPortNumber) {
-        Logger.appDebugLog("fire getFileList");
+        Logger.consoleDebugLog("fire getFileList");
 
         Socket connectionSocket = null;
         try {
@@ -83,7 +83,7 @@ public class TCPConsoleActionH2H {
             e.printStackTrace();
         }
 
-        Logger.appDebugLog(command + " output: " + "no message");
+        Logger.consoleDebugLog(command + " output: " + "no message");
         try {
             outToServer.writeBytes(command + "\n");
         } catch (IOException e) {
@@ -103,12 +103,12 @@ public class TCPConsoleActionH2H {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Logger.appDebugLog(command + " input: " + response);
+        Logger.consoleDebugLog(command + " input: " + response);
 
         int serverFileListSize = ActionUtils.getListSize(response);
         for (int i = 0; i < serverFileListSize; i++) {
             try {
-                Logger.appLog(
+                Logger.consoleLog(
                         inFromServer.readLine().replaceAll("\\|", " ")
                 );
             } catch (IOException e) {
@@ -122,6 +122,6 @@ public class TCPConsoleActionH2H {
             e.printStackTrace();
         }
 
-        Logger.appLog("Server file list was displayed");
+        Logger.consoleLog("Server file list was displayed");
     }
 }

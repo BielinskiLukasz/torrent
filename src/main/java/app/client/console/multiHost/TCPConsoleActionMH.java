@@ -43,17 +43,21 @@ public class TCPConsoleActionMH {
                 break;
             case UNSUPPORTED_COMMAND:
             default:
-                Logger.appLog("command is not supported");
+                Logger.consoleLog("command is not supported");
                 break;
         }
     }
 
     private static String addSplitChars(String userSentence) {
-        return userSentence.replaceFirst(" ", Config.SPLITS_CHAR).replaceFirst(" ", Config.SPLITS_CHAR);
+        for (int i = 0; i < (Config.MAX_NUMBER_OF_PARAMETERS - 1); i++) {
+            userSentence = userSentence.replaceFirst(" ", Config.SPLITS_CHAR);
+        }
+
+        return userSentence;
     }
 
     private static void getFileList(String command) {
-        Logger.appDebugLog("fire getFileList");
+        Logger.consoleDebugLog("fire getFileList");
 
         Socket connectionSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
         /*Socket connectionSocket = null;
@@ -71,12 +75,13 @@ public class TCPConsoleActionMH {
             e.printStackTrace();
         }*/
 
-        Logger.appDebugLog(command + " output: " + "no message");
-        try {
+        ConnectionUtils.sendMessageToDataOutputStream(outToServer, command);
+        /*try {
             outToServer.writeBytes(command + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Logger.consoleDebugLog(command + " output: " + "no message");*/
 
         BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);
         /*BufferedReader inFromServer = null;
@@ -92,13 +97,14 @@ public class TCPConsoleActionMH {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Logger.appDebugLog(command + " input: " + response);
+        Logger.consoleDebugLog(command + " input: " + response);
 
         int serverFileListSize = ActionUtils.getListSize(response);
         for (int i = 0; i < serverFileListSize; i++) {
             try {
-                Logger.appLog(
-                        inFromServer.readLine().replaceAll("\\|", " ")
+                Logger.consoleLog(
+                        inFromServer.readLine()
+                                .replaceAll(String.format("\\%s", Config.FILE_INFO_SPLITS_CHAR), " ")
                 );
             } catch (IOException e) {
                 e.printStackTrace();
@@ -111,17 +117,17 @@ public class TCPConsoleActionMH {
             e.printStackTrace();
         }
 
-        Logger.appLog("Server file list was displayed");
+        Logger.consoleLog("Server file list was displayed");
     }
 
     private static void pull(int clientNumber, String userSentence) {
-        Logger.appDebugLog("fire pull");
+        Logger.consoleDebugLog("fire pull");
 
         int sourceClientNumber = ActionUtils.getClientNumber(userSentence);
 
         if (sourceClientNumber == clientNumber) {
-            Logger.appLog("It is not the client you are looking for :)");
-            Logger.appLog("There is no need to download the file from yourself");
+            Logger.consoleLog("It is not the client you are looking for :)");
+            Logger.consoleLog("There is no need to download the file from yourself");
         } else {
 
             //TODO BACKLOG connect to server and check that selected client is connected with server - here
@@ -146,13 +152,14 @@ public class TCPConsoleActionMH {
             String command = ActionUtils.getConsoleCommand(userSentence);
             String fileName = ActionUtils.getFileName(userSentence);
 
-            Logger.appDebugLog(command + " output: " + clientNumber + " " + fileName);
-            try {
+            ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
+            /*try {
                 outToClient.writeBytes(command + Config.SPLITS_CHAR + clientNumber +
                         Config.SPLITS_CHAR + fileName + "\n");
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            Logger.consoleDebugLog(command + " output: " + clientNumber + " " + fileName);*/
 
             InputStream inputStream = null;
             try {
@@ -175,13 +182,13 @@ public class TCPConsoleActionMH {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Logger.appDebugLog(command + " input: " + response);
+            Logger.consoleDebugLog(command + " input: " + response);
 
             Boolean fileExist = ActionUtils.getBoolean(response);
             String message = ActionUtils.getMessage(response);
 
-            Logger.appLog(message);
-            Logger.appDebugLog("" + fileExist);
+            Logger.consoleLog(message);
+            Logger.consoleDebugLog("" + fileExist);
 
             if (fileExist) {
                 try {
@@ -189,7 +196,7 @@ public class TCPConsoleActionMH {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Logger.appDebugLog(command + " input: " + response);
+                Logger.consoleDebugLog(command + " input: " + response);
 
                 String fileMD5Sum = ActionUtils.getMD5Sum(response);
                 String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
@@ -201,7 +208,7 @@ public class TCPConsoleActionMH {
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-                Logger.appDebugLog(command + " open fileOutputStream");
+                Logger.consoleDebugLog(command + " open fileOutputStream");
 
                 int count;
                 byte[] buffer = new byte[8192];
@@ -217,14 +224,14 @@ public class TCPConsoleActionMH {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Logger.appDebugLog(command + " close fileOutputStream");
+                Logger.consoleDebugLog(command + " close fileOutputStream");
 
                 if (MD5Sum.check(filePath, fileMD5Sum)) {
-                    Logger.appLog("File downloaded successfully");
+                    Logger.consoleLog("File downloaded successfully");
                 } else {
-                    Logger.appLog("Unsuccessful file download");
+                    Logger.consoleLog("Unsuccessful file download");
                     if (file.delete()) {
-                        Logger.appDebugLog("Remove invalid file");
+                        Logger.consoleDebugLog("Remove invalid file");
                     }
                 }
             }
@@ -236,7 +243,7 @@ public class TCPConsoleActionMH {
                 e.printStackTrace();
             }*/
 
-            Logger.appLog("Finished");
+            Logger.consoleLog("Finished");
         }
     }
 
@@ -245,7 +252,7 @@ public class TCPConsoleActionMH {
     }
 
     private static void close(int clientNumber, String command) {
-        Logger.appDebugLog("fire close");
+        Logger.consoleDebugLog("fire close");
 
         Socket connectionSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
         /*Socket connectionSocket = null;
@@ -263,12 +270,13 @@ public class TCPConsoleActionMH {
             e.printStackTrace();
         }*/
 
-        Logger.appDebugLog(command + " output: " + clientNumber);
-        try {
+        ConnectionUtils.sendMessageToDataOutputStream(outToServer, command, String.valueOf(clientNumber));
+        /*try {
             outToServer.writeBytes(command + Config.SPLITS_CHAR + clientNumber + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Logger.consoleDebugLog(command + " output: " + clientNumber);*/
 
         BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);
         /*BufferedReader inFromServer = null;
@@ -284,7 +292,7 @@ public class TCPConsoleActionMH {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Logger.appDebugLog(command + " input: " + response);
+        Logger.consoleDebugLog(command + " input: " + response);
 
         ConnectionUtils.closeSocket(connectionSocket);
         /*try {
@@ -293,6 +301,6 @@ public class TCPConsoleActionMH {
             e.printStackTrace();
         }*/
 
-        Logger.appLog("Connection closed");
+        Logger.consoleLog("Connection closed");
     }
 }

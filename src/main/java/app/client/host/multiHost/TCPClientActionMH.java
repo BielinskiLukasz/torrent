@@ -56,13 +56,14 @@ public class TCPClientActionMH {
 
         String command = ActionUtils.getCommand(clientSentence);
         String message = ActionUtils.getMessage(clientSentence);
-        Logger.clientDebugLog(command + " output: " + message);
-        try {
+        ConnectionUtils.sendMessageToDataOutputStream(outToServer, command, String.valueOf(clientNumber), message);
+        /*try {
             outToServer.writeBytes(command + Config.SPLITS_CHAR + clientNumber +
                     Config.SPLITS_CHAR + message + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Logger.clientDebugLog(command + " output: " + message);*/
 
         BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);
         /*BufferedReader inFromServer = null;
@@ -103,22 +104,23 @@ public class TCPClientActionMH {
         );
 
         String response = String.valueOf(clientFileList.size());
-        try {
+        ConnectionUtils.sendMessageToDataOutputStream(outToServer, command, response);
+        /*try {
             outToServer.writeBytes(command + Config.SPLITS_CHAR + response + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Logger.clientDebugLog(command + " input: " + response);
+        Logger.clientDebugLog(command + " input: " + response);*/
 
-        DataOutputStream finalOutToServer = outToServer;
         clientFileList.forEach(
                 fileData -> {
-                    try {
+                    ConnectionUtils.sendMessageToDataOutputStream(outToServer, fileData);
+                    /*try {
                         finalOutToServer.writeBytes(fileData + "\n");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    Logger.clientDebugLog(command + " input: " + fileData);
+                    Logger.clientDebugLog(command + " input: " + fileData);*/
                 }
         );
 
@@ -158,11 +160,12 @@ public class TCPClientActionMH {
                     ". Chceck file name and client number";
         }
 
-        try {
+        ConnectionUtils.sendMessageToDataOutputStream(outToServer, command, String.valueOf(file.exists()), response);
+        /*try {
             outToServer.writeBytes(command + Config.SPLITS_CHAR + file.exists() + Config.SPLITS_CHAR + response + "\n");
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         if (file.exists()) {
             String md5sum = null;
@@ -172,11 +175,12 @@ public class TCPClientActionMH {
                 e.printStackTrace();
             }
             response = "Sending file " + fileName + " md5 sum";
-            try {
+            ConnectionUtils.sendMessageToDataOutputStream(outToServer, command, md5sum, response);
+            /*try {
                 outToServer.writeBytes(command + Config.SPLITS_CHAR + md5sum + Config.SPLITS_CHAR + response + "\n");
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             FileInputStream fileInputStream = null;
             try {

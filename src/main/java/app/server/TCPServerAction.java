@@ -52,17 +52,17 @@ class TCPServerAction {
         server.addClient(clientNumber);
 
         String response = "Hello client " + clientNumber;
-        Logger.serverDebugLog(command + " output: " + response);
 
-        try {
+        ConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
+        /*try {
             outToClient.writeBytes(response + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Logger.serverDebugLog(command + " output: " + response);*/
 
         Logger.serverLog("Connection to client " + clientNumber + " was detected");
     }
-
 
     private static void getFileList(TCPServer server, Socket connectionSocket, String command) {
         Logger.serverDebugLog("fire getFileList");
@@ -89,12 +89,13 @@ class TCPServerAction {
                         e.printStackTrace();
                     }*/
 
-                    Logger.serverDebugLog(command + " output: " + "no message");
-                    try {
+                    ConnectionUtils.sendMessageToDataOutputStream(outToClient, command);
+                    /*try {
                         outToClient.writeBytes(command + "\n");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    Logger.serverDebugLog(command + " output: " + "no message");*/
 
                     BufferedReader inFromClient = ConnectionUtils.getBufferedReader(userSocket);
                     /*BufferedReader inFromClient = null;
@@ -145,12 +146,13 @@ class TCPServerAction {
         }*/
 
         String response = String.valueOf(serverFileList.size());
-        Logger.serverDebugLog(command + " output: " + response);
-        try {
+        ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, response);
+        /*try {
             outToClient.writeBytes(command + Config.SPLITS_CHAR + response + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Logger.serverDebugLog(command + " output: " + response);*/
 
         DataOutputStream finalOutToServer = outToClient;
         serverFileList.forEach(
@@ -182,15 +184,16 @@ class TCPServerAction {
 
         server.removeClient(clientNumber);
 
-        String command = ActionUtils.getCommand(clientSentence);
+//        String command = ActionUtils.getCommand(clientSentence);
         String response = "Bye client " + clientNumber;
-        Logger.serverDebugLog(command + " output: " + response);
 
-        try {
+        ConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
+        /*try {
             outToClient.writeBytes(response + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Logger.serverDebugLog(command + " output: " + response);*/
 
         Logger.serverLog("Connection with client " + clientNumber + " was closed");
     }
@@ -207,13 +210,14 @@ class TCPServerAction {
         }*/
 
         String response = '"' + command + '"' + " command is not supported yet";
-        Logger.serverDebugLog(command + " output: " + response);
 
-        try {
+        ConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
+        /*try {
             outToClient.writeBytes(response + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Logger.serverDebugLog(command + " output: " + response);*/
 
         Logger.serverLog("Not supported command message sent");
     }

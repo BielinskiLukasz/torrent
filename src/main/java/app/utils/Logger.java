@@ -4,8 +4,8 @@ public class Logger {
 
     private static final boolean SERVER_LOG_DISPLAY = true;
     private static final boolean CLIENT_LOG_DISPLAY = true;
-    private static final boolean APP_LOG_DISPLAY = true;
-    private static final boolean DEBUG_LOG_DISPLAY = false;
+    private static final boolean CONSOLE_LOG_DISPLAY = true;
+    private static final boolean DEBUG_LOG_DISPLAY = true;
 
     public static void serverLog(String message) {
         if (SERVER_LOG_DISPLAY)
@@ -17,8 +17,8 @@ public class Logger {
             System.out.println(message);
     }
 
-    public static void appLog(String message) {
-        if (APP_LOG_DISPLAY)
+    public static void consoleLog(String message) {
+        if (CONSOLE_LOG_DISPLAY)
             System.out.println(message);
     }
 
@@ -32,8 +32,13 @@ public class Logger {
             System.out.println("Client: " + message);
     }
 
-    public static void appDebugLog(String message) {
+    public static void consoleDebugLog(String message) {
         if (DEBUG_LOG_DISPLAY)
-            System.out.println("App: " + message);
+            System.out.println("Console: " + message);
+    }
+
+    static void utilsDebugLog(String message) {
+        if (DEBUG_LOG_DISPLAY)
+            System.out.println("Utils: " + message);
     }
 }

@@ -17,7 +17,7 @@ public class TCPConsoleConnectionMH extends Thread {
     }
 
     public void run() {
-        Logger.appDebugLog("TCPConsoleConnectionMH: run");
+        Logger.consoleDebugLog("TCPConsoleConnectionMH: run");
 
         BufferedReader inFromUser;
         String userSentence;
