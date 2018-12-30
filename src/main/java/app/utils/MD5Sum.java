@@ -8,7 +8,9 @@ import java.security.NoSuchAlgorithmException;
 
 public class MD5Sum {
 
-    public static String md5(byte[] data) {
+    public static String md5(String filePath) {
+        byte[] data = readFileByres(filePath);
+
         MessageDigest mDigest = null;
         try {
             mDigest = MessageDigest.getInstance("MD5");
@@ -25,15 +27,18 @@ public class MD5Sum {
         return sb.toString();
     }
 
-    public static boolean check(String filePath, String md5Sum) {
+    private static byte[] readFileByres(String filePath) {
         byte[] data = new byte[0];
         try {
             data = Files.readAllBytes(Paths.get(filePath));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return data;
+    }
 
-        String checksum = md5(data);
+    public static boolean check(String filePath, String md5Sum) {
+        String checksum = md5(filePath);
 
         return checksum.equals(md5Sum);
     }
