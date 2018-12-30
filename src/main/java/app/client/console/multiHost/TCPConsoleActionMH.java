@@ -91,24 +91,30 @@ public class TCPConsoleActionMH {
             e.printStackTrace();
         }*/
 
-        String response = null;
+        String response = ConnectionUtils.readBufferedReaderLine(inFromServer);
+        /*String response = null;
         try {
             response = inFromServer.readLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Logger.consoleDebugLog(command + " input: " + response);
+        Logger.consoleDebugLog(command + " input: " + response);*/
 
         int serverFileListSize = ActionUtils.getListSize(response);
         for (int i = 0; i < serverFileListSize; i++) {
-            try {
+            Logger.consoleLog(
+                    ConnectionUtils.readBufferedReaderLine(inFromServer)
+                            .replaceAll(String.format("\\%s", Config.FILE_INFO_SPLITS_CHAR), " ")
+                    // TODO move getting better format to another place
+            );
+            /*try {
                 Logger.consoleLog(
                         inFromServer.readLine()
                                 .replaceAll(String.format("\\%s", Config.FILE_INFO_SPLITS_CHAR), " ")
                 );
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
 
         try {
@@ -176,13 +182,14 @@ public class TCPConsoleActionMH {
                 e.printStackTrace();
             }*/
 
-            String response = null;
+            String response = ConnectionUtils.readBufferedReaderLine(inFromClient);
+            /*String response = null;
             try {
                 response = inFromClient.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Logger.consoleDebugLog(command + " input: " + response);
+            Logger.consoleDebugLog(command + " input: " + response);*/
 
             Boolean fileExist = ActionUtils.getBoolean(response);
             String message = ActionUtils.getMessage(response);
@@ -191,12 +198,13 @@ public class TCPConsoleActionMH {
             Logger.consoleDebugLog("" + fileExist);
 
             if (fileExist) {
-                try {
+                response = ConnectionUtils.readBufferedReaderLine(inFromClient);
+                /*try {
                     response = inFromClient.readLine();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Logger.consoleDebugLog(command + " input: " + response);
+                Logger.consoleDebugLog(command + " input: " + response);*/
 
                 String fileMD5Sum = ActionUtils.getMD5Sum(response);
                 String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
@@ -219,6 +227,7 @@ public class TCPConsoleActionMH {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
                 try {
                     fileOutputStream.close();
                 } catch (IOException e) {
@@ -286,13 +295,14 @@ public class TCPConsoleActionMH {
             e.printStackTrace();
         }*/
 
-        String response = null;
+        ConnectionUtils.readBufferedReaderLine(inFromServer);
+        /*String response = null;
         try {
             response = inFromServer.readLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Logger.consoleDebugLog(command + " input: " + response);
+        Logger.consoleDebugLog(command + " input: " + response);*/
 
         ConnectionUtils.closeSocket(connectionSocket);
         /*try {

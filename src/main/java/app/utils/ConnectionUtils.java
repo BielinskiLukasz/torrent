@@ -66,4 +66,15 @@ public class ConnectionUtils {
 
         return attachedMessage.toString();
     }
+
+    public static String readBufferedReaderLine(BufferedReader bufferedReader) {
+        String response = null;
+        try {
+            response = bufferedReader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Logger.serverDebugLog("get: " + response);
+        return response;
+    }
 }

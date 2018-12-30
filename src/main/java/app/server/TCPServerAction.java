@@ -105,13 +105,14 @@ class TCPServerAction {
                         e.printStackTrace();
                     }*/
 
-                    String response = null;
+                    String response = ConnectionUtils.readBufferedReaderLine(inFromClient);
+                    /*String response = null;
                     try {
                         response = inFromClient.readLine();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    Logger.serverDebugLog(command + " input: " + response);
+                    Logger.serverDebugLog(command + " input: " + response);*/
 
                     int clientFileListSize = ActionUtils.getListSize(response);
                     for (int i = 0; i < clientFileListSize; i++) {
@@ -154,15 +155,15 @@ class TCPServerAction {
         }
         Logger.serverDebugLog(command + " output: " + response);*/
 
-        DataOutputStream finalOutToServer = outToClient;
         serverFileList.forEach(
                 fileData -> {
-                    try {
+                    ConnectionUtils.sendMessageToDataOutputStream(outToClient, fileData);
+                    /*try {
                         finalOutToServer.writeBytes(fileData + "\n");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    Logger.serverDebugLog(command + " input: " + fileData);
+                    Logger.serverDebugLog(command + " input: " + fileData);*/
                 }
         );
 

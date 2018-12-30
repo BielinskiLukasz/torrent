@@ -40,7 +40,6 @@ public class TCPClientActionMH {
                 Logger.clientLog('"' + command + '"' + " command is not supported yet");
                 break;
         }
-
     }
 
     private static void connect(int clientNumber, Socket connectionSocket, String clientSentence) {
@@ -73,13 +72,14 @@ public class TCPClientActionMH {
             e.printStackTrace();
         }*/
 
-        String response = null;
+        ConnectionUtils.readBufferedReaderLine(inFromServer);
+        /*String response = null;
         try {
             response = inFromServer.readLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Logger.clientDebugLog(command + " input: " + response);
+        Logger.clientDebugLog(command + " input: " + response);*/
 
         Logger.clientLog("Client " + clientNumber + " has connected to the server");
     }
