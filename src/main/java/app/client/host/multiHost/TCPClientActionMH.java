@@ -12,7 +12,6 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.List;
@@ -42,15 +41,22 @@ public class TCPClientActionMH {
     private static void connect(int clientNumber, Socket connectionSocket, String clientSentence) {
         Logger.clientDebugLog("fire connect");
 
+        sendConnectionRequest(connectionSocket, clientNumber, clientSentence);
+        receiveConfirmationOfConnection(connectionSocket);
+
+        Logger.clientLog("Client " + clientNumber + " has connected to the server");
+    }
+
+    private static void sendConnectionRequest(Socket connectionSocket, int clientNumber, String clientSentence) {
         DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
         String command = ActionUtils.getCommand(clientSentence);
         String message = ActionUtils.getMessage(clientSentence);
         ConnectionUtils.sendMessageToDataOutputStream(outToServer, command, String.valueOf(clientNumber), message);
+    }
 
+    private static void receiveConfirmationOfConnection(Socket connectionSocket) {
         BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);
         ConnectionUtils.readBufferedReaderLine(inFromServer);
-
-        Logger.clientLog("Client " + clientNumber + " has connected to the server");
     }
 
     private static void getFileList(int clientNumber, Socket connectionSocket, String clientSentence) {
@@ -103,15 +109,7 @@ public class TCPClientActionMH {
 
             FileInputStream fileInputStream = ConnectionUtils.createFileInputStream(file);
             OutputStream outputStream = ConnectionUtils.getOutputStream(connectionSocket);
-            int count;
-            byte[] buffer = new byte[Config.BUFFER_SIZE_IN_BYTES];
-            try {
-                while ((count = fileInputStream.read(buffer)) > 0) {
-                    outputStream.write(buffer, 0, count);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            ConnectionUtils.sendFileByStream(fileInputStream, outputStream);
             ConnectionUtils.closeFileInputStream(fileInputStream);
 
             Logger.clientLog("Send file " + fileName + " to client " + targetClientNumber);

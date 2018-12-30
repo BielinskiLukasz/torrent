@@ -166,4 +166,28 @@ public class ConnectionUtils {
         Logger.serverDebugLog("get: " + response);
         return response;
     }
+
+    public static void sendFileByStream(FileInputStream fileInputStream, OutputStream outputStream) {
+        int count;
+        byte[] buffer = new byte[Config.BUFFER_SIZE_IN_BYTES];
+        try {
+            while ((count = fileInputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, count);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void readFileFromStream(FileOutputStream fileOutputStream, InputStream inputStream) {
+        int count;
+        byte[] buffer = new byte[8192];
+        try {
+            while ((count = inputStream.read(buffer)) > 0) {
+                fileOutputStream.write(buffer, 0, count);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

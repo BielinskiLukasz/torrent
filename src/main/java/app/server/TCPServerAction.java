@@ -35,18 +35,29 @@ class TCPServerAction {
     private static void connect(TCPServer server, Socket connectionSocket, String clientSentence) {
         Logger.serverDebugLog("fire connect");
 
+        int clientNumber = getClientDataFromReceiveRequest(clientSentence);
+        registerClient(server, clientNumber);
+        sendConnectionConfirmation(connectionSocket, clientNumber);
+
+        Logger.serverLog("Connection to client " + clientNumber + " was detected");
+    }
+
+    private static int getClientDataFromReceiveRequest(String clientSentence) {
         String command = ActionUtils.getCommand(clientSentence);
         String message = ActionUtils.getMessage(clientSentence);
         int clientNumber = ActionUtils.getClientNumber(clientSentence);
         Logger.serverDebugLog(command + " input: " + message);
+        return clientNumber;
+    }
 
+    private static void registerClient(TCPServer server, int clientNumber) {
         server.addClient(clientNumber);
+    }
 
+    private static void sendConnectionConfirmation(Socket connectionSocket, int clientNumber) {
         DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
         String response = "Hello client " + clientNumber;
         ConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
-
-        Logger.serverLog("Connection to client " + clientNumber + " was detected");
     }
 
     private static void getFileList(TCPServer server, Socket connectionSocket, String command) {

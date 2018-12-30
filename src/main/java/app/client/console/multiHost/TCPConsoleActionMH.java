@@ -11,7 +11,6 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 
@@ -119,15 +118,7 @@ public class TCPConsoleActionMH {
                 File file = new File(filePath);
                 FileOutputStream fileOutputStream = ConnectionUtils.createFileOutputStream(file);
                 InputStream inputStream = ConnectionUtils.getInputStream(connectionSocket);
-                int count;
-                byte[] buffer = new byte[8192];
-                try {
-                    while ((count = inputStream.read(buffer)) > 0) {
-                        fileOutputStream.write(buffer, 0, count);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                ConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
                 ConnectionUtils.closeFileOutputStream(fileOutputStream);
 
                 if (MD5Sum.check(filePath, fileMD5Sum)) {
