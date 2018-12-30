@@ -26,6 +26,8 @@ public class TCPClientActionH2H {
         switch (ClientCommand.valueOf(command)) {
             case CONNECT:
                 connect(client, connectionSocket, clientSentence);
+                // TODO REMEMBER this is important method with connect two hosts without server
+                //  do not replace it when you will working on other features in h2h app version
                 break;
             case FILE_LIST:
                 getFileList(client.getClientNumber(), connectionSocket, clientSentence);

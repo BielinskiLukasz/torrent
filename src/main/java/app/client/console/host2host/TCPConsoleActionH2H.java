@@ -17,6 +17,8 @@ import java.net.Socket;
 
 public class TCPConsoleActionH2H {
 
+    // TODO REMEMBER connecting with second host, not server!
+
     public static void perform(int clientNumber, String userSentence, int connectedHostPortNumber) {
         String command = getCommandAppName(ActionUtils.getCommand(userSentence));
 

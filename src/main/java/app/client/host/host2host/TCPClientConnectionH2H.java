@@ -13,6 +13,8 @@ import java.net.Socket;
 
 public class TCPClientConnectionH2H extends Thread {
 
+    // TODO REMEMBER don't need to update here
+
     private TCPClientH2H client;
 
     TCPClientConnectionH2H(TCPClientH2H tcpClientH2h) {
