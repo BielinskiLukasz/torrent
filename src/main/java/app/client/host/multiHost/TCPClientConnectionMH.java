@@ -31,17 +31,17 @@ public class TCPClientConnectionMH extends Thread {
         }
 
         while (true) {
-            Socket connectionSocket;
+            Socket clientSocket;
             BufferedReader inFromServer;
             String clientSentence;
 
             try {
-                connectionSocket = hostServerSocket.accept();
+                clientSocket = hostServerSocket.accept();
                 if (!hostServerSocket.isClosed()) {
-                    inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+                    inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                     clientSentence = inFromServer.readLine();
 
-                    TCPClientActionMH.perform(client.getClientNumber(), connectionSocket, clientSentence);
+                    TCPClientActionMH.perform(client.getClientNumber(), clientSocket, clientSentence);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -58,13 +58,13 @@ public class TCPClientConnectionMH extends Thread {
     private void connectWithServer() {
         Logger.clientDebugLog("TCPClientConnectionMH: fire connectWithServer");
 
-        Socket hostClientSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
+        Socket serverSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
 
         String helloMessage = ClientCommand.CONNECT + Config.SPLITS_CHAR + client.getClientNumber() +
                 Config.SPLITS_CHAR + "Hello, I'm client " + client.getClientNumber();
-        TCPClientActionMH.perform(client.getClientNumber(), hostClientSocket, helloMessage);
+        TCPClientActionMH.perform(client.getClientNumber(), serverSocket, helloMessage);
 
-        ConnectionUtils.closeSocket(hostClientSocket);
+        ConnectionUtils.closeSocket(serverSocket);
 
         Logger.clientDebugLog("TCPClientConnectionMH: connectWithServer successfully");
     }

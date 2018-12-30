@@ -2,6 +2,7 @@ package app.client.console.multiHost;
 
 import app.client.console.ConsoleCommand;
 import app.config.Config;
+import app.server.ServerCommand;
 import app.utils.ActionUtils;
 import app.utils.ConnectionUtils;
 import app.utils.Logger;
@@ -27,9 +28,7 @@ public class TCPConsoleActionMH {
                 getFileList(command);
                 break;
             case PULL:
-                pull(clientNumber, userSentence); // TODO BACKLOG implement checking client connection with server!
-                //                                      (trying to download from not connected client throw exception)
-                //                                      and protect against file overwriting
+                pull(clientNumber, userSentence); // TODO BACKLOG implement protect against file overwriting
                 break;
             case PUSH:
                 push();
@@ -88,52 +87,66 @@ public class TCPConsoleActionMH {
             Logger.consoleLog("It is not the client you are looking for :)");
             Logger.consoleLog("There is no need to download the file from yourself");
         } else {
-            //TODO BACKLOG connect to server and check that selected client is connected with server - here
+            Socket connectionSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
 
-            Socket connectionSocket = ConnectionUtils.createSocket(Config.HOST_IP,
-                    Config.PORT_NR + sourceClientNumber);
+            DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
+            ConnectionUtils.sendMessageToDataOutputStream(outToServer,
+                    String.valueOf(ServerCommand.CONFIRM_CONNECTION),
+                    String.valueOf(sourceClientNumber));
 
-            DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
-            String command = ActionUtils.getConsoleCommand(userSentence);
-            String fileName = ActionUtils.getFileName(userSentence);
-            ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
+            BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);
+            String response = ConnectionUtils.readBufferedReaderLine(inFromServer);
+            boolean sourceClientConnected = ActionUtils.getBoolean(response);
+
+            if (sourceClientConnected) {
+                ConnectionUtils.closeSocket(connectionSocket);
+
+                Socket hostConnectionSocket = ConnectionUtils.createSocket(Config.HOST_IP,
+                        Config.PORT_NR + sourceClientNumber);
+
+                DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(hostConnectionSocket);
+                String command = ActionUtils.getConsoleCommand(userSentence);
+                String fileName = ActionUtils.getFileName(userSentence);
+                ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
 
 
-            BufferedReader inFromClient = ConnectionUtils.getBufferedReader(connectionSocket);
-
-            String response = ConnectionUtils.readBufferedReaderLine(inFromClient);
-
-            Boolean fileExist = ActionUtils.getBoolean(response);
-            String message = ActionUtils.getMessage(response);
-
-            Logger.consoleLog(message);
-            Logger.consoleDebugLog("" + fileExist);
-
-            if (fileExist) {
+                BufferedReader inFromClient = ConnectionUtils.getBufferedReader(hostConnectionSocket);
                 response = ConnectionUtils.readBufferedReaderLine(inFromClient);
 
-                String fileMD5Sum = ActionUtils.getMD5Sum(response);
-                String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+                Boolean fileExist = ActionUtils.getBoolean(response);
+                String message = ActionUtils.getMessage(response);
 
-                File file = new File(filePath);
-                FileOutputStream fileOutputStream = ConnectionUtils.createFileOutputStream(file);
-                InputStream inputStream = ConnectionUtils.getInputStream(connectionSocket);
-                ConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
-                ConnectionUtils.closeFileOutputStream(fileOutputStream);
+                Logger.consoleLog(message);
+                Logger.consoleDebugLog("" + fileExist);
 
-                if (MD5Sum.check(filePath, fileMD5Sum)) {
-                    Logger.consoleLog("File downloaded successfully");
-                } else {
-                    Logger.consoleLog("Unsuccessful file download");
-                    if (file.delete()) {
-                        Logger.consoleDebugLog("Remove invalid file");
+                if (fileExist) {
+                    response = ConnectionUtils.readBufferedReaderLine(inFromClient);
+
+                    String fileMD5Sum = ActionUtils.getMD5Sum(response);
+                    String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+
+                    File file = new File(filePath);
+                    FileOutputStream fileOutputStream = ConnectionUtils.createFileOutputStream(file);
+                    InputStream inputStream = ConnectionUtils.getInputStream(hostConnectionSocket);
+                    ConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
+                    ConnectionUtils.closeFileOutputStream(fileOutputStream);
+
+                    if (MD5Sum.check(filePath, fileMD5Sum)) {
+                        Logger.consoleLog("File downloaded successfully");
+                    } else {
+                        Logger.consoleLog("Unsuccessful file download");
+                        if (file.delete()) {
+                            Logger.consoleDebugLog("Remove invalid file");
+                        }
                     }
                 }
+
+                ConnectionUtils.closeSocket(hostConnectionSocket);
+
+                Logger.consoleLog("Finished");
+            } else {
+                Logger.consoleLog("Client " + sourceClientNumber + " isn't connected");
             }
-
-            ConnectionUtils.closeSocket(connectionSocket);
-
-            Logger.consoleLog("Finished");
         }
     }
 

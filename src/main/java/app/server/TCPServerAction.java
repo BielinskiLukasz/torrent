@@ -23,6 +23,9 @@ class TCPServerAction {
             case FILE_LIST:
                 getFileList(server, connectionSocket, command);
                 break;
+            case CONFIRM_CONNECTION:
+                confirmConnection(server, connectionSocket, clientSentence);
+                break;
             case CLOSE:
                 close(server, connectionSocket, clientSentence);
                 break;
@@ -30,6 +33,19 @@ class TCPServerAction {
                 sendNotSupportedCommandMessage(connectionSocket, command);
                 break;
         }
+    }
+
+    private static void confirmConnection(TCPServer server, Socket connectionSocket, String clientSentence) {
+        Logger.serverDebugLog("fire connect");
+
+        int clientNumber = ActionUtils.getClientNumber(clientSentence);
+        boolean sourceClientConnected = server.getUserList().contains(clientNumber); //TODO extract method
+
+        DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
+        String response = "Client " + clientNumber + " connection confirmation";
+        ConnectionUtils.sendMessageToDataOutputStream(outToClient, response, String.valueOf(sourceClientConnected));
+
+        Logger.serverLog("Connection to client " + clientNumber + " was detected");
     }
 
     private static void connect(TCPServer server, Socket connectionSocket, String clientSentence) {
