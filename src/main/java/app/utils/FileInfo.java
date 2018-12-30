@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 
 public class FileInfo {
 
@@ -27,11 +26,7 @@ public class FileInfo {
             e.printStackTrace();
         }
 
-        try {
-            this.md5 = MD5Sum.md5(data);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        this.md5 = MD5Sum.md5(data);
     }
 
     FileInfo(String data) {

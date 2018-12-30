@@ -215,7 +215,7 @@ public class TCPConsoleActionH2H {
             }
             Logger.appDebugLog(command + " close fileOutputStream");
 
-            // TODO implements checking md5 sum (and delete file if aren't correct)
+            // TODO implements checking md5 sum (and delete file if aren't correct) ==> UPDATE H2H dirs
 
             try {
                 connectionSocket.close();

@@ -5,6 +5,7 @@ import app.config.Config;
 import app.utils.ActionUtils;
 import app.utils.FileList;
 import app.utils.Logger;
+import app.utils.MD5Sum;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -15,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class TCPClientActionMH {
@@ -139,7 +142,8 @@ public class TCPClientActionMH {
             e.printStackTrace();
         }
 
-        File file = new File(Config.BASIC_PATH + clientNumber + "//" + fileName);
+        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+        File file = new File(filePath);
 
         if (file.exists()) {
             response = "Sending file " + fileName + " started";
@@ -155,6 +159,18 @@ public class TCPClientActionMH {
         }
 
         if (file.exists()) {
+            String md5sum = null;
+            try {
+                md5sum = MD5Sum.md5(Files.readAllBytes(Paths.get(filePath)));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            response = "Sending file " + fileName + " md5 sum";
+            try {
+                outToServer.writeBytes(command + Config.SPLITS_CHAR + md5sum + Config.SPLITS_CHAR + response + "\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             FileInputStream fileInputStream = null;
             try {
@@ -180,7 +196,6 @@ public class TCPClientActionMH {
             }
 
             Logger.clientLog("Send file " + fileName + " to client " + targetClientNumber);
-
         }
 
         try {
