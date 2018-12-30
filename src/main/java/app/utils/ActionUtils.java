@@ -26,13 +26,6 @@ public class ActionUtils {
             case "FILE LIST":
             case "FILELIST":
                 return ConsoleCommand.FILE_LIST.name();
-            case "C":
-            case "CLOSE":
-            case "E":
-            case "EXIT":
-            case "Q":
-            case "QUIT":
-                return ConsoleCommand.CLOSE.name();
             case "PULL":
             case "D":
             case "DOWNLOAD":
@@ -41,6 +34,13 @@ public class ActionUtils {
             case "U":
             case "UPLOAD":
                 return ConsoleCommand.PUSH.name();
+            case "C":
+            case "CLOSE":
+            case "E":
+            case "EXIT":
+            case "Q":
+            case "QUIT":
+                return ConsoleCommand.CLOSE.name();
             case "":
                 return ConsoleCommand.EMPTY_COMMAND.name();
             default:
@@ -73,6 +73,6 @@ public class ActionUtils {
     }
 
     private static String[] splitSentence(String sentence) {
-        return sentence.split("\\" + Config.SPLITS_CHAR);
+        return sentence.split(String.format("\\%s", Config.SPLITS_CHAR));
     }
 }

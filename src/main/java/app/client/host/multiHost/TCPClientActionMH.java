@@ -3,6 +3,7 @@ package app.client.host.multiHost;
 import app.client.host.ClientCommand;
 import app.config.Config;
 import app.utils.ActionUtils;
+import app.utils.ConnectionUtils;
 import app.utils.FileList;
 import app.utils.Logger;
 import app.utils.MD5Sum;
@@ -198,11 +199,12 @@ public class TCPClientActionMH {
             Logger.clientLog("Send file " + fileName + " to client " + targetClientNumber);
         }
 
-        try {
+        ConnectionUtils.closeSocket(connectionSocket);
+        /*try {
             outputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         Logger.clientDebugLog(command + " sending sequence ended");
     }

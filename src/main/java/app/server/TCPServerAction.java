@@ -2,6 +2,7 @@ package app.server;
 
 import app.config.Config;
 import app.utils.ActionUtils;
+import app.utils.ConnectionUtils;
 import app.utils.Logger;
 
 import java.io.BufferedReader;
@@ -71,12 +72,13 @@ class TCPServerAction {
 
         server.getUserList().forEach(
                 userNumber -> {
-                    Socket userSocket = null;
+                    Socket userSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + userNumber);
+                    /*user Socket = null
                     try {
                         userSocket = new Socket(Config.HOST_IP, Config.PORT_NR + userNumber);
                     } catch (IOException e) {
                         e.printStackTrace();
-                    }
+                    }*/
 
                     DataOutputStream outToClient = null;
                     try {
@@ -118,11 +120,12 @@ class TCPServerAction {
                         }
                     }
 
-                    try {
+                    ConnectionUtils.closeSocket(userSocket);
+                    /*try {
                         userSocket.close();
                     } catch (IOException e) {
                         e.printStackTrace();
-                    }
+                    }*/
 
                     Logger.serverLog("A file list from the client " + userNumber + " was received");
                 }

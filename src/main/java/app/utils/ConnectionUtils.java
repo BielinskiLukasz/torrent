@@ -6,18 +6,18 @@ import java.net.Socket;
 public class ConnectionUtils {
 
     public static Socket createSocket(String host, int port) {
-        Socket hostClientSocket = null;
+        Socket socket = null;
         try {
-            hostClientSocket = new Socket(host, port);
+            socket = new Socket(host, port);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return hostClientSocket;
+        return socket;
     }
 
-    public static void closeSocket(Socket hostClientSocket) {
+    public static void closeSocket(Socket socket) {
         try {
-            hostClientSocket.close();
+            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

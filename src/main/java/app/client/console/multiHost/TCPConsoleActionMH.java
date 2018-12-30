@@ -3,6 +3,7 @@ package app.client.console.multiHost;
 import app.client.console.ConsoleCommand;
 import app.config.Config;
 import app.utils.ActionUtils;
+import app.utils.ConnectionUtils;
 import app.utils.Logger;
 import app.utils.MD5Sum;
 
@@ -55,12 +56,13 @@ public class TCPConsoleActionMH {
     private static void getFileList(String command) {
         Logger.appDebugLog("fire getFileList");
 
-        Socket connectionSocket = null;
+        Socket connectionSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
+        /*Socket connectionSocket = null;
         try {
             connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         DataOutputStream outToServer = null;
         try {
@@ -123,12 +125,14 @@ public class TCPConsoleActionMH {
 
             //TODO BACKLOG connect to server and check that selected client is connected with server - here
 
-            Socket connectionSocket = null;
+            Socket connectionSocket = ConnectionUtils.createSocket(Config.HOST_IP,
+                    Config.PORT_NR + sourceClientNumber);
+            /*Socket connectionSocket = null;
             try {
                 connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR + sourceClientNumber);
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             DataOutputStream outToClient = null;
             try {
@@ -216,16 +220,18 @@ public class TCPConsoleActionMH {
                     Logger.appLog("File downloaded successfully");
                 } else {
                     Logger.appLog("Unsuccessful file download");
-                    file.delete();
-                    Logger.appDebugLog("Remove invalid file");
+                    if (file.delete()) {
+                        Logger.appDebugLog("Remove invalid file");
+                    }
                 }
             }
 
-            try {
+            ConnectionUtils.closeSocket(connectionSocket);
+            /*try {
                 connectionSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             Logger.appLog("Finished");
         }
@@ -238,12 +244,13 @@ public class TCPConsoleActionMH {
     private static void close(int clientNumber, String command) {
         Logger.appDebugLog("fire close");
 
-        Socket connectionSocket = null;
+        Socket connectionSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
+        /*Socket connectionSocket = null;
         try {
             connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         DataOutputStream outToServer = null;
         try {
@@ -274,11 +281,12 @@ public class TCPConsoleActionMH {
         }
         Logger.appDebugLog(command + " input: " + response);
 
-        try {
+        ConnectionUtils.closeSocket(connectionSocket);
+        /*try {
             connectionSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         Logger.appLog("Connection closed");
     }
