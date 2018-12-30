@@ -19,6 +19,9 @@ import java.net.Socket;
 public class TCPConsoleActionMH {
 
     public static void perform(int clientNumber, String userSentence) {
+        if (!userSentence.contains(Config.SPLITS_CHAR)) {
+            userSentence = addSplitChars(userSentence);
+        }
         String command = ActionUtils.getConsoleCommand(userSentence);
 
         switch (ConsoleCommand.valueOf(command)) {
@@ -43,6 +46,10 @@ public class TCPConsoleActionMH {
                 Logger.appLog("command is not supported");
                 break;
         }
+    }
+
+    private static String addSplitChars(String userSentence) {
+        return userSentence.replaceFirst(" ", Config.SPLITS_CHAR).replaceFirst(" ", Config.SPLITS_CHAR);
     }
 
     private static void getFileList(String command) {
@@ -110,7 +117,7 @@ public class TCPConsoleActionMH {
         int sourceClientNumber = ActionUtils.getClientNumber(userSentence);
 
         if (sourceClientNumber == clientNumber) {
-            Logger.appLog("It is not the customer you are looking for :)");
+            Logger.appLog("It is not the client you are looking for :)");
             Logger.appLog("There is no need to download the file from yourself");
         } else {
 

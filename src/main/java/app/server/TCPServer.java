@@ -28,6 +28,7 @@ public class TCPServer extends Thread {
 
     public void run() {
         Logger.serverDebugLog("TCPServer: run");
+        Logger.serverLog("Start server");
 
         ServerSocket welcomeSocket = null;
         try {
