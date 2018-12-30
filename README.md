@@ -7,90 +7,85 @@
 
 Istrukcja:
 -
-- Aplikacja umożliwia wymianę plików między dwoma klientami (wersja h2h) jak i wieloma (mh)
-- Każda instancja aplikacji ma domyślny folder z pobieranymi/udostępnianymi plikami (możliwa zmiana folderu w konfiguracji aplikacji)
-- Ścieżki i zmienne globalne mogą być konfigurowane w pliku config/Config.java
-- Wyświetlanie logów może być konfigurowane w pliku utils/Logger.java
+- Aplikacja umożliwia wymianę plików między dwoma klientami (wersja h2h) jak i wieloma (mh);
+- Każda instancja aplikacji ma domyślny folder z pobieranymi/udostępnianymi plikami (możliwa zmiana folderu w konfiguracji aplikacji);
+- Ścieżki i zmienne globalne mogą być konfigurowane w pliku config/Config.java;
+- Wyświetlanie logów może być konfigurowane w pliku utils/Logger.java;
 
 ***API***
-- wszystkie argumenty uruchamianych klientów muszą być oddzielone spacjami
-- uruchomienie serwera nie wymaga żadnych argumentów
-- uruchomienie klientów pracujących w systemie mh wymaga podania mumeru klienta (unikatowa liczba naturalna większa od 0)
-- uruchomienie pierwszego klienta pracującego w systemie h2h wymaga podania mumeru klienta (unikatowa liczba naturalna większa od 0)
-- uruchomienie drugiego klienta pracującego w systemie h2h wymaga podania mumeru klienta (unikatowa liczba naturalna większa od 0) oraz numeru pierwszego klienta
-- wszystkie parametry zapytań muszą być oddzielane znakiem *
-- tylko pliki znajdujące się bezpośrednio w domyślnym folderze są widoczne (foldery znajdujące się w domyślnym folderze są pomijane)
+- Wszystkie argumenty uruchamianych klientów muszą być oddzielone spacjami;
+- Uruchomienie serwera nie wymaga żadnych argumentów;
+- Uruchomienie klientów pracujących w systemie mh wymaga podania mumeru klienta (unikatowa liczba naturalna większa od 0);
+- Uruchomienie pierwszego klienta pracującego w systemie h2h wymaga podania mumeru klienta (unikatowa liczba naturalna większa od 0);
+- Uruchomienie drugiego klienta pracującego w systemie h2h wymaga podania mumeru klienta (unikatowa liczba naturalna większa od 0) oraz numeru pierwszego klienta;
+- Wszystkie parametry zapytań muszą być oddzielane spacją;
+- Tylko pliki znajdujące się bezpośrednio w domyślnym folderze są widoczne (foldery znajdujące się w domyślnym folderze są pomijane);
 
 **Dostępne zapytania:**
 
 - ### connect TODO jeżeli zostanie zaimplementowane
 
-łączy klienta z serwerem (wywoływane automatycznie w trakcie utworzenia serwera)
+Łączy klienta z serwerem (wywoływane automatycznie w trakcie utworzenia serwera).
+````
+connect numer_klienta(int) wiadomość(string)
+
+przykład:
+connect 1 Hello all
+````
 
 - list
 
-wyświetla listę dostępnych do pobrania plików jako listę zawierającą: numer klienta udostępniającego dany plik, nazwę pliku, sumę md5 pliku
+Wyświetla listę dostępnych do pobrania plików wraz z numerem klienta udostępniającego dany plik oraz sumą konstrolną pliku.
+````
+list
+
+przykład:
+list
+````
 
 - pull
 
-pobiera wybrany plik od wybranego klienta
+Pobiera wybrany plik od wskazanego klienta.
+
+*Aktualnie nieobsłużony jest przypadek próby pobrania pliku od niepołączonego klienta*
+````
+pull numer_klienta_udostępniającego_plik(int) nazwa_pliku(string)
+
+przykład:
+pull 2 example.txt
+````
 
 - push
 
-wysyła wybrany (lokalny) plik od wybranego klienta
+Wysyła wybrany (lokalny) plik od wskazanego klienta
 
-Parametry zapytań:
-- connect*numer klienta(int)*wiadomość(string)
-- list
-- pull*numer klienta od którego pobierany będzie plik(int)*nazwa pliku(string)
-- push*numer klienta do którego wysyłany będzie plik(int)*nazwa pliku(string)
-- ### TODO podać parametry
+*Aktualnie nieobsłużony jest przypadek próby wysłania pliku od niepołączonego klienta*
+````
+push numer_klienta_odbierającego_plik(int) nazwa_pliku(string)
+
+przykład:
+push 2 otherFile.txt
+````
+
+- exit
+
+Usuwa numer klienta z bazy serwera. Pliki w domyślnym folderze nie będą udostępniane aż do kolejnego połączenia. Po wywołaniu tej komendy możliwe jest bezpieczne zatrzymanie aplikacji klienta - nie zostanie zakłucone połączenie innych klientów z serwerem oraz między klieantami. 
+````
+exit
+
+przykład:
+exit
+````
 
 ### TODO API regex
 ***API regex:***
 ````
 ""
 ````
-np.
-- connect*1*Hello all
-- list
-- pull*2*example.txt
-- push*2*otherFile.txt
-- ### TODO
 
-***CONFIG***
+***Konfiguracja***
 - _config/Config.java_ - konfiguracja ścieżek i zmiennych globalnych
 - _utils/Logger.java_ - konfiguracja wyświetlania logów
 
 ****
 ### TODO English version update
-
-Instructions:
--
-- Each instance of application has it's own default download folders, which can be changed in application configuration
-- Paths and globals can be configured in config/Config.java
-- Log display can be configured in utils/Logger.java
-
-***API***
-- all API query parameters have to be splitted with space
-- files whose names contain spaces should be written in quotes
-- only files in default download folders are visible (inner dirs are omitted)
-
-**Possible queries:**
-- list
-
-
-query parameters:
-- ... 
-
-***API Request regex:***
-````
-"TODO"
-````
-e.g.
-- list
-
-***CONFIG***
-- _config/Config.java_ - specifies all env variables
-- _utils/Logger.java_ - turn on/off logs
-
