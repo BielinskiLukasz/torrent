@@ -27,6 +27,8 @@ public class TCPConsoleConnectionMH extends Thread {
                 inFromUser = new BufferedReader(new InputStreamReader(System.in));
                 userSentence = inFromUser.readLine();
 
+                //TODO add regex of incoming user sentence
+
                 TCPConsoleActionMH.perform(client.getClientNumber(), userSentence);
             } catch (IOException e) {
                 e.printStackTrace();

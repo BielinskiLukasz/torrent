@@ -39,7 +39,7 @@ class TCPServerAction {
         Logger.serverDebugLog("fire connect");
 
         int clientNumber = ActionUtils.getClientNumber(clientSentence);
-        boolean sourceClientConnected = server.getUserList().contains(clientNumber); //TODO extract method
+        boolean sourceClientConnected = server.isClientConnected(clientNumber);
 
         DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
         String response = "Client " + clientNumber + " connection confirmation";

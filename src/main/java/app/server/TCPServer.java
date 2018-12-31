@@ -70,4 +70,8 @@ public class TCPServer extends Thread {
     void setFileList(List<String> fileList) {
         this.fileList = fileList;
     }
+
+    public boolean isClientConnected(int clientNumber) {
+        return userList.contains(clientNumber);
+    }
 }
