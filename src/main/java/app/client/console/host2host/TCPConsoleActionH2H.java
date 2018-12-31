@@ -2,8 +2,8 @@ package app.client.console.host2host;
 
 import app.client.console.ConsoleCommand;
 import app.config.Config;
-import app.utils.ConsoleCommandUtils;
 import app.utils.Logger;
+import app.utils.SentenceUtils;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -16,7 +16,7 @@ public class TCPConsoleActionH2H {
     // TODO REMEMBER connecting with second host, not server!
 
     public static void perform(int clientNumber, String userSentence, int connectedHostPortNumber) {
-        String command = getCommandAppName(ConsoleCommandUtils.getCommand(userSentence));
+        String command = getCommandAppName(SentenceUtils.getCommand(userSentence));
 
         switch (ConsoleCommand.valueOf(command)) {
             case FILE_LIST:
@@ -105,7 +105,7 @@ public class TCPConsoleActionH2H {
         }
         Logger.consoleDebugLog(command + " input: " + response);
 
-        int serverFileListSize = ConsoleCommandUtils.getListSize(response);
+        int serverFileListSize = SentenceUtils.getListSize(response);
         for (int i = 0; i < serverFileListSize; i++) {
             try {
                 Logger.consoleLog(

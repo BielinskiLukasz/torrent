@@ -5,9 +5,9 @@ import app.client.console.ConsoleCommand;
 import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
-import app.utils.ConnectionUtils;
-import app.utils.ConsoleCommandUtils;
 import app.utils.Logger;
+import app.utils.SentenceUtils;
+import app.utils.TCPConnectionUtils;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -21,7 +21,7 @@ public class TCPConsoleActionMH {
         if (!userSentence.contains(Config.SPLITS_CHAR)) {
             userSentence = addSplitChars(userSentence);
         }
-        String command = ConsoleCommandUtils.getConsoleCommand(userSentence);
+        String command = SentenceUtils.getConsoleCommand(userSentence);
 
         switch (ConsoleCommand.valueOf(command)) {
             case FILE_LIST:
@@ -56,25 +56,25 @@ public class TCPConsoleActionMH {
     private static void getFileList() {
         Logger.consoleDebugLog("fire getFileList");
 
-        Socket connectionSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
+        Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
 
-        DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
+        DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String command = String.valueOf(ServerCommand.SERVER_FILE_LIST);
-        ConnectionUtils.sendMessageToDataOutputStream(outToServer, command);
+        TCPConnectionUtils.sendMessageToDataOutputStream(outToServer, command);
 
-        BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);
-        String response = ConnectionUtils.readBufferedReaderLine(inFromServer);
+        BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
+        String response = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
 
-        int serverFileListSize = ConsoleCommandUtils.getListSize(response);
+        int serverFileListSize = SentenceUtils.getListSize(response);
         for (int i = 0; i < serverFileListSize; i++) {
             Logger.consoleLog(
-                    ConnectionUtils.readBufferedReaderLine(inFromServer)
+                    TCPConnectionUtils.readBufferedReaderLine(inFromServer)
                             .replaceAll(String.format("\\%s", Config.FILE_INFO_SPLITS_CHAR), " ")
                     // TODO move getting better format to another place
             );
         }
 
-        ConnectionUtils.closeSocket(connectionSocket);
+        TCPConnectionUtils.closeSocket(connectionSocket);
 
         Logger.consoleLog("Server file list was displayed");
     }
@@ -82,7 +82,7 @@ public class TCPConsoleActionMH {
     private static void pull(int clientNumber, String userSentence) {
         Logger.consoleDebugLog("fire pull");
 
-        int sourceClientNumber = ConsoleCommandUtils.getClientNumber(userSentence);
+        int sourceClientNumber = SentenceUtils.getClientNumber(userSentence);
 
         if (isClientChooseHisOwnNumber(clientNumber, sourceClientNumber)) {
             Logger.consoleLog("This is not the client you are looking for :)");
@@ -90,15 +90,15 @@ public class TCPConsoleActionMH {
         } else {
             if (ClientActionUtils.isSelectedClientConnected(sourceClientNumber)) {
 
-                Socket hostConnectionSocket = ConnectionUtils.createSocket(Config.HOST_IP,
+                Socket hostConnectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,
                         Config.PORT_NR + sourceClientNumber);
 
-                DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(hostConnectionSocket);
+                DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
                 String command = String.valueOf(ClientCommand.PUSH_ON_DEMAND);
-                String fileName = ConsoleCommandUtils.getFileName(userSentence);
-                ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
+                String fileName = SentenceUtils.getFileName(userSentence);
+                TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
 
-                ConnectionUtils.closeSocket(hostConnectionSocket);
+                TCPConnectionUtils.closeSocket(hostConnectionSocket);
 
                 Logger.consoleLog("Finished");
             } else {
@@ -110,8 +110,8 @@ public class TCPConsoleActionMH {
     private static void push(int clientNumber, String userSentence) {
         Logger.consoleDebugLog("fire push");
 
-        int targetClientNumber = ConsoleCommandUtils.getClientNumber(userSentence);
-        String fileName = ConsoleCommandUtils.getFileName(userSentence);
+        int targetClientNumber = SentenceUtils.getClientNumber(userSentence);
+        String fileName = SentenceUtils.getFileName(userSentence);
 
         if (isClientChooseHisOwnNumber(clientNumber, targetClientNumber)) {
             Logger.consoleLog("This is not the client you are looking for :)");
@@ -130,16 +130,16 @@ public class TCPConsoleActionMH {
     private static void close(int clientNumber) {
         Logger.consoleDebugLog("fire close");
 
-        Socket connectionSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
+        Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
 
-        DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
+        DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String command = String.valueOf(ServerCommand.UNREGISTER);
-        ConnectionUtils.sendMessageToDataOutputStream(outToServer, command, String.valueOf(clientNumber));
+        TCPConnectionUtils.sendMessageToDataOutputStream(outToServer, command, String.valueOf(clientNumber));
 
-        BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);
-        ConnectionUtils.readBufferedReaderLine(inFromServer);
+        BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
+        TCPConnectionUtils.readBufferedReaderLine(inFromServer);
 
-        ConnectionUtils.closeSocket(connectionSocket);
+        TCPConnectionUtils.closeSocket(connectionSocket);
 
         Logger.consoleLog("Connection closed");
     }

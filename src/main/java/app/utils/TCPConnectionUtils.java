@@ -14,7 +14,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class ConnectionUtils {
+public class TCPConnectionUtils {
 
     public static Socket createSocket(String host, int port) {
         Socket socket = null;
@@ -145,6 +145,7 @@ public class ConnectionUtils {
             ExceptionHandler.handle(e);
         }
 
+        Logger.utilsDebugLog("sendMessageToDataOutputStream");
         Logger.utilsDebugLog("send: " + message);
     }
 
@@ -167,7 +168,8 @@ public class ConnectionUtils {
             ExceptionHandler.handle(e);
         }
 
-        Logger.serverDebugLog("get: " + response);
+        Logger.utilsDebugLog("readBufferedReaderLine");
+        Logger.serverDebugLog("read: " + response);
         return response;
     }
 

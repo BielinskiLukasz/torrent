@@ -6,5 +6,6 @@ public enum ClientCommand {
     CLIENT_FILE_LIST,
     HANDLE_PUSH,
     PUSH_ON_DEMAND,
-    REPUSH
+    REPUSH,
+    CHECK_SENDING
 }

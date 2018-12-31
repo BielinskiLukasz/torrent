@@ -3,9 +3,9 @@ package app.server;
 import app.client.console.ConsoleCommand;
 import app.client.host.ClientCommand;
 import app.config.Config;
-import app.utils.ConnectionUtils;
-import app.utils.ConsoleCommandUtils;
 import app.utils.Logger;
+import app.utils.SentenceUtils;
+import app.utils.TCPConnectionUtils;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -18,7 +18,7 @@ class TCPServerAction {
     static void perform(TCPServer server, Socket connectionSocket, String sentence) {
         Logger.serverDebugLog("perform: " + sentence);
 
-        String command = ConsoleCommandUtils.getCommand(sentence);
+        String command = SentenceUtils.getCommand(sentence);
 
         switch (ServerCommand.valueOf(command)) {
             case REGISTER:
@@ -42,12 +42,12 @@ class TCPServerAction {
     private static void confirmConnection(TCPServer server, Socket connectionSocket, String clientSentence) {
         Logger.serverDebugLog("fire connect");
 
-        int clientNumber = ConsoleCommandUtils.getClientNumber(clientSentence);
+        int clientNumber = SentenceUtils.getClientNumber(clientSentence);
         boolean sourceClientConnected = server.isClientConnected(clientNumber);
 
-        DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
+        DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String response = "Client " + clientNumber + " connection confirmation";
-        ConnectionUtils.sendMessageToDataOutputStream(outToClient, response, String.valueOf(sourceClientConnected));
+        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, response, String.valueOf(sourceClientConnected));
 
         Logger.serverLog("Register client " + clientNumber);
     }
@@ -63,9 +63,9 @@ class TCPServerAction {
     }
 
     private static int getClientDataFromReceiveRequest(String clientSentence) {
-        String command = ConsoleCommandUtils.getCommand(clientSentence);
-        String message = ConsoleCommandUtils.getMessage(clientSentence);
-        int clientNumber = ConsoleCommandUtils.getClientNumber(clientSentence);
+        String command = SentenceUtils.getCommand(clientSentence);
+        String message = SentenceUtils.getMessage(clientSentence);
+        int clientNumber = SentenceUtils.getClientNumber(clientSentence);
         Logger.serverDebugLog(command + " input: " + message);
         return clientNumber;
     }
@@ -75,9 +75,9 @@ class TCPServerAction {
     }
 
     private static void sendConnectionConfirmation(Socket connectionSocket, int clientNumber) {
-        DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
+        DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String response = "Hello client " + clientNumber;
-        ConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
+        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
     }
 
     private static void getServerFileList(TCPServer server, Socket connectionSocket) {
@@ -86,23 +86,23 @@ class TCPServerAction {
         List<String> serverFileList = new ArrayList<>();
         server.getUserList().forEach(
                 userNumber -> {
-                    Socket userSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + userNumber);
+                    Socket userSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + userNumber);
 
-                    DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(userSocket);
+                    DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(userSocket);
                     String command = String.valueOf(ClientCommand.CLIENT_FILE_LIST);
-                    ConnectionUtils.sendMessageToDataOutputStream(outToClient, command);
+                    TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, command);
 
-                    BufferedReader inFromClient = ConnectionUtils.getBufferedReader(userSocket);
-                    String response = ConnectionUtils.readBufferedReaderLine(inFromClient);
+                    BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(userSocket);
+                    String response = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
 
-                    int clientFileListSize = ConsoleCommandUtils.getListSize(response);
+                    int clientFileListSize = SentenceUtils.getListSize(response);
                     for (int i = 0; i < clientFileListSize; i++) {
                         serverFileList.add(
-                                ConnectionUtils.readBufferedReaderLine(inFromClient)
+                                TCPConnectionUtils.readBufferedReaderLine(inFromClient)
                         );
                     }
 
-                    ConnectionUtils.closeSocket(userSocket);
+                    TCPConnectionUtils.closeSocket(userSocket);
 
                     Logger.serverLog("A file list from the client " + userNumber + " was received");
                 }
@@ -110,13 +110,13 @@ class TCPServerAction {
 
         server.setFileList(serverFileList);
 
-        DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
+        DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String response = String.valueOf(serverFileList.size());
         String command = String.valueOf(ConsoleCommand.FILE_LIST);
-        ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, response);
+        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, command, response);
 
         serverFileList.forEach(
-                fileData -> ConnectionUtils.sendMessageToDataOutputStream(outToClient, fileData)
+                fileData -> TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, fileData)
         );
 
         Logger.serverLog("Server file list sent to client ");
@@ -125,14 +125,14 @@ class TCPServerAction {
     private static void close(TCPServer server, Socket connectionSocket, String clientSentence) {
         Logger.serverDebugLog("fire close");
 
-        int clientNumber = ConsoleCommandUtils.getClientNumber(clientSentence);
+        int clientNumber = SentenceUtils.getClientNumber(clientSentence);
 
         server.removeClient(clientNumber);
 
         String response = "Bye client " + clientNumber;
 
-        DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
-        ConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
+        DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
 
         Logger.serverLog("Unregister client " + clientNumber);
     }
@@ -140,9 +140,9 @@ class TCPServerAction {
     private static void sendNotSupportedCommandMessage(Socket connectionSocket, String command) {
         Logger.serverDebugLog("fire sendNotSupportedCommandMessage");
 
-        DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
+        DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String response = '"' + command + '"' + " command is not supported yet";
-        ConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
+        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
 
         Logger.serverLog("Not supported command message sent");
     }

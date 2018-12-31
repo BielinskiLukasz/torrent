@@ -2,9 +2,9 @@ package app.client.host.multiHost;
 
 import app.client.host.ClientCommand;
 import app.config.Config;
-import app.utils.ConnectionUtils;
 import app.utils.ExceptionHandler;
 import app.utils.Logger;
+import app.utils.TCPConnectionUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -59,13 +59,13 @@ public class TCPClientConnectionMH extends Thread {
     private void connectWithServer() {
         Logger.clientDebugLog("TCPClientConnectionMH: fire connectWithServer");
 
-        Socket serverSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
+        Socket serverSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
 
         String helloMessage = ClientCommand.CONNECT + Config.SPLITS_CHAR + client.getClientNumber() +
                 Config.SPLITS_CHAR + "Hello, I'm client " + client.getClientNumber();
         TCPClientConnectionActionMH.perform(client.getClientNumber(), serverSocket, helloMessage);
 
-        ConnectionUtils.closeSocket(serverSocket);
+        TCPConnectionUtils.closeSocket(serverSocket);
 
         Logger.clientDebugLog("TCPClientConnectionMH: connectWithServer successfully");
     }

@@ -3,7 +3,7 @@ package app.utils;
 import app.client.console.ConsoleCommand;
 import app.config.Config;
 
-public class ConsoleCommandUtils {
+public class SentenceUtils {
 
     public static String getCommand(String sentence) {
         return splitSentence(sentence)[0];
@@ -70,7 +70,7 @@ public class ConsoleCommandUtils {
     }
 
     public static String getMD5Sum(String sentence) {
-        return splitSentence(sentence)[1];
+        return splitSentence(sentence)[3];
     }
 
     public static long getStartByteNumber(String sentence) {
