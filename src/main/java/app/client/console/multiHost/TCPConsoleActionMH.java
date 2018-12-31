@@ -1,6 +1,6 @@
 package app.client.console.multiHost;
 
-import app.client.ClienActionUtils;
+import app.client.ClientActionUtils;
 import app.client.console.ConsoleCommand;
 import app.client.host.ClientCommand;
 import app.config.Config;
@@ -23,7 +23,7 @@ public class TCPConsoleActionMH {
 
         switch (ConsoleCommand.valueOf(command)) {
             case FILE_LIST:
-                getFileList(command);
+                getFileList();
                 break;
             case PULL:
                 pull(clientNumber, userSentence);
@@ -32,7 +32,7 @@ public class TCPConsoleActionMH {
                 push(clientNumber, userSentence);
                 break;
             case CLOSE:
-                close(clientNumber, command);
+                close(clientNumber);
                 break;
             case EMPTY_COMMAND:
                 break;
@@ -51,12 +51,13 @@ public class TCPConsoleActionMH {
         return userSentence;
     }
 
-    private static void getFileList(String command) {
+    private static void getFileList() {
         Logger.consoleDebugLog("fire getFileList");
 
         Socket connectionSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
 
         DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
+        String command = String.valueOf(ServerCommand.SERVER_FILE_LIST);
         ConnectionUtils.sendMessageToDataOutputStream(outToServer, command);
 
         BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);
@@ -91,7 +92,7 @@ public class TCPConsoleActionMH {
                         Config.PORT_NR + sourceClientNumber);
 
                 DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(hostConnectionSocket);
-                String command = ClientCommand.PUSH_ON_DEMAND.name();
+                String command = String.valueOf(ClientCommand.PUSH_ON_DEMAND);
                 String fileName = ConsoleCommandUtils.getFileName(userSentence);
                 ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
 
@@ -114,7 +115,7 @@ public class TCPConsoleActionMH {
             Logger.consoleLog("This is not the client you are looking for :)");
             Logger.consoleLog("There is no need to upload the file to yourself");
         } else if (isSelectedClientConnected(targetClientNumber)) {
-            ClienActionUtils.uploadIfFileExist(clientNumber, targetClientNumber, fileName);
+            ClientActionUtils.uploadIfFileExist(clientNumber, targetClientNumber, fileName);
         } else {
             Logger.consoleLog("You haven't selected file");
         }
@@ -141,12 +142,13 @@ public class TCPConsoleActionMH {
     }
 
 
-    private static void close(int clientNumber, String command) {
+    private static void close(int clientNumber) {
         Logger.consoleDebugLog("fire close");
 
         Socket connectionSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
 
         DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
+        String command = String.valueOf(ServerCommand.UNREGISTER);
         ConnectionUtils.sendMessageToDataOutputStream(outToServer, command, String.valueOf(clientNumber));
 
         BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);

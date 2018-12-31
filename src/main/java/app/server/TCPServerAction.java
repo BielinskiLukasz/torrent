@@ -1,5 +1,7 @@
 package app.server;
 
+import app.client.console.ConsoleCommand;
+import app.client.host.ClientCommand;
 import app.config.Config;
 import app.utils.ConnectionUtils;
 import app.utils.ConsoleCommandUtils;
@@ -17,16 +19,16 @@ class TCPServerAction {
         String command = ConsoleCommandUtils.getCommand(clientSentence);
 
         switch (ServerCommand.valueOf(command)) {
-            case CONNECT:
+            case REGISTER:
                 connect(server, connectionSocket, clientSentence);
                 break;
-            case FILE_LIST:
-                getFileList(server, connectionSocket, command);
+            case SERVER_FILE_LIST:
+                getServerFileList(server, connectionSocket);
                 break;
             case CONFIRM_CONNECTION:
                 confirmConnection(server, connectionSocket, clientSentence);
                 break;
-            case CLOSE:
+            case UNREGISTER:
                 close(server, connectionSocket, clientSentence);
                 break;
             default:
@@ -45,7 +47,7 @@ class TCPServerAction {
         String response = "Client " + clientNumber + " connection confirmation";
         ConnectionUtils.sendMessageToDataOutputStream(outToClient, response, String.valueOf(sourceClientConnected));
 
-        Logger.serverLog("Connection to client " + clientNumber + " was detected");
+        Logger.serverLog("Register client " + clientNumber);
     }
 
     private static void connect(TCPServer server, Socket connectionSocket, String clientSentence) {
@@ -76,9 +78,8 @@ class TCPServerAction {
         ConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
     }
 
-    private static void getFileList(TCPServer server, Socket connectionSocket, String command) {
-        Logger.serverDebugLog("fire getFileList");
-        Logger.serverDebugLog(command + " input: " + "no message");
+    private static void getServerFileList(TCPServer server, Socket connectionSocket) {
+        Logger.serverDebugLog("fire getServerFileList");
 
         List<String> serverFileList = new ArrayList<>();
         server.getUserList().forEach(
@@ -86,6 +87,7 @@ class TCPServerAction {
                     Socket userSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + userNumber);
 
                     DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(userSocket);
+                    String command = String.valueOf(ClientCommand.CLIENT_FILE_LIST);
                     ConnectionUtils.sendMessageToDataOutputStream(outToClient, command);
 
                     BufferedReader inFromClient = ConnectionUtils.getBufferedReader(userSocket);
@@ -108,6 +110,7 @@ class TCPServerAction {
 
         DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
         String response = String.valueOf(serverFileList.size());
+        String command = String.valueOf(ConsoleCommand.FILE_LIST);
         ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, response);
 
         serverFileList.forEach(
@@ -129,7 +132,7 @@ class TCPServerAction {
         DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
         ConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
 
-        Logger.serverLog("Connection with client " + clientNumber + " was closed");
+        Logger.serverLog("Unregister client " + clientNumber);
     }
 
     private static void sendNotSupportedCommandMessage(Socket connectionSocket, String command) {

@@ -25,26 +25,27 @@ public class ConsoleCommandUtils {
             case "FILES_LIST":
             case "FILE LIST":
             case "FILELIST":
-                return ConsoleCommand.FILE_LIST.name();
+                return String.valueOf(ConsoleCommand.FILE_LIST);
             case "PULL":
             case "D":
             case "DOWNLOAD":
-                return ConsoleCommand.PULL.name();
+                return String.valueOf(ConsoleCommand.PULL);
             case "PUSH":
             case "U":
             case "UPLOAD":
-                return ConsoleCommand.PUSH.name();
+                return String.valueOf(ConsoleCommand.PUSH);
             case "C":
             case "CLOSE":
             case "E":
             case "EXIT":
             case "Q":
             case "QUIT":
-                return ConsoleCommand.CLOSE.name();
+            case "UNREGISTER":
+                return String.valueOf(ConsoleCommand.CLOSE);
             case "":
-                return ConsoleCommand.EMPTY_COMMAND.name();
+                return String.valueOf(ConsoleCommand.EMPTY_COMMAND);
             default:
-                return ConsoleCommand.UNSUPPORTED_COMMAND.name();
+                return String.valueOf(ConsoleCommand.UNSUPPORTED_COMMAND);
         }
     }
 

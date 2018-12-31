@@ -3,7 +3,7 @@ package app.client.host;
 public enum ClientCommand {
 
     CONNECT,
-    FILE_LIST,
-    PUSH,
+    CLIENT_FILE_LIST,
+    HANDLE_PUSH,
     PUSH_ON_DEMAND
 }

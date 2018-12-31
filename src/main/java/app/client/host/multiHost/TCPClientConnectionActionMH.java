@@ -1,8 +1,9 @@
 package app.client.host.multiHost;
 
-import app.client.ClienActionUtils;
+import app.client.ClientActionUtils;
 import app.client.host.ClientCommand;
 import app.config.Config;
+import app.server.ServerCommand;
 import app.utils.ConnectionUtils;
 import app.utils.ConsoleCommandUtils;
 import app.utils.FileList;
@@ -27,10 +28,10 @@ public class TCPClientConnectionActionMH {
             case CONNECT:
                 connect(clientNumber, connectionSocket, clientSentence);
                 break;
-            case FILE_LIST:
+            case CLIENT_FILE_LIST:
                 getFileList(clientNumber, connectionSocket, clientSentence);
                 break;
-            case PUSH:
+            case HANDLE_PUSH:
                 push(clientNumber, connectionSocket, clientSentence);
                 break;
             case PUSH_ON_DEMAND:
@@ -53,7 +54,7 @@ public class TCPClientConnectionActionMH {
 
     private static void sendConnectionRequest(Socket connectionSocket, int clientNumber, String clientSentence) {
         DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
-        String command = ConsoleCommandUtils.getCommand(clientSentence);
+        String command = String.valueOf(ServerCommand.REGISTER);
         String message = ConsoleCommandUtils.getMessage(clientSentence);
         ConnectionUtils.sendMessageToDataOutputStream(outToServer, command, String.valueOf(clientNumber), message);
     }
@@ -121,6 +122,6 @@ public class TCPClientConnectionActionMH {
         int targetClientNumber = ConsoleCommandUtils.getClientNumber(clientSentence);
         String fileName = ConsoleCommandUtils.getFileName(clientSentence);
 
-        ClienActionUtils.uploadIfFileExist(clientNumber, targetClientNumber, fileName);
+        ClientActionUtils.uploadIfFileExist(clientNumber, targetClientNumber, fileName);
     }
 }

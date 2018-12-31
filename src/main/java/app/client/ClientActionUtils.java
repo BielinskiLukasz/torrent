@@ -1,6 +1,6 @@
 package app.client;
 
-import app.client.console.ConsoleCommand;
+import app.client.host.ClientCommand;
 import app.config.Config;
 import app.utils.ConnectionUtils;
 import app.utils.FileList;
@@ -14,7 +14,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.List;
 
-public class ClienActionUtils {
+public class ClientActionUtils {
 
     public static void uploadIfFileExist(int sourceClientNumber, int targetClientNumber, String fileName) {
         if (isClientHaveFile(sourceClientNumber, fileName)) {
@@ -32,7 +32,7 @@ public class ClienActionUtils {
                 Config.PORT_NR + targetClientNumber);
 
         DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(hostConnectionSocket);
-        String command = ConsoleCommand.PUSH.name();
+        String command = String.valueOf(ClientCommand.HANDLE_PUSH);
         ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(sourceClientNumber), fileName);
 
         String md5sum = MD5Sum.md5(filePath);

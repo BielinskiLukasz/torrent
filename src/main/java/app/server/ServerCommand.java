@@ -2,8 +2,8 @@ package app.server;
 
 public enum ServerCommand {
 
-    CONNECT,
-    FILE_LIST,
+    REGISTER,
+    SERVER_FILE_LIST,
     CONFIRM_CONNECTION,
-    CLOSE
+    UNREGISTER
 }
