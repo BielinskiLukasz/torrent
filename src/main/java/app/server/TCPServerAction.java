@@ -15,21 +15,23 @@ import java.util.List;
 
 class TCPServerAction {
 
-    static void perform(TCPServer server, Socket connectionSocket, String clientSentence) {
-        String command = ConsoleCommandUtils.getCommand(clientSentence);
+    static void perform(TCPServer server, Socket connectionSocket, String sentence) {
+        Logger.serverDebugLog("perform: " + sentence);
+
+        String command = ConsoleCommandUtils.getCommand(sentence);
 
         switch (ServerCommand.valueOf(command)) {
             case REGISTER:
-                connect(server, connectionSocket, clientSentence);
+                connect(server, connectionSocket, sentence);
                 break;
             case SERVER_FILE_LIST:
                 getServerFileList(server, connectionSocket);
                 break;
             case CONFIRM_CONNECTION:
-                confirmConnection(server, connectionSocket, clientSentence);
+                confirmConnection(server, connectionSocket, sentence);
                 break;
             case UNREGISTER:
-                close(server, connectionSocket, clientSentence);
+                close(server, connectionSocket, sentence);
                 break;
             default:
                 sendNotSupportedCommandMessage(connectionSocket, command);

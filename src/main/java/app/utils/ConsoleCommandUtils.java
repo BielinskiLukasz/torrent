@@ -73,6 +73,10 @@ public class ConsoleCommandUtils {
         return splitSentence(sentence)[1];
     }
 
+    public static long getStartByteNumber(String sentence) {
+        return Long.parseLong(splitSentence(sentence)[3]);
+    }
+
     private static String[] splitSentence(String sentence) {
         return sentence.split(String.format("\\%s", Config.SPLITS_CHAR));
     }

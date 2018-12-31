@@ -16,6 +16,8 @@ import java.net.Socket;
 public class TCPConsoleActionMH {
 
     public static void perform(int clientNumber, String userSentence) {
+        Logger.consoleDebugLog("perform: " + userSentence);
+
         if (!userSentence.contains(Config.SPLITS_CHAR)) {
             userSentence = addSplitChars(userSentence);
         }
@@ -86,7 +88,7 @@ public class TCPConsoleActionMH {
             Logger.consoleLog("This is not the client you are looking for :)");
             Logger.consoleLog("There is no need to download the file from yourself");
         } else {
-            if (isSelectedClientConnected(sourceClientNumber)) {
+            if (ClientActionUtils.isSelectedClientConnected(sourceClientNumber)) {
 
                 Socket hostConnectionSocket = ConnectionUtils.createSocket(Config.HOST_IP,
                         Config.PORT_NR + sourceClientNumber);
@@ -114,7 +116,7 @@ public class TCPConsoleActionMH {
         if (isClientChooseHisOwnNumber(clientNumber, targetClientNumber)) {
             Logger.consoleLog("This is not the client you are looking for :)");
             Logger.consoleLog("There is no need to upload the file to yourself");
-        } else if (isSelectedClientConnected(targetClientNumber)) {
+        } else if (ClientActionUtils.isSelectedClientConnected(targetClientNumber)) {
             ClientActionUtils.uploadIfFileExist(clientNumber, targetClientNumber, fileName);
         } else {
             Logger.consoleLog("You haven't selected file");
@@ -124,23 +126,6 @@ public class TCPConsoleActionMH {
     private static boolean isClientChooseHisOwnNumber(int clientNumber, int targetClientNumber) {
         return targetClientNumber == clientNumber;
     }
-
-    private static boolean isSelectedClientConnected(int sourceClientNumber) {
-        Socket connectionSocket = ConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
-
-        DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
-        ConnectionUtils.sendMessageToDataOutputStream(outToServer,
-                String.valueOf(ServerCommand.CONFIRM_CONNECTION),
-                String.valueOf(sourceClientNumber));
-
-        BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);
-        String response = ConnectionUtils.readBufferedReaderLine(inFromServer);
-        boolean sourceClientConnected = ConsoleCommandUtils.getBoolean(response);
-
-        ConnectionUtils.closeSocket(connectionSocket);
-        return sourceClientConnected;
-    }
-
 
     private static void close(int clientNumber) {
         Logger.consoleDebugLog("fire close");

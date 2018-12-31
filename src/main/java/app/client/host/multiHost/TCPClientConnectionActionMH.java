@@ -6,6 +6,7 @@ import app.config.Config;
 import app.server.ServerCommand;
 import app.utils.ConnectionUtils;
 import app.utils.ConsoleCommandUtils;
+import app.utils.ExceptionHandler;
 import app.utils.FileList;
 import app.utils.Logger;
 import app.utils.MD5Sum;
@@ -14,28 +15,35 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 import java.util.List;
 
+import static java.lang.Thread.sleep;
+
 public class TCPClientConnectionActionMH {
 
-    public static void perform(int clientNumber, Socket connectionSocket, String clientSentence) {
+    public static void perform(int clientNumber, Socket connectionSocket, String sentence) {
+        Logger.clientDebugLog("perform: " + sentence);
 
-        String command = ConsoleCommandUtils.getCommand(clientSentence);
+        String command = ConsoleCommandUtils.getCommand(sentence);
 
         switch (ClientCommand.valueOf(command)) {
             case CONNECT:
-                connect(clientNumber, connectionSocket, clientSentence);
+                connect(clientNumber, connectionSocket, sentence);
                 break;
             case CLIENT_FILE_LIST:
-                getFileList(clientNumber, connectionSocket, clientSentence);
+                getFileList(clientNumber, connectionSocket, sentence);
                 break;
             case HANDLE_PUSH:
-                push(clientNumber, connectionSocket, clientSentence);
+                handlePush(clientNumber, connectionSocket, sentence);
                 break;
             case PUSH_ON_DEMAND:
-                pushOnDemand(clientNumber, clientSentence);
+                pushOnDemand(clientNumber, sentence);
+                break;
+            case REPUSH:
+                repush(clientNumber, connectionSocket, sentence);
                 break;
             default:
                 Logger.clientLog('"' + command + '"' + " command is not supported yet");
@@ -85,8 +93,8 @@ public class TCPClientConnectionActionMH {
         Logger.clientLog("Client file list sent to server");
     }
 
-    private static void push(int clientNumber, Socket connectionSocket, String clientSentence) {
-        Logger.clientDebugLog("fire pull");
+    private static void handlePush(int clientNumber, Socket connectionSocket, String clientSentence) {
+        Logger.clientDebugLog("fire handlePush");
 
         String command = ConsoleCommandUtils.getCommand(clientSentence);
         int sourceClientNumber = ConsoleCommandUtils.getClientNumber(clientSentence);
@@ -104,13 +112,63 @@ public class TCPClientConnectionActionMH {
         ConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
         ConnectionUtils.closeFileOutputStream(fileOutputStream);
 
+
         if (MD5Sum.check(filePath, fileMD5Sum)) {
             Logger.clientLog("File downloaded successfully");
         } else {
             Logger.clientLog("Unsuccessful file download");
-            if (file.delete()) {
-                Logger.clientDebugLog("Removed invalid file");
+            ConnectionUtils.closeSocket(connectionSocket);
+            // TODO start repush code
+            Long receivedFilePartSize = file.length();
+            Logger.clientDebugLog("Downloaded " + receivedFilePartSize + " bytes");
+
+            boolean reconnect = false;
+            for (int i = 0; i < Config.WAITING_TIME_SEC; i++) {
+                try {
+                    Logger.clientDebugLog("Try reconnect with client " + sourceClientNumber);
+                    connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR + sourceClientNumber);
+                    reconnect = true;
+                    break;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                try { // TODO sleep
+                    sleep(1000);
+                } catch (InterruptedException e) {
+                    ExceptionHandler.handle(e);
+                }
             }
+            if (reconnect) {
+                Logger.clientDebugLog("Reconnected");
+
+                DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
+                command = String.valueOf(ClientCommand.REPUSH);
+                ConnectionUtils.sendMessageToDataOutputStream(outToClient,
+                        command,
+                        String.valueOf(clientNumber),
+                        fileName, String.valueOf(receivedFilePartSize));
+                Logger.clientDebugLog("Repush request sended");
+
+                fileOutputStream = ConnectionUtils.createFileOutputStream(file, true);
+                inputStream = ConnectionUtils.getInputStream(connectionSocket);
+                ConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
+                ConnectionUtils.closeFileOutputStream(fileOutputStream);
+
+                Logger.clientDebugLog("End downloading file " + fileName);
+
+                if (MD5Sum.check(filePath, fileMD5Sum)) {
+                    Logger.clientLog("File downloaded successfully");
+                } else {
+                    Logger.clientLog("Unsuccessful file download");
+                }
+            } else {
+                Logger.clientLog("Cannot reconnect with client " + sourceClientNumber);
+            }
+            // TODO end repush code
+            /*if (file.delete()) {
+                Logger.clientDebugLog("Removed invalid file");
+            }*/
         }
 
         Logger.clientDebugLog(command + " downloading sequence ended");
@@ -124,4 +182,16 @@ public class TCPClientConnectionActionMH {
 
         ClientActionUtils.uploadIfFileExist(clientNumber, targetClientNumber, fileName);
     }
+
+    private static void repush(int clientNumber, Socket connectionSocket, String clientSentence) {
+        Logger.clientDebugLog("fire repush");
+
+        int targetClientNumber = ConsoleCommandUtils.getClientNumber(clientSentence);
+        String fileName = ConsoleCommandUtils.getFileName(clientSentence);
+        long receivedFilePartSize = ConsoleCommandUtils.getStartByteNumber(clientSentence);
+
+        ClientActionUtils.uploadIfFileExist(clientNumber, connectionSocket, fileName, receivedFilePartSize);
+    }
+
+
 }

@@ -8,6 +8,8 @@ public class Config {
 
     public static final int BUFFER_SIZE_IN_BYTES = 4096;
 
+    public static final int WAITING_TIME_SEC = 10; //TODO set to 30 or 60 after tests
+
     public static final int MAX_NUMBER_OF_PARAMETERS = 3;
     public static final int MILLISECONDS_OF_CONNECTION_LISTENER_WAITING = 1000;
     private static final char EDITABLE_SPLITS_CHAR = '*';

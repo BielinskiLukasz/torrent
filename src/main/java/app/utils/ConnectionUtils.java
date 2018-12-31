@@ -86,7 +86,7 @@ public class ConnectionUtils {
         return inputStream;
     }
 
-    private static FileOutputStream createFileOutputStream(File file, boolean append) {
+    public static FileOutputStream createFileOutputStream(File file, boolean append) {
         FileOutputStream fileOutputStream = null;
         try {
             fileOutputStream = new FileOutputStream(file, append);
@@ -172,6 +172,8 @@ public class ConnectionUtils {
     }
 
     public static void sendFileByStream(FileInputStream fileInputStream, OutputStream outputStream) {
+        Logger.serverDebugLog("start sending file");
+
         int count;
         byte[] buffer = new byte[Config.BUFFER_SIZE_IN_BYTES];
         try {
@@ -181,9 +183,13 @@ public class ConnectionUtils {
         } catch (IOException e) {
             ExceptionHandler.handle(e);
         }
+
+        Logger.serverDebugLog("finish sending file");
     }
 
     public static void readFileFromStream(FileOutputStream fileOutputStream, InputStream inputStream) {
+        Logger.serverDebugLog("start read file");
+
         int count;
         byte[] buffer = new byte[8192];
         try {
@@ -193,5 +199,7 @@ public class ConnectionUtils {
         } catch (IOException e) {
             ExceptionHandler.handle(e);
         }
+
+        Logger.serverDebugLog("finish read file");
     }
 }
