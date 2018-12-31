@@ -42,7 +42,7 @@ public class TCPClientConnectionMH extends Thread {
                     inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                     clientSentence = inFromServer.readLine();
 
-                    TCPClientActionMH.perform(client.getClientNumber(), clientSocket, clientSentence);
+                    TCPClientConnectionActionMH.perform(client.getClientNumber(), clientSocket, clientSentence);
                 }
             } catch (IOException e) {
                 ExceptionHandler.handle(e);
@@ -63,7 +63,7 @@ public class TCPClientConnectionMH extends Thread {
 
         String helloMessage = ClientCommand.CONNECT + Config.SPLITS_CHAR + client.getClientNumber() +
                 Config.SPLITS_CHAR + "Hello, I'm client " + client.getClientNumber();
-        TCPClientActionMH.perform(client.getClientNumber(), serverSocket, helloMessage);
+        TCPClientConnectionActionMH.perform(client.getClientNumber(), serverSocket, helloMessage);
 
         ConnectionUtils.closeSocket(serverSocket);
 

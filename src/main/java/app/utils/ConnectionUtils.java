@@ -86,16 +86,20 @@ public class ConnectionUtils {
         return inputStream;
     }
 
-    public static FileOutputStream createFileOutputStream(File file) {
+    private static FileOutputStream createFileOutputStream(File file, boolean append) {
         FileOutputStream fileOutputStream = null;
         try {
-            fileOutputStream = new FileOutputStream(file);
+            fileOutputStream = new FileOutputStream(file, append);
         } catch (FileNotFoundException e) {
             ExceptionHandler.handle(e);
         }
 
         Logger.utilsDebugLog("createFileOutputStream");
         return fileOutputStream;
+    }
+
+    public static FileOutputStream createFileOutputStream(File file) {
+        return createFileOutputStream(file, false);
     }
 
     public static void closeFileOutputStream(FileOutputStream fileOutputStream) {

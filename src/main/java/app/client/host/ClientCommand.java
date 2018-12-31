@@ -4,6 +4,6 @@ public enum ClientCommand {
 
     CONNECT,
     FILE_LIST,
-    PULL,
-    PUSH
+    PUSH,
+    PUSH_ON_DEMAND
 }

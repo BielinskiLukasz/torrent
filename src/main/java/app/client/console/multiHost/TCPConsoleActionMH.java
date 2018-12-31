@@ -1,23 +1,17 @@
 package app.client.console.multiHost;
 
+import app.client.ClienActionUtils;
 import app.client.console.ConsoleCommand;
+import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
-import app.utils.ActionUtils;
 import app.utils.ConnectionUtils;
-import app.utils.FileList;
+import app.utils.ConsoleCommandUtils;
 import app.utils.Logger;
-import app.utils.MD5Sum;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
-import java.util.List;
 
 public class TCPConsoleActionMH {
 
@@ -25,17 +19,17 @@ public class TCPConsoleActionMH {
         if (!userSentence.contains(Config.SPLITS_CHAR)) {
             userSentence = addSplitChars(userSentence);
         }
-        String command = ActionUtils.getConsoleCommand(userSentence);
+        String command = ConsoleCommandUtils.getConsoleCommand(userSentence);
 
         switch (ConsoleCommand.valueOf(command)) {
             case FILE_LIST:
                 getFileList(command);
                 break;
             case PULL:
-                pull(clientNumber, userSentence); // TODO BACKLOG implement protect against file overwriting
+                pull(clientNumber, userSentence);
                 break;
             case PUSH:
-                push(clientNumber, userSentence); // TODO BACKLOG implement protect against file overwriting
+                push(clientNumber, userSentence);
                 break;
             case CLOSE:
                 close(clientNumber, command);
@@ -68,7 +62,7 @@ public class TCPConsoleActionMH {
         BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);
         String response = ConnectionUtils.readBufferedReaderLine(inFromServer);
 
-        int serverFileListSize = ActionUtils.getListSize(response);
+        int serverFileListSize = ConsoleCommandUtils.getListSize(response);
         for (int i = 0; i < serverFileListSize; i++) {
             Logger.consoleLog(
                     ConnectionUtils.readBufferedReaderLine(inFromServer)
@@ -85,7 +79,7 @@ public class TCPConsoleActionMH {
     private static void pull(int clientNumber, String userSentence) {
         Logger.consoleDebugLog("fire pull");
 
-        int sourceClientNumber = ActionUtils.getClientNumber(userSentence);
+        int sourceClientNumber = ConsoleCommandUtils.getClientNumber(userSentence);
 
         if (isClientChooseHisOwnNumber(clientNumber, sourceClientNumber)) {
             Logger.consoleLog("This is not the client you are looking for :)");
@@ -97,40 +91,9 @@ public class TCPConsoleActionMH {
                         Config.PORT_NR + sourceClientNumber);
 
                 DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(hostConnectionSocket);
-                String command = ActionUtils.getConsoleCommand(userSentence);
-                String fileName = ActionUtils.getFileName(userSentence);
+                String command = ClientCommand.PUSH_ON_DEMAND.name();
+                String fileName = ConsoleCommandUtils.getFileName(userSentence);
                 ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
-
-
-                BufferedReader inFromClient = ConnectionUtils.getBufferedReader(hostConnectionSocket);
-                String response = ConnectionUtils.readBufferedReaderLine(inFromClient);
-
-                Boolean fileExist = ActionUtils.getBoolean(response);
-                String message = ActionUtils.getMessage(response);
-
-                Logger.consoleLog(message);
-                Logger.consoleDebugLog(String.valueOf(fileExist));
-
-                if (fileExist) {
-                    response = ConnectionUtils.readBufferedReaderLine(inFromClient);
-                    String fileMD5Sum = ActionUtils.getMD5Sum(response);
-
-                    String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
-                    File file = new File(filePath);
-                    FileOutputStream fileOutputStream = ConnectionUtils.createFileOutputStream(file);
-                    InputStream inputStream = ConnectionUtils.getInputStream(hostConnectionSocket);
-                    ConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
-                    ConnectionUtils.closeFileOutputStream(fileOutputStream);
-
-                    if (MD5Sum.check(filePath, fileMD5Sum)) {
-                        Logger.consoleLog("File downloaded successfully");
-                    } else {
-                        Logger.consoleLog("Unsuccessful file download");
-                        if (file.delete()) {
-                            Logger.consoleDebugLog("Removed invalid file");
-                        }
-                    }
-                }
 
                 ConnectionUtils.closeSocket(hostConnectionSocket);
 
@@ -144,45 +107,17 @@ public class TCPConsoleActionMH {
     private static void push(int clientNumber, String userSentence) {
         Logger.consoleDebugLog("fire push");
 
-        int targetClientNumber = ActionUtils.getClientNumber(userSentence);
-        String fileName = ActionUtils.getFileName(userSentence);
+        int targetClientNumber = ConsoleCommandUtils.getClientNumber(userSentence);
+        String fileName = ConsoleCommandUtils.getFileName(userSentence);
 
         if (isClientChooseHisOwnNumber(clientNumber, targetClientNumber)) {
             Logger.consoleLog("This is not the client you are looking for :)");
             Logger.consoleLog("There is no need to upload the file to yourself");
-        } else if (!isClientHaveFile(clientNumber, fileName)) {
-            Logger.consoleLog("You haven't selected file");
+        } else if (isSelectedClientConnected(targetClientNumber)) {
+            ClienActionUtils.uploadIfFileExist(clientNumber, targetClientNumber, fileName);
         } else {
-            if (isSelectedClientConnected(targetClientNumber)) {
-                String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
-                File file = new File(filePath);
-
-                Socket hostConnectionSocket = ConnectionUtils.createSocket(Config.HOST_IP,
-                        Config.PORT_NR + targetClientNumber);
-
-                DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(hostConnectionSocket);
-                String command = ActionUtils.getConsoleCommand(userSentence);
-                ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
-
-                String md5sum = MD5Sum.md5(filePath);
-                String response = "Sending file " + fileName + " md5 sum";
-                ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, md5sum, response);
-
-                FileInputStream fileInputStream = ConnectionUtils.createFileInputStream(file);
-                OutputStream outputStream = ConnectionUtils.getOutputStream(hostConnectionSocket);
-                ConnectionUtils.sendFileByStream(fileInputStream, outputStream);
-                ConnectionUtils.closeFileInputStream(fileInputStream);
-
-                Logger.consoleLog("Send file " + fileName + " to client " + targetClientNumber);
-
-                ConnectionUtils.closeSocket(hostConnectionSocket);
-
-                Logger.consoleLog("Finished");
-            } else {
-                Logger.consoleLog("Client " + targetClientNumber + " isn't connected");
-            }
+            Logger.consoleLog("You haven't selected file");
         }
-
     }
 
     private static boolean isClientChooseHisOwnNumber(int clientNumber, int targetClientNumber) {
@@ -199,16 +134,12 @@ public class TCPConsoleActionMH {
 
         BufferedReader inFromServer = ConnectionUtils.getBufferedReader(connectionSocket);
         String response = ConnectionUtils.readBufferedReaderLine(inFromServer);
-        boolean sourceClientConnected = ActionUtils.getBoolean(response);
+        boolean sourceClientConnected = ConsoleCommandUtils.getBoolean(response);
 
         ConnectionUtils.closeSocket(connectionSocket);
         return sourceClientConnected;
     }
 
-    private static boolean isClientHaveFile(int clientNumber, String fileName) {
-        List<String> clientFileNameList = FileList.getFileNameList(clientNumber);
-        return clientFileNameList.contains(fileName);
-    }
 
     private static void close(int clientNumber, String command) {
         Logger.consoleDebugLog("fire close");

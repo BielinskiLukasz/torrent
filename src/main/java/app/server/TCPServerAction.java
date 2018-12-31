@@ -1,8 +1,8 @@
 package app.server;
 
 import app.config.Config;
-import app.utils.ActionUtils;
 import app.utils.ConnectionUtils;
+import app.utils.ConsoleCommandUtils;
 import app.utils.Logger;
 
 import java.io.BufferedReader;
@@ -14,7 +14,7 @@ import java.util.List;
 class TCPServerAction {
 
     static void perform(TCPServer server, Socket connectionSocket, String clientSentence) {
-        String command = ActionUtils.getCommand(clientSentence);
+        String command = ConsoleCommandUtils.getCommand(clientSentence);
 
         switch (ServerCommand.valueOf(command)) {
             case CONNECT:
@@ -38,7 +38,7 @@ class TCPServerAction {
     private static void confirmConnection(TCPServer server, Socket connectionSocket, String clientSentence) {
         Logger.serverDebugLog("fire connect");
 
-        int clientNumber = ActionUtils.getClientNumber(clientSentence);
+        int clientNumber = ConsoleCommandUtils.getClientNumber(clientSentence);
         boolean sourceClientConnected = server.isClientConnected(clientNumber);
 
         DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
@@ -59,9 +59,9 @@ class TCPServerAction {
     }
 
     private static int getClientDataFromReceiveRequest(String clientSentence) {
-        String command = ActionUtils.getCommand(clientSentence);
-        String message = ActionUtils.getMessage(clientSentence);
-        int clientNumber = ActionUtils.getClientNumber(clientSentence);
+        String command = ConsoleCommandUtils.getCommand(clientSentence);
+        String message = ConsoleCommandUtils.getMessage(clientSentence);
+        int clientNumber = ConsoleCommandUtils.getClientNumber(clientSentence);
         Logger.serverDebugLog(command + " input: " + message);
         return clientNumber;
     }
@@ -91,7 +91,7 @@ class TCPServerAction {
                     BufferedReader inFromClient = ConnectionUtils.getBufferedReader(userSocket);
                     String response = ConnectionUtils.readBufferedReaderLine(inFromClient);
 
-                    int clientFileListSize = ActionUtils.getListSize(response);
+                    int clientFileListSize = ConsoleCommandUtils.getListSize(response);
                     for (int i = 0; i < clientFileListSize; i++) {
                         serverFileList.add(
                                 ConnectionUtils.readBufferedReaderLine(inFromClient)
@@ -120,7 +120,7 @@ class TCPServerAction {
     private static void close(TCPServer server, Socket connectionSocket, String clientSentence) {
         Logger.serverDebugLog("fire close");
 
-        int clientNumber = ActionUtils.getClientNumber(clientSentence);
+        int clientNumber = ConsoleCommandUtils.getClientNumber(clientSentence);
 
         server.removeClient(clientNumber);
 

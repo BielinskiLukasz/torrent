@@ -3,7 +3,7 @@ package app.utils;
 import app.client.console.ConsoleCommand;
 import app.config.Config;
 
-public class ActionUtils {
+public class ConsoleCommandUtils {
 
     public static String getCommand(String sentence) {
         return splitSentence(sentence)[0];

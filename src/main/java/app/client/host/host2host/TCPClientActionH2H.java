@@ -2,7 +2,7 @@ package app.client.host.host2host;
 
 import app.client.host.ClientCommand;
 import app.config.Config;
-import app.utils.ActionUtils;
+import app.utils.ConsoleCommandUtils;
 import app.utils.FileList;
 import app.utils.Logger;
 
@@ -17,7 +17,7 @@ public class TCPClientActionH2H {
 
     public static void perform(TCPClientH2H client, Socket connectionSocket, String clientSentence) {
 
-        String command = ActionUtils.getCommand(clientSentence);
+        String command = ConsoleCommandUtils.getCommand(clientSentence);
 
         switch (ClientCommand.valueOf(command)) {
             case CONNECT:
@@ -44,11 +44,11 @@ public class TCPClientActionH2H {
             e.printStackTrace();
         }
 
-        int connectedClientNumber = ActionUtils.getClientNumber(clientSentence);
+        int connectedClientNumber = ConsoleCommandUtils.getClientNumber(clientSentence);
         client.setConnectedClientNumber(connectedClientNumber);
 
-        String command = ActionUtils.getCommand(clientSentence);
-        String message = ActionUtils.getMessage(clientSentence);
+        String command = ConsoleCommandUtils.getCommand(clientSentence);
+        String message = ConsoleCommandUtils.getMessage(clientSentence);
         Logger.clientDebugLog(command + " output: " + message);
         try {
             outToServer.writeBytes(command + Config.SPLITS_CHAR + client.getClientNumber() +
@@ -78,7 +78,7 @@ public class TCPClientActionH2H {
     private static void getFileList(int clientNumber, Socket connectionSocket, String clientSentence) {
         Logger.clientDebugLog("fire getFileList");
 
-        String command = ActionUtils.getCommand(clientSentence);
+        String command = ConsoleCommandUtils.getCommand(clientSentence);
         DataOutputStream outToServer = null;
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());

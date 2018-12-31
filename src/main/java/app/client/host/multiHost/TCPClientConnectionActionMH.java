@@ -1,9 +1,10 @@
 package app.client.host.multiHost;
 
+import app.client.ClienActionUtils;
 import app.client.host.ClientCommand;
 import app.config.Config;
-import app.utils.ActionUtils;
 import app.utils.ConnectionUtils;
+import app.utils.ConsoleCommandUtils;
 import app.utils.FileList;
 import app.utils.Logger;
 import app.utils.MD5Sum;
@@ -11,18 +12,16 @@ import app.utils.MD5Sum;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.util.List;
 
-public class TCPClientActionMH {
+public class TCPClientConnectionActionMH {
 
     public static void perform(int clientNumber, Socket connectionSocket, String clientSentence) {
 
-        String command = ActionUtils.getCommand(clientSentence);
+        String command = ConsoleCommandUtils.getCommand(clientSentence);
 
         switch (ClientCommand.valueOf(command)) {
             case CONNECT:
@@ -31,11 +30,11 @@ public class TCPClientActionMH {
             case FILE_LIST:
                 getFileList(clientNumber, connectionSocket, clientSentence);
                 break;
-            case PULL:
-                pull(clientNumber, connectionSocket, clientSentence);
-                break;
             case PUSH:
                 push(clientNumber, connectionSocket, clientSentence);
+                break;
+            case PUSH_ON_DEMAND:
+                pushOnDemand(clientNumber, clientSentence);
                 break;
             default:
                 Logger.clientLog('"' + command + '"' + " command is not supported yet");
@@ -54,8 +53,8 @@ public class TCPClientActionMH {
 
     private static void sendConnectionRequest(Socket connectionSocket, int clientNumber, String clientSentence) {
         DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
-        String command = ActionUtils.getCommand(clientSentence);
-        String message = ActionUtils.getMessage(clientSentence);
+        String command = ConsoleCommandUtils.getCommand(clientSentence);
+        String message = ConsoleCommandUtils.getMessage(clientSentence);
         ConnectionUtils.sendMessageToDataOutputStream(outToServer, command, String.valueOf(clientNumber), message);
     }
 
@@ -67,7 +66,7 @@ public class TCPClientActionMH {
     private static void getFileList(int clientNumber, Socket connectionSocket, String clientSentence) {
         Logger.clientDebugLog("fire getFileList");
 
-        String command = ActionUtils.getCommand(clientSentence);
+        String command = ConsoleCommandUtils.getCommand(clientSentence);
         Logger.clientDebugLog(command + " input: " + clientSentence);
 
         List<String> clientFileList = FileList.packFileInfoList(
@@ -85,56 +84,17 @@ public class TCPClientActionMH {
         Logger.clientLog("Client file list sent to server");
     }
 
-    private static void pull(int clientNumber, Socket connectionSocket, String clientSentence) {
-        Logger.clientDebugLog("fire pull");
-
-        String command = ActionUtils.getCommand(clientSentence);
-        int targetClientNumber = ActionUtils.getClientNumber(clientSentence);
-        String fileName = ActionUtils.getFileName(clientSentence);
-
-        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
-        File file = new File(filePath);
-
-        String response;
-        if (file.exists()) {
-            response = "Sending file " + fileName + " started";
-        } else {
-            response = "Client " + clientNumber + " doesn't share file " + fileName +
-                    ". Chceck file name and client number";
-        }
-
-        DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
-        ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(file.exists()), response);
-
-        if (file.exists()) {
-            String md5sum = MD5Sum.md5(filePath);
-            response = "Sending file " + fileName + " md5 sum";
-            ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, md5sum, response);
-
-            FileInputStream fileInputStream = ConnectionUtils.createFileInputStream(file);
-            OutputStream outputStream = ConnectionUtils.getOutputStream(connectionSocket);
-            ConnectionUtils.sendFileByStream(fileInputStream, outputStream);
-            ConnectionUtils.closeFileInputStream(fileInputStream);
-
-            Logger.clientLog("Send file " + fileName + " to client " + targetClientNumber);
-        }
-
-        ConnectionUtils.closeSocket(connectionSocket);
-
-        Logger.clientDebugLog(command + " sending sequence ended");
-    }
-
     private static void push(int clientNumber, Socket connectionSocket, String clientSentence) {
         Logger.clientDebugLog("fire pull");
 
-        String command = ActionUtils.getCommand(clientSentence);
-        int sourceClientNumber = ActionUtils.getClientNumber(clientSentence);
-        String fileName = ActionUtils.getFileName(clientSentence);
+        String command = ConsoleCommandUtils.getCommand(clientSentence);
+        int sourceClientNumber = ConsoleCommandUtils.getClientNumber(clientSentence);
+        String fileName = ConsoleCommandUtils.getFileName(clientSentence);
         Logger.clientLog("Receiving file " + fileName + " from client " + sourceClientNumber);
 
         BufferedReader inFromClient = ConnectionUtils.getBufferedReader(connectionSocket);
         String sentence = ConnectionUtils.readBufferedReaderLine(inFromClient);
-        String fileMD5Sum = ActionUtils.getMD5Sum(sentence);
+        String fileMD5Sum = ConsoleCommandUtils.getMD5Sum(sentence);
 
         String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
         File file = new File(filePath);
@@ -153,5 +113,14 @@ public class TCPClientActionMH {
         }
 
         Logger.clientDebugLog(command + " downloading sequence ended");
+    }
+
+    private static void pushOnDemand(int clientNumber, String clientSentence) {
+        Logger.clientDebugLog("fire pushOnDemand");
+
+        int targetClientNumber = ConsoleCommandUtils.getClientNumber(clientSentence);
+        String fileName = ConsoleCommandUtils.getFileName(clientSentence);
+
+        ClienActionUtils.uploadIfFileExist(clientNumber, targetClientNumber, fileName);
     }
 }
