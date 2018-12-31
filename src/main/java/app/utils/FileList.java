@@ -56,4 +56,8 @@ public class FileList {
     static FileInfo unpackFileInfo(String packedFileInfo) {
         return new FileInfo(packedFileInfo);
     }
+
+    public static List<String> getFileNameList(int clientNumber) {
+        return getFileList(Config.BASIC_PATH + clientNumber);
+    }
 }

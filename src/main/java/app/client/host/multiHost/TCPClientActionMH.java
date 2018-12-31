@@ -12,6 +12,8 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.List;
@@ -31,6 +33,9 @@ public class TCPClientActionMH {
                 break;
             case PULL:
                 pull(clientNumber, connectionSocket, clientSentence);
+                break;
+            case PUSH:
+                push(clientNumber, connectionSocket, clientSentence);
                 break;
             default:
                 Logger.clientLog('"' + command + '"' + " command is not supported yet");
@@ -87,7 +92,6 @@ public class TCPClientActionMH {
         int targetClientNumber = ActionUtils.getClientNumber(clientSentence);
         String fileName = ActionUtils.getFileName(clientSentence);
 
-
         String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
         File file = new File(filePath);
 
@@ -99,13 +103,13 @@ public class TCPClientActionMH {
                     ". Chceck file name and client number";
         }
 
-        DataOutputStream outToServer = ConnectionUtils.getDataOutputStream(connectionSocket);
-        ConnectionUtils.sendMessageToDataOutputStream(outToServer, command, String.valueOf(file.exists()), response);
+        DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
+        ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(file.exists()), response);
 
         if (file.exists()) {
             String md5sum = MD5Sum.md5(filePath);
             response = "Sending file " + fileName + " md5 sum";
-            ConnectionUtils.sendMessageToDataOutputStream(outToServer, command, md5sum, response);
+            ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, md5sum, response);
 
             FileInputStream fileInputStream = ConnectionUtils.createFileInputStream(file);
             OutputStream outputStream = ConnectionUtils.getOutputStream(connectionSocket);
@@ -118,5 +122,36 @@ public class TCPClientActionMH {
         ConnectionUtils.closeSocket(connectionSocket);
 
         Logger.clientDebugLog(command + " sending sequence ended");
+    }
+
+    private static void push(int clientNumber, Socket connectionSocket, String clientSentence) {
+        Logger.clientDebugLog("fire pull");
+
+        String command = ActionUtils.getCommand(clientSentence);
+        int sourceClientNumber = ActionUtils.getClientNumber(clientSentence);
+        String fileName = ActionUtils.getFileName(clientSentence);
+        Logger.clientLog("Receiving file " + fileName + " from client " + sourceClientNumber);
+
+        BufferedReader inFromClient = ConnectionUtils.getBufferedReader(connectionSocket);
+        String sentence = ConnectionUtils.readBufferedReaderLine(inFromClient);
+        String fileMD5Sum = ActionUtils.getMD5Sum(sentence);
+
+        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+        File file = new File(filePath);
+        FileOutputStream fileOutputStream = ConnectionUtils.createFileOutputStream(file);
+        InputStream inputStream = ConnectionUtils.getInputStream(connectionSocket);
+        ConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
+        ConnectionUtils.closeFileOutputStream(fileOutputStream);
+
+        if (MD5Sum.check(filePath, fileMD5Sum)) {
+            Logger.clientLog("File downloaded successfully");
+        } else {
+            Logger.clientLog("Unsuccessful file download");
+            if (file.delete()) {
+                Logger.clientDebugLog("Removed invalid file");
+            }
+        }
+
+        Logger.clientDebugLog(command + " downloading sequence ended");
     }
 }

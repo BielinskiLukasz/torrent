@@ -9,7 +9,7 @@ import java.security.NoSuchAlgorithmException;
 public class MD5Sum {
 
     public static String md5(String filePath) {
-        byte[] data = readFileByres(filePath);
+        byte[] data = readFileBytes(filePath);
 
         MessageDigest mDigest = null;
         try {
@@ -27,7 +27,7 @@ public class MD5Sum {
         return sb.toString();
     }
 
-    private static byte[] readFileByres(String filePath) {
+    private static byte[] readFileBytes(String filePath) {
         byte[] data = new byte[0];
         try {
             data = Files.readAllBytes(Paths.get(filePath));
