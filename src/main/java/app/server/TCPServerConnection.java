@@ -1,6 +1,7 @@
 package app.server;
 
 import app.config.Config;
+import app.utils.ExceptionHandler;
 import app.utils.Logger;
 
 import java.io.BufferedReader;
@@ -27,7 +28,7 @@ public class TCPServerConnection extends Thread {
         try {
             inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         while (true) {
@@ -35,7 +36,7 @@ public class TCPServerConnection extends Thread {
             try {
                 clientSentence = inFromClient.readLine();
             } catch (IOException e) {
-                e.printStackTrace();
+                ExceptionHandler.handle(e);
             }
 
             if (clientSentence != null) {
@@ -45,7 +46,7 @@ public class TCPServerConnection extends Thread {
             try { // TODO sleep
                 sleep(Config.MILLISECONDS_OF_CONNECTION_LISTENER_WAITING);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                ExceptionHandler.handle(e);
             }
         }
     }

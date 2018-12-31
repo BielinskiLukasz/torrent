@@ -3,6 +3,7 @@ package app.client.host.multiHost;
 import app.client.host.ClientCommand;
 import app.config.Config;
 import app.utils.ConnectionUtils;
+import app.utils.ExceptionHandler;
 import app.utils.Logger;
 
 import java.io.BufferedReader;
@@ -27,7 +28,7 @@ public class TCPClientConnectionMH extends Thread {
             hostServerSocket = new ServerSocket(Config.PORT_NR + client.getClientNumber());
             connectWithServer();
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         while (true) {
@@ -44,13 +45,13 @@ public class TCPClientConnectionMH extends Thread {
                     TCPClientActionMH.perform(client.getClientNumber(), clientSocket, clientSentence);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                ExceptionHandler.handle(e);
             }
 
             try { // TODO sleep
                 sleep(Config.MILLISECONDS_OF_CONNECTION_LISTENER_WAITING);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                ExceptionHandler.handle(e);
             }
         }
     }

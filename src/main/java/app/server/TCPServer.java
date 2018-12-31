@@ -1,6 +1,7 @@
 package app.server;
 
 import app.config.Config;
+import app.utils.ExceptionHandler;
 import app.utils.FileInfo;
 import app.utils.Logger;
 
@@ -34,7 +35,7 @@ public class TCPServer extends Thread {
         try {
             welcomeSocket = new ServerSocket(Config.PORT_NR);
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         while (true) {
@@ -44,13 +45,13 @@ public class TCPServer extends Thread {
                 TCPServerConnection connection = new TCPServerConnection(this, connectionSocket);
                 connection.start();
             } catch (IOException e) {
-                e.printStackTrace();
+                ExceptionHandler.handle(e);
             }
 
             try { // TODO sleep
                 sleep(Config.MILLISECONDS_OF_CONNECTION_LISTENER_WAITING);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                ExceptionHandler.handle(e);
             }
         }
     }
@@ -71,7 +72,7 @@ public class TCPServer extends Thread {
         this.fileList = fileList;
     }
 
-    public boolean isClientConnected(int clientNumber) {
+    boolean isClientConnected(int clientNumber) {
         return userList.contains(clientNumber);
     }
 }

@@ -41,4 +41,11 @@ public class Logger {
         if (DEBUG_LOG_DISPLAY)
             System.out.println("Utils: " + message);
     }
+
+    static void exceptionDebugLog(Exception e) {
+        if (DEBUG_LOG_DISPLAY) {
+            System.out.println("Stack Trace:");
+            e.printStackTrace();
+        }
+    }
 }

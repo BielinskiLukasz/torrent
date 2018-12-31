@@ -21,7 +21,7 @@ public class ConnectionUtils {
         try {
             socket = new Socket(host, port);
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         Logger.utilsDebugLog("createSocket");
@@ -32,7 +32,7 @@ public class ConnectionUtils {
         try {
             socket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         Logger.utilsDebugLog("closeSocket");
@@ -43,7 +43,7 @@ public class ConnectionUtils {
         try {
             dataOutputStream = new DataOutputStream(socket.getOutputStream());
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         Logger.utilsDebugLog("getDataOutputStream");
@@ -55,7 +55,7 @@ public class ConnectionUtils {
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         Logger.utilsDebugLog("getBufferedReader");
@@ -67,7 +67,7 @@ public class ConnectionUtils {
         try {
             outputStream = connectionSocket.getOutputStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         Logger.utilsDebugLog("getOutputStream");
@@ -79,7 +79,7 @@ public class ConnectionUtils {
         try {
             inputStream = connectionSocket.getInputStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         Logger.utilsDebugLog("getInputStream");
@@ -91,7 +91,7 @@ public class ConnectionUtils {
         try {
             fileOutputStream = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         Logger.utilsDebugLog("createFileOutputStream");
@@ -102,7 +102,7 @@ public class ConnectionUtils {
         try {
             fileOutputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         Logger.utilsDebugLog("closeFileOutputStream");
@@ -113,7 +113,7 @@ public class ConnectionUtils {
         try {
             fileInputStream = new FileInputStream(file);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         Logger.utilsDebugLog("createFileInputStream");
@@ -124,7 +124,7 @@ public class ConnectionUtils {
         try {
             fileInputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         Logger.utilsDebugLog("closeFileInputStream");
@@ -138,7 +138,7 @@ public class ConnectionUtils {
         try {
             dataOutputStream.writeBytes(message + "\n");
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         Logger.utilsDebugLog("send: " + message);
@@ -160,7 +160,7 @@ public class ConnectionUtils {
         try {
             response = bufferedReader.readLine();
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         Logger.serverDebugLog("get: " + response);
@@ -175,7 +175,7 @@ public class ConnectionUtils {
                 outputStream.write(buffer, 0, count);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
     }
 
@@ -187,7 +187,7 @@ public class ConnectionUtils {
                 fileOutputStream.write(buffer, 0, count);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
     }
 }

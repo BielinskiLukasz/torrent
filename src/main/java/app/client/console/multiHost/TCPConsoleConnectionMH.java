@@ -2,6 +2,7 @@ package app.client.console.multiHost;
 
 import app.client.host.multiHost.TCPClientMH;
 import app.config.Config;
+import app.utils.ExceptionHandler;
 import app.utils.Logger;
 
 import java.io.BufferedReader;
@@ -31,14 +32,14 @@ public class TCPConsoleConnectionMH extends Thread {
 
                 TCPConsoleActionMH.perform(client.getClientNumber(), userSentence);
             } catch (IOException e) {
-                e.printStackTrace();
-                this.interrupt();
+                ExceptionHandler.handle(e);
+                this.interrupt(); // TODO ???
             }
 
             try { // TODO sleep
                 sleep(Config.MILLISECONDS_OF_CONNECTION_LISTENER_WAITING);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                ExceptionHandler.handle(e);
             }
         }
     }

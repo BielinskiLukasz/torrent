@@ -15,7 +15,7 @@ public class MD5Sum {
         try {
             mDigest = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
         byte[] md5 = mDigest.digest(data);
 
@@ -32,7 +32,7 @@ public class MD5Sum {
         try {
             data = Files.readAllBytes(Paths.get(filePath));
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
         return data;
     }
