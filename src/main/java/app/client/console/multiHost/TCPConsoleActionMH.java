@@ -27,7 +27,7 @@ public class TCPConsoleActionMH {
             case FILE_LIST:
                 getFileList();
                 break;
-            case PULL:
+            case PULL: // TODO print message in console if host haven file
                 pull(clientNumber, userSentence);
                 break;
             case PUSH:

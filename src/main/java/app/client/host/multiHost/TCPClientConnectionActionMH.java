@@ -117,61 +117,76 @@ public class TCPClientConnectionActionMH {
             Logger.clientLog("File downloaded successfully");
         } else {
             Logger.clientLog("Unsuccessful file download");
-            ConnectionUtils.closeSocket(connectionSocket);
-            // TODO start repush code
-            Long receivedFilePartSize = file.length();
-            Logger.clientDebugLog("Downloaded " + receivedFilePartSize + " bytes");
-
-            boolean reconnect = false;
-            for (int i = 0; i < Config.WAITING_TIME_SEC; i++) {
-                try {
-                    Logger.clientDebugLog("Try reconnect with client " + sourceClientNumber);
-                    connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR + sourceClientNumber);
-                    reconnect = true;
-                    break;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                try { // TODO sleep
-                    sleep(1000);
-                } catch (InterruptedException e) {
-                    ExceptionHandler.handle(e);
-                }
-            }
-            if (reconnect) {
-                Logger.clientDebugLog("Reconnected");
-
-                DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
-                command = String.valueOf(ClientCommand.REPUSH);
-                ConnectionUtils.sendMessageToDataOutputStream(outToClient,
-                        command,
-                        String.valueOf(clientNumber),
-                        fileName, String.valueOf(receivedFilePartSize));
-                Logger.clientDebugLog("Repush request sended");
-
-                fileOutputStream = ConnectionUtils.createFileOutputStream(file, true);
-                inputStream = ConnectionUtils.getInputStream(connectionSocket);
-                ConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
-                ConnectionUtils.closeFileOutputStream(fileOutputStream);
-
-                Logger.clientDebugLog("End downloading file " + fileName);
-
-                if (MD5Sum.check(filePath, fileMD5Sum)) {
-                    Logger.clientLog("File downloaded successfully");
-                } else {
-                    Logger.clientLog("Unsuccessful file download");
-                }
-            } else {
-                Logger.clientLog("Cannot reconnect with client " + sourceClientNumber);
-            }
-            // TODO end repush code
+            handleRepush(clientNumber, connectionSocket, fileMD5Sum, clientSentence, 0);
             /*if (file.delete()) {
                 Logger.clientDebugLog("Removed invalid file");
-            }*/
+            }*/ // TODO old code (deleting file) remove
         }
 
         Logger.clientDebugLog(command + " downloading sequence ended");
+    }
+
+    private static void handleRepush(int clientNumber,
+                                     Socket connectionSocket,
+                                     String fileMD5Sum,
+                                     String clientSentence,
+                                     int reconnectCounter) {
+        Logger.clientDebugLog("fire handleRepush");
+
+        int sourceClientNumber = ConsoleCommandUtils.getClientNumber(clientSentence);
+        String fileName = ConsoleCommandUtils.getFileName(clientSentence);
+        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+        File file = new File(filePath);
+
+        ConnectionUtils.closeSocket(connectionSocket);
+        Long receivedFilePartSize = file.length();
+        Logger.clientDebugLog("Downloaded " + receivedFilePartSize + " bytes");
+
+        boolean reconnect = false;
+        for (int i = 0; i < Config.WAITING_TIME_SEC; i++) {
+            try {
+                Logger.clientDebugLog("Try reconnect with client " + sourceClientNumber);
+                connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR + sourceClientNumber);
+                reconnect = true;
+                break;
+            } catch (IOException e) {
+                ExceptionHandler.handle(e);
+            }
+
+            try { // TODO sleep
+                sleep(1000);
+            } catch (InterruptedException e) {
+                ExceptionHandler.handle(e);
+            }
+        }
+        if (reconnect) {
+            Logger.clientLog("Reconnected");
+
+            DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(connectionSocket);
+            String command = String.valueOf(ClientCommand.REPUSH);
+            ConnectionUtils.sendMessageToDataOutputStream(outToClient,
+                    command,
+                    String.valueOf(clientNumber),
+                    fileName, String.valueOf(receivedFilePartSize));
+            Logger.clientDebugLog("Repush request sended");
+
+            FileOutputStream fileOutputStream = ConnectionUtils.createFileOutputStream(file, true);
+            InputStream inputStream = ConnectionUtils.getInputStream(connectionSocket);
+            ConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
+            ConnectionUtils.closeFileOutputStream(fileOutputStream);
+
+            Logger.clientDebugLog("End downloading file " + fileName);
+
+            if (MD5Sum.check(filePath, fileMD5Sum)) {
+                Logger.clientLog("File downloaded successfully");
+            } else {
+                Logger.clientLog("Unsuccessful file download");
+                if (reconnectCounter++ > Config.MAX_NUMBER_OF_RECONNECT)
+                    handleRepush(clientNumber, connectionSocket, fileMD5Sum, clientSentence, reconnectCounter);
+            }
+        } else {
+            Logger.clientLog("Cannot reconnect with client " + sourceClientNumber);
+        }
     }
 
     private static void pushOnDemand(int clientNumber, String clientSentence) {
@@ -186,7 +201,6 @@ public class TCPClientConnectionActionMH {
     private static void repush(int clientNumber, Socket connectionSocket, String clientSentence) {
         Logger.clientDebugLog("fire repush");
 
-        int targetClientNumber = ConsoleCommandUtils.getClientNumber(clientSentence);
         String fileName = ConsoleCommandUtils.getFileName(clientSentence);
         long receivedFilePartSize = ConsoleCommandUtils.getStartByteNumber(clientSentence);
 

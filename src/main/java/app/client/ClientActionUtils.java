@@ -69,26 +69,15 @@ public class ClientActionUtils {
         String filePath = Config.BASIC_PATH + sourceClientNumber + "//" + fileName;
         File file = new File(filePath);
 
-//        Socket hostConnectionSocket = ConnectionUtils.createSocket(Config.HOST_IP,
-//                Config.PORT_NR + targetClientNumber);
-
-        DataOutputStream outToClient = ConnectionUtils.getDataOutputStream(targetClientSocket);
-//        String command = String.valueOf(ClientCommand.HANDLE_REPUSH);
-//        ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(sourceClientNumber), fileName); // TODO invoke handle push again?
-
-//        String md5sum = MD5Sum.md5(filePath);
-//        String response = "Sending file " + fileName + " md5 sum";
-//        ConnectionUtils.sendMessageToDataOutputStream(outToClient, command, md5sum, response); // TODO sending md5 sum again?
-
         FileInputStream fileInputStream = ConnectionUtils.createFileInputStream(file);
-        //TODO other code
+
         try {
             Logger.clientDebugLog("Skip " + receivedFilePartSize + " bytes");
             fileInputStream.skip(receivedFilePartSize);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // TODO END other code
+
         OutputStream outputStream = ConnectionUtils.getOutputStream(targetClientSocket);
         ConnectionUtils.sendFileByStream(fileInputStream, outputStream);
         ConnectionUtils.closeFileInputStream(fileInputStream);
