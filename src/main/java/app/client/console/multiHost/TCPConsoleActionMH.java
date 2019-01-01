@@ -18,16 +18,14 @@ public class TCPConsoleActionMH {
     public static void perform(int clientNumber, String userSentence) {
         Logger.consoleDebugLog("perform: " + userSentence);
 
-        if (!userSentence.contains(Config.SPLITS_CHAR)) {
-            userSentence = addSplitChars(userSentence);
-        }
+        userSentence = cleanUserSentence(userSentence);
         String command = SentenceUtils.getConsoleCommand(userSentence);
 
         switch (ConsoleCommand.valueOf(command)) {
             case FILE_LIST:
                 getFileList();
                 break;
-            case PULL: // TODO print message in console if host haven file
+            case PULL: // TODO print message in console if host haven't file
                 pull(clientNumber, userSentence);
                 break;
             case PUSH:
@@ -43,6 +41,13 @@ public class TCPConsoleActionMH {
                 Logger.consoleLog("command is not supported");
                 break;
         }
+    }
+
+    private static String cleanUserSentence(String userSentence) {
+        if (!userSentence.contains(Config.SPLITS_CHAR)) {
+            userSentence = addSplitChars(userSentence);
+        }
+        return userSentence.replaceAll("\"", "");
     }
 
     private static String addSplitChars(String userSentence) {

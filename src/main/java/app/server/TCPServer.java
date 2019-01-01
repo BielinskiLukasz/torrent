@@ -2,7 +2,6 @@ package app.server;
 
 import app.config.Config;
 import app.utils.ExceptionHandler;
-import app.utils.FileInfo;
 import app.utils.Logger;
 
 import java.io.IOException;
@@ -15,14 +14,12 @@ import java.util.Set;
 
 public class TCPServer extends Thread {
 
-    private List<FileInfo> fileInfoList;
     private List<String> fileList;
     private Set<Integer> userList;
 
     public TCPServer() {
         userList = new HashSet<>();
         fileList = new ArrayList<>();
-        fileInfoList = new ArrayList<>();
 
         Logger.serverDebugLog("TCPServer: create server");
     }

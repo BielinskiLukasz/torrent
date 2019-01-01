@@ -15,6 +15,9 @@ public class TCPConsoleActionH2H {
 
     // TODO REMEMBER connecting with second host, not server!
 
+    // TODO NOW IMPLEMENT H2H VERSION :)
+    //  and then write run scripts
+
     public static void perform(int clientNumber, String userSentence, int connectedHostPortNumber) {
         String command = getCommandAppName(SentenceUtils.getCommand(userSentence));
 

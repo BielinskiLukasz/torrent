@@ -8,6 +8,21 @@ import java.util.List;
 
 public class FileList {
 
+    public static List<FileInfo> getFileInfoList(int clientNumber) {
+        List<String> clientFileNameList = getFileList(Config.BASIC_PATH + clientNumber);
+
+        List<FileInfo> clientFileInfoList = new ArrayList<>();
+        clientFileNameList.forEach(
+                file -> clientFileInfoList.add(new FileInfo(file, clientNumber))
+        );
+
+        return clientFileInfoList;
+    }
+
+    public static List<String> getFileNameList(int clientNumber) {
+        return getFileList(Config.BASIC_PATH + clientNumber);
+    }
+
     private static List<String> getFileList(String directoryPath) {
         List<String> directoryFileList = new ArrayList<>();
         File folder = new File(directoryPath);
@@ -20,17 +35,6 @@ public class FileList {
         }
 
         return directoryFileList;
-    }
-
-    public static List<FileInfo> getFileInfoList(int clientNumber) {
-        List<String> clientFileNameList = getFileList(Config.BASIC_PATH + clientNumber);
-
-        List<FileInfo> clientFileInfoList = new ArrayList<>();
-        clientFileNameList.forEach(
-                file -> clientFileInfoList.add(new FileInfo(file, clientNumber))
-        );
-
-        return clientFileInfoList;
     }
 
     public static List<String> packFileInfoList(List<FileInfo> clientFileInfoList) {
@@ -55,9 +59,5 @@ public class FileList {
 
     static FileInfo unpackFileInfo(String packedFileInfo) {
         return new FileInfo(packedFileInfo);
-    }
-
-    public static List<String> getFileNameList(int clientNumber) {
-        return getFileList(Config.BASIC_PATH + clientNumber);
     }
 }

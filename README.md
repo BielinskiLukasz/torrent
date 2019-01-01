@@ -9,11 +9,14 @@ Istrukcja:
 -
 - Aplikacja umożliwia wymianę plików między dwoma klientami (wersja h2h) jak i wieloma (mh);
 - Każda instancja aplikacji ma domyślny folder z pobieranymi/udostępnianymi plikami (możliwa zmiana folderu w konfiguracji aplikacji);
+- Zakłada się, że powyższy folder (foldery) został wcześniej utworzony
 - Ścieżki i zmienne globalne mogą być konfigurowane w pliku config/Config.java;
 - Wyświetlanie logów może być konfigurowane w pliku utils/Logger.java;
 
 ***API***
 - Wszystkie argumenty uruchamianych klientów muszą być oddzielone spacjami;
+- Nazwy plików można podawać w cudzysłowie lub bez niego;
+- Nazwy plików nie mogą zawierać znaku '*';
 - Uruchomienie serwera nie wymaga żadnych argumentów;
 - Uruchomienie klientów pracujących w systemie mh wymaga podania mumeru klienta (unikatowa liczba naturalna większa od 0);
 - Uruchomienie pierwszego klienta pracującego w systemie h2h wymaga podania mumeru klienta (unikatowa liczba naturalna większa od 0);
@@ -23,48 +26,33 @@ Istrukcja:
 
 **Dostępne zapytania:**
 
-- ### connect TODO jeżeli zostanie zaimplementowane
-
-Łączy klienta z serwerem (wywoływane automatycznie w trakcie utworzenia serwera).
-````
-connect numer_klienta(int) wiadomość(string)
-
-przykład:
-connect 1 Hello all
-````
-
 - list
 
 Wyświetla listę dostępnych do pobrania plików wraz z numerem klienta udostępniającego dany plik oraz sumą konstrolną pliku.
 ````
 list
-
-przykład:
-list
 ````
 
 - pull
 
-Pobiera wybrany plik od wskazanego klienta.
+Pobiera wybrany plik od wskazanego klienta. Przed pobraniem sprawdza, czy wskazany klient połączony jest z serwerem i udostępnia wskazany plik. Wznawia pobieranie w przypadku przerwania połączenia oraz wstrzymania/wyłączenia na krótki czas jednego z klientów (ale nie dwóch, w przypadku wyłączenia dwóch klientów pobieranie nie zostanie wznowione). Czas usiłowania nawiązania ponownego połączeniu można edytować w pliku konfiguracyjnym.
 
-*Aktualnie nieobsłużony jest przypadek próby pobrania pliku od niepołączonego klienta*
 ````
 pull numer_klienta_udostępniającego_plik(int) nazwa_pliku(string)
 
 przykład:
-pull 2 example.txt
+pull 2 exampleFileFromClient2.txt
 ````
 
 - push
 
-Wysyła wybrany (lokalny) plik od wskazanego klienta
+Wysyła wybrany (lokalny) plik do wskazanego klienta. Przed wysłaniem sprawdza, czy wskazany klient połączony jest z serwerem i czy klient wysyłający udostępnia wskazany plik. Wznawia wysyłanie w przypadku przerwania połączenia oraz wstrzymania/wyłączenia na krótki czas jednego z klientów (ale nie dwóch, w przypadku wyłączenia dwóch klientów wysyłanie nie zostanie wznowione). Czas usiłowania nawiązania ponownego połączeniu można edytować w pliku konfiguracyjnym.
 
-*Aktualnie nieobsłużony jest przypadek próby wysłania pliku od niepołączonego klienta*
 ````
 push numer_klienta_odbierającego_plik(int) nazwa_pliku(string)
 
 przykład:
-push 2 otherFile.txt
+push 2 otherFileFromCientEnteringCommand.txt
 ````
 
 - exit
@@ -72,15 +60,12 @@ push 2 otherFile.txt
 Usuwa numer klienta z bazy serwera. Pliki w domyślnym folderze nie będą udostępniane aż do kolejnego połączenia. Po wywołaniu tej komendy możliwe jest bezpieczne zatrzymanie aplikacji klienta - nie zostanie zakłucone połączenie innych klientów z serwerem oraz między klieantami. 
 ````
 exit
-
-przykład:
-exit
 ````
 
 ### TODO API regex
 ***API regex:***
 ````
-""
+"not implemented yet"
 ````
 
 ***Konfiguracja***

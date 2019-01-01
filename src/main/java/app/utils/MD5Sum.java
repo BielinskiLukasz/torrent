@@ -1,6 +1,5 @@
 package app.utils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -8,10 +7,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class MD5Sum {
-
-    public static String md5(File file) {
-        return md5(file.getPath());
-    }
 
     public static String md5(String filePath) {
         byte[] data = readFileBytes(filePath);

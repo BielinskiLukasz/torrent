@@ -33,7 +33,7 @@ public class TCPConsoleConnectionMH extends Thread {
                 TCPConsoleActionMH.perform(client.getClientNumber(), userSentence);
             } catch (IOException e) {
                 ExceptionHandler.handle(e);
-                this.interrupt(); // TODO ???
+                this.interrupt(); // TODO if (regex is added) remove this line
             }
 
             try { // TODO sleep

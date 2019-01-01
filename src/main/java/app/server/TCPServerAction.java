@@ -22,7 +22,7 @@ class TCPServerAction {
 
         switch (ServerCommand.valueOf(command)) {
             case REGISTER:
-                connect(server, connectionSocket, sentence);
+                register(server, connectionSocket, sentence);
                 break;
             case SERVER_FILE_LIST:
                 getServerFileList(server, connectionSocket);
@@ -39,21 +39,8 @@ class TCPServerAction {
         }
     }
 
-    private static void confirmConnection(TCPServer server, Socket connectionSocket, String clientSentence) {
-        Logger.serverDebugLog("fire connect");
-
-        int clientNumber = SentenceUtils.getClientNumber(clientSentence);
-        boolean sourceClientConnected = server.isClientConnected(clientNumber);
-
-        DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        String response = "Client " + clientNumber + " connection confirmation";
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, response, String.valueOf(sourceClientConnected));
-
-        Logger.serverLog("Register client " + clientNumber);
-    }
-
-    private static void connect(TCPServer server, Socket connectionSocket, String clientSentence) {
-        Logger.serverDebugLog("fire connect");
+    private static void register(TCPServer server, Socket connectionSocket, String clientSentence) {
+        Logger.serverDebugLog("fire register");
 
         int clientNumber = getClientDataFromReceiveRequest(clientSentence);
         registerClient(server, clientNumber);
@@ -78,6 +65,19 @@ class TCPServerAction {
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String response = "Hello client " + clientNumber;
         TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
+    }
+
+    private static void confirmConnection(TCPServer server, Socket connectionSocket, String clientSentence) {
+        Logger.serverDebugLog("fire confirmConnection");
+
+        int clientNumber = SentenceUtils.getClientNumber(clientSentence);
+        boolean sourceClientConnected = server.isClientConnected(clientNumber);
+
+        DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+        String response = "Client " + clientNumber + " connection confirmation";
+        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, response, String.valueOf(sourceClientConnected));
+
+        Logger.serverLog("Register client " + clientNumber);
     }
 
     private static void getServerFileList(TCPServer server, Socket connectionSocket) {

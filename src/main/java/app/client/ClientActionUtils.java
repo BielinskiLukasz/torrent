@@ -31,15 +31,6 @@ public class ClientActionUtils {
         }
     }
 
-    public static void uploadIfFileExist(int sourceClientNumber, Socket targetClientSocket, String fileName,
-                                         long receivedFilePartSize) {
-        if (isClientHaveFile(sourceClientNumber, fileName)) {
-            upload(sourceClientNumber, targetClientSocket, fileName, receivedFilePartSize);
-        } else {
-            Logger.consoleLog("You haven't selected file");
-        }
-    }
-
     private static void upload(int sourceClientNumber, int targetClientNumber, String fileName) {
         String filePath = Config.BASIC_PATH + sourceClientNumber + "//" + fileName;
         File file = new File(filePath);
@@ -97,17 +88,6 @@ public class ClientActionUtils {
                     String.valueOf(sourceClientNumber),
                     fileName,
                     MD5Sum.md5(filePath));
-
-            /*BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(hostConnectionSocket);
-            response = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
-
-            String sendFileMd5Sum = SentenceUtils.getMD5Sum(response);
-            if (MD5Sum.check(filePath, sendFileMd5Sum)) {
-                Logger.consoleLog("Send file " + fileName + " to client " + targetClientNumber + " successfully");
-            } else {
-                long sendFileSize = SentenceUtils.getFileSize(response);
-                upload(sourceClientNumber, targetClientNumber, fileName, sendFileSize);
-            }*/
         } else {
             TCPConnectionUtils.closeSocket(hostConnectionSocket);
 
@@ -118,6 +98,20 @@ public class ClientActionUtils {
         TCPConnectionUtils.closeSocket(hostConnectionSocket);
 
         Logger.consoleLog("Finished");
+    }
+
+    public static void uploadIfFileExist(int sourceClientNumber, Socket targetClientSocket, String fileName,
+                                         long receivedFilePartSize) {
+        if (isClientHaveFile(sourceClientNumber, fileName)) {
+            upload(sourceClientNumber, targetClientSocket, fileName, receivedFilePartSize);
+        } else {
+            Logger.consoleLog("You haven't selected file");
+        }
+    }
+
+    private static boolean isClientHaveFile(int clientNumber, String fileName) {
+        List<String> clientFileNameList = FileList.getFileNameList(clientNumber);
+        return clientFileNameList.contains(fileName);
     }
 
     private static void upload(int sourceClientNumber, Socket targetClientSocket, String fileName,
@@ -143,11 +137,6 @@ public class ClientActionUtils {
         TCPConnectionUtils.closeSocket(targetClientSocket);
 
         Logger.consoleLog("Finished");
-    }
-
-    private static boolean isClientHaveFile(int clientNumber, String fileName) {
-        List<String> clientFileNameList = FileList.getFileNameList(clientNumber);
-        return clientFileNameList.contains(fileName);
     }
 
     public static boolean isSelectedClientConnected(int sourceClientNumber) {
