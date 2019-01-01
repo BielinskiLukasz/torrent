@@ -5,7 +5,7 @@ import app.utils.Logger;
 
 public class TCPClientMH extends Thread {
 
-    private int clientNumber;
+    private final int clientNumber;
 
     public TCPClientMH(int clientNumber) {
         this.clientNumber = clientNumber;

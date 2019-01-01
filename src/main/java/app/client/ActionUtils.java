@@ -1,5 +1,6 @@
 package app.client;
 
+import app.client.console.ConsoleCommand;
 import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
@@ -21,7 +22,7 @@ import java.util.List;
 
 import static java.lang.Thread.sleep;
 
-public class ClientActionUtils {
+public class ActionUtils {
 
     public static void uploadIfFileExist(int sourceClientNumber, int targetClientNumber, String fileName) {
         if (isClientHaveFile(sourceClientNumber, fileName)) {
@@ -29,6 +30,20 @@ public class ClientActionUtils {
         } else {
             Logger.consoleLog("Haven't selected file");
         }
+    }
+
+    public static void uploadIfFileExist(int sourceClientNumber, Socket targetClientSocket, String fileName,
+                                         long receivedFilePartSize) {
+        if (isClientHaveFile(sourceClientNumber, fileName)) {
+            upload(sourceClientNumber, targetClientSocket, fileName, receivedFilePartSize);
+        } else {
+            Logger.consoleLog("You haven't selected file");
+        }
+    }
+
+    private static boolean isClientHaveFile(int clientNumber, String fileName) {
+        List<String> clientFileNameList = FileList.getFileNameList(clientNumber);
+        return clientFileNameList.contains(fileName);
     }
 
     private static void upload(int sourceClientNumber, int targetClientNumber, String fileName) {
@@ -100,20 +115,6 @@ public class ClientActionUtils {
         Logger.consoleLog("Finished");
     }
 
-    public static void uploadIfFileExist(int sourceClientNumber, Socket targetClientSocket, String fileName,
-                                         long receivedFilePartSize) {
-        if (isClientHaveFile(sourceClientNumber, fileName)) {
-            upload(sourceClientNumber, targetClientSocket, fileName, receivedFilePartSize);
-        } else {
-            Logger.consoleLog("You haven't selected file");
-        }
-    }
-
-    private static boolean isClientHaveFile(int clientNumber, String fileName) {
-        List<String> clientFileNameList = FileList.getFileNameList(clientNumber);
-        return clientFileNameList.contains(fileName);
-    }
-
     private static void upload(int sourceClientNumber, Socket targetClientSocket, String fileName,
                                long receivedFilePartSize) {
         String filePath = Config.BASIC_PATH + sourceClientNumber + "//" + fileName;
@@ -153,5 +154,16 @@ public class ClientActionUtils {
 
         TCPConnectionUtils.closeSocket(connectionSocket);
         return sourceClientConnected;
+    }
+
+    public static void sendList(Socket connectionSocket, List<String> serverFileList) {
+        DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+        String response = String.valueOf(serverFileList.size());
+        String command = String.valueOf(ConsoleCommand.FILE_LIST);
+        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, command, response);
+
+        serverFileList.forEach(
+                fileData -> TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, fileData)
+        );
     }
 }

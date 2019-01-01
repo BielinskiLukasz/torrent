@@ -8,11 +8,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.Objects;
 
-public class TCPServerConnection extends Thread {
+class TCPServerConnection extends Thread {
 
-    private TCPServer server;
-    private Socket connectionSocket;
+    private final TCPServer server;
+    private final Socket connectionSocket;
 
     TCPServerConnection(TCPServer tcpServer, Socket connectionSocket) {
         this.server = tcpServer;
@@ -34,7 +35,7 @@ public class TCPServerConnection extends Thread {
         while (true) {
             String clientSentence = null;
             try {
-                clientSentence = inFromClient.readLine();
+                clientSentence = Objects.requireNonNull(inFromClient).readLine();
             } catch (IOException e) {
                 ExceptionHandler.handle(e);
             }

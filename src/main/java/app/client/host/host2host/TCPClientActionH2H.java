@@ -13,7 +13,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.List;
 
-public class TCPClientActionH2H {
+class TCPClientActionH2H {
 
     public static void perform(TCPClientH2H client, Socket connectionSocket, String clientSentence) {
 

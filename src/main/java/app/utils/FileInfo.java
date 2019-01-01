@@ -2,11 +2,11 @@ package app.utils;
 
 import app.config.Config;
 
-public class FileInfo {
+class FileInfo {
 
-    int clientId;
-    String name;
-    String md5;
+    final int clientId;
+    final String name;
+    final String md5;
 
     FileInfo(String fileName, int clientId) {
         String filePath = Config.BASIC_PATH + clientId + "\\" + fileName;

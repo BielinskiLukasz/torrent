@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-public class TCPConsoleActionH2H {
+class TCPConsoleActionH2H {
 
     // TODO REMEMBER connecting with second host, not server!
 

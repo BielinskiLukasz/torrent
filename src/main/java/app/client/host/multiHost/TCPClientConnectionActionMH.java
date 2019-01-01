@@ -1,6 +1,6 @@
 package app.client.host.multiHost;
 
-import app.client.ClientActionUtils;
+import app.client.ActionUtils;
 import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
@@ -34,7 +34,7 @@ public class TCPClientConnectionActionMH {
                 connect(clientNumber, connectionSocket, sentence);
                 break;
             case CLIENT_FILE_LIST:
-                getFileList(clientNumber, connectionSocket, sentence);
+                getClientFileList(clientNumber, connectionSocket, sentence);
                 break;
             case HANDLE_PUSH:
                 handlePush(clientNumber, connectionSocket, sentence);
@@ -75,8 +75,8 @@ public class TCPClientConnectionActionMH {
         TCPConnectionUtils.readBufferedReaderLine(inFromServer);
     }
 
-    private static void getFileList(int clientNumber, Socket connectionSocket, String clientSentence) {
-        Logger.clientDebugLog("fire getFileList");
+    private static void getClientFileList(int clientNumber, Socket connectionSocket, String clientSentence) {
+        Logger.clientDebugLog("fire getClientFileList");
 
         String command = SentenceUtils.getCommand(clientSentence);
         Logger.clientDebugLog(command + " input: " + clientSentence);
@@ -85,13 +85,7 @@ public class TCPClientConnectionActionMH {
                 FileList.getFileInfoList(clientNumber)
         );
 
-        DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        String response = String.valueOf(clientFileList.size());
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToServer, command, response);
-
-        clientFileList.forEach(
-                fileData -> TCPConnectionUtils.sendMessageToDataOutputStream(outToServer, fileData)
-        );
+        ActionUtils.sendList(connectionSocket, clientFileList);
 
         Logger.clientLog("Client file list sent to server");
     }
@@ -235,7 +229,7 @@ public class TCPClientConnectionActionMH {
         int targetClientNumber = SentenceUtils.getClientNumber(clientSentence);
         String fileName = SentenceUtils.getFileName(clientSentence);
 
-        ClientActionUtils.uploadIfFileExist(clientNumber, targetClientNumber, fileName);
+        ActionUtils.uploadIfFileExist(clientNumber, targetClientNumber, fileName);
     }
 
     private static void repush(int clientNumber, Socket connectionSocket, String clientSentence) {
@@ -244,6 +238,6 @@ public class TCPClientConnectionActionMH {
         String fileName = SentenceUtils.getFileName(clientSentence);
         long receivedFilePartSize = SentenceUtils.getStartByteNumber(clientSentence);
 
-        ClientActionUtils.uploadIfFileExist(clientNumber, connectionSocket, fileName, receivedFilePartSize);
+        ActionUtils.uploadIfFileExist(clientNumber, connectionSocket, fileName, receivedFilePartSize);
     }
 }

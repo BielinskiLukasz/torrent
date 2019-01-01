@@ -10,12 +10,13 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class TCPServer extends Thread {
 
     private List<String> fileList;
-    private Set<Integer> userList;
+    private final Set<Integer> userList;
 
     public TCPServer() {
         userList = new HashSet<>();
@@ -38,7 +39,7 @@ public class TCPServer extends Thread {
         while (true) {
             Socket connectionSocket;
             try {
-                connectionSocket = welcomeSocket.accept();
+                connectionSocket = Objects.requireNonNull(welcomeSocket).accept();
                 TCPServerConnection connection = new TCPServerConnection(this, connectionSocket);
                 connection.start();
             } catch (IOException e) {

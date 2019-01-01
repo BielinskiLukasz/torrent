@@ -8,8 +8,6 @@ public enum ConsoleCommand {
     FILE_LIST,
     PULL,
     PUSH,
-    REPULL,
-    REPUSH,
     MULTIPLE_PULL,
     CLOSE, // Not used in h2h version
     EMPTY_COMMAND,

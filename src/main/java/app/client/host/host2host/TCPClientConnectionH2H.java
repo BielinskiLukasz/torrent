@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class TCPClientConnectionH2H extends Thread {
+class TCPClientConnectionH2H extends Thread {
 
     // TODO REMEMBER don't need to update here
 

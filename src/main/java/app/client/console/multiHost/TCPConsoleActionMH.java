@@ -1,6 +1,6 @@
 package app.client.console.multiHost;
 
-import app.client.ClientActionUtils;
+import app.client.ActionUtils;
 import app.client.console.ConsoleCommand;
 import app.client.host.ClientCommand;
 import app.config.Config;
@@ -13,7 +13,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.net.Socket;
 
-public class TCPConsoleActionMH {
+class TCPConsoleActionMH {
 
     public static void perform(int clientNumber, String userSentence) {
         Logger.consoleDebugLog("perform: " + userSentence);
@@ -93,7 +93,7 @@ public class TCPConsoleActionMH {
             Logger.consoleLog("This is not the client you are looking for :)");
             Logger.consoleLog("There is no need to download the file from yourself");
         } else {
-            if (ClientActionUtils.isSelectedClientConnected(sourceClientNumber)) {
+            if (ActionUtils.isSelectedClientConnected(sourceClientNumber)) {
 
                 Socket hostConnectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,
                         Config.PORT_NR + sourceClientNumber);
@@ -121,8 +121,8 @@ public class TCPConsoleActionMH {
         if (isClientChooseHisOwnNumber(clientNumber, targetClientNumber)) {
             Logger.consoleLog("This is not the client you are looking for :)");
             Logger.consoleLog("There is no need to upload the file to yourself");
-        } else if (ClientActionUtils.isSelectedClientConnected(targetClientNumber)) {
-            ClientActionUtils.uploadIfFileExist(clientNumber, targetClientNumber, fileName);
+        } else if (ActionUtils.isSelectedClientConnected(targetClientNumber)) {
+            ActionUtils.uploadIfFileExist(clientNumber, targetClientNumber, fileName);
         } else {
             Logger.consoleLog("You haven't selected file");
         }

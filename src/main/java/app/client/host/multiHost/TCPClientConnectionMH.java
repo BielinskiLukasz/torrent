@@ -11,10 +11,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Objects;
 
-public class TCPClientConnectionMH extends Thread {
+class TCPClientConnectionMH extends Thread {
 
-    private TCPClientMH client;
+    private final TCPClientMH client;
 
     TCPClientConnectionMH(TCPClientMH tcpClientMH) {
         this.client = tcpClientMH;
@@ -37,7 +38,7 @@ public class TCPClientConnectionMH extends Thread {
             String clientSentence;
 
             try {
-                clientSocket = hostServerSocket.accept();
+                clientSocket = Objects.requireNonNull(hostServerSocket).accept();
                 if (!hostServerSocket.isClosed()) {
                     inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                     clientSentence = inFromServer.readLine();

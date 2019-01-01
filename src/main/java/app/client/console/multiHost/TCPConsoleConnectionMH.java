@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 
 public class TCPConsoleConnectionMH extends Thread {
 
-    private TCPClientMH client;
+    private final TCPClientMH client;
 
     public TCPConsoleConnectionMH(TCPClientMH tcpClientMH) {
         this.client = tcpClientMH;

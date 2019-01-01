@@ -1,6 +1,6 @@
 package app.server;
 
-import app.client.console.ConsoleCommand;
+import app.client.ActionUtils;
 import app.client.host.ClientCommand;
 import app.config.Config;
 import app.utils.Logger;
@@ -110,14 +110,7 @@ class TCPServerAction {
 
         server.setFileList(serverFileList);
 
-        DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        String response = String.valueOf(serverFileList.size());
-        String command = String.valueOf(ConsoleCommand.FILE_LIST);
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, command, response);
-
-        serverFileList.forEach(
-                fileData -> TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, fileData)
-        );
+        ActionUtils.sendList(connectionSocket, serverFileList);
 
         Logger.serverLog("Server file list sent to client ");
     }
