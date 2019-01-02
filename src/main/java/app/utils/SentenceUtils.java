@@ -50,31 +50,40 @@ public class SentenceUtils {
     }
 
     public static String getMessage(String sentence) {
-        return splitSentence(sentence)[2];
+        return getElement(sentence, 2);
     }
 
     public static String getFileName(String sentence) {
-        return splitSentence(sentence)[2];
+        return getElement(sentence, 2);
     }
 
     public static int getClientNumber(String sentence) {
-        return Integer.parseInt(splitSentence(sentence)[1]);
+        return Integer.parseInt(getElement(sentence, 1));
     }
 
     public static int getListSize(String sentence) {
-        return Integer.parseInt(splitSentence(sentence)[1]);
+        return Integer.parseInt(getElement(sentence, 1));
     }
 
-    public static Boolean getBoolean(String sentence) {
-        return Boolean.parseBoolean(splitSentence(sentence)[1]);
+    static Boolean getBoolean(String sentence) {
+        return Boolean.parseBoolean(getElement(sentence, 1));
     }
 
     public static String getMD5Sum(String sentence) {
-        return splitSentence(sentence)[3];
+        return getElement(sentence, 3);
     }
 
     public static long getStartByteNumber(String sentence) {
-        return Long.parseLong(splitSentence(sentence)[3]);
+        return Long.parseLong(getElement(sentence, 3));
+    }
+
+    private static String getElement(String sentence, int elementId) {
+        try {
+            return splitSentence(sentence)[elementId];
+        } catch (Exception e) {
+            ExceptionHandler.handle(e);
+        }
+        return null;
     }
 
     private static String[] splitSentence(String sentence) {

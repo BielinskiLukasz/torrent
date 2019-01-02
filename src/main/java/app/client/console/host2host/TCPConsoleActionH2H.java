@@ -17,6 +17,8 @@ class TCPConsoleActionH2H {
 
     // TODO NOW IMPLEMENT H2H VERSION :)
     //  and then write run scripts
+    //  and update README - max file size (Inreger.MAX_VALUE - 8 bytes)
+    //  and try re download/upload if isn't start yet
 
     public static void perform(int clientNumber, String userSentence, int connectedHostPortNumber) {
         String command = getCommandAppName(SentenceUtils.getCommand(userSentence));

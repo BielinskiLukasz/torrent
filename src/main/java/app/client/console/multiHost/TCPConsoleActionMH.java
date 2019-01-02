@@ -1,10 +1,10 @@
 package app.client.console.multiHost;
 
-import app.client.ActionUtils;
 import app.client.console.ConsoleCommand;
 import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
+import app.utils.ActionUtils;
 import app.utils.Logger;
 import app.utils.SentenceUtils;
 import app.utils.TCPConnectionUtils;

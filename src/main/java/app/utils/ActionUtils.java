@@ -1,15 +1,9 @@
-package app.client;
+package app.utils;
 
 import app.client.console.ConsoleCommand;
 import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
-import app.utils.ExceptionHandler;
-import app.utils.FileList;
-import app.utils.Logger;
-import app.utils.MD5Sum;
-import app.utils.SentenceUtils;
-import app.utils.TCPConnectionUtils;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -32,10 +26,12 @@ public class ActionUtils {
         }
     }
 
-    public static void uploadIfFileExist(int sourceClientNumber, Socket targetClientSocket, String fileName,
+    public static void uploadIfFileExist(int sourceClientNumber,
+                                         int targetClientNumber,
+                                         String fileName,
                                          long receivedFilePartSize) {
         if (isClientHaveFile(sourceClientNumber, fileName)) {
-            upload(sourceClientNumber, targetClientSocket, fileName, receivedFilePartSize);
+            upload(sourceClientNumber, targetClientNumber, fileName, receivedFilePartSize);
         } else {
             Logger.consoleLog("You haven't selected file");
         }
@@ -49,6 +45,8 @@ public class ActionUtils {
     private static void upload(int sourceClientNumber, int targetClientNumber, String fileName) {
         String filePath = Config.BASIC_PATH + sourceClientNumber + "//" + fileName;
         File file = new File(filePath);
+
+        Logger.consoleLog("Resend file " + fileName + " started");
 
         Socket hostConnectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,
                 Config.PORT_NR + targetClientNumber);
@@ -75,7 +73,6 @@ public class ActionUtils {
 
         Logger.consoleLog("Sending file " + fileName + " to client " + targetClientNumber + " ends");
 
-        //TODO check sending correctness
         boolean reconnect = false;
         TCPConnectionUtils.closeSocket(hostConnectionSocket);
 
@@ -108,17 +105,38 @@ public class ActionUtils {
 
             Logger.clientLog("Cannot reconnect with client " + sourceClientNumber);
         }
-        //TODO END
 
         TCPConnectionUtils.closeSocket(hostConnectionSocket);
 
         Logger.consoleLog("Finished");
     }
 
-    private static void upload(int sourceClientNumber, Socket targetClientSocket, String fileName,
+    private static void upload(int sourceClientNumber,
+                               int targetClientNumber,
+                               String fileName,
                                long receivedFilePartSize) {
         String filePath = Config.BASIC_PATH + sourceClientNumber + "//" + fileName;
         File file = new File(filePath);
+
+        Logger.consoleLog("Resend file " + fileName + " started");
+
+        Socket hostConnectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,
+                Config.PORT_NR + targetClientNumber);
+
+        DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
+        String command = String.valueOf(ClientCommand.HANDLE_REPUSH);
+        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+                command,
+                String.valueOf(sourceClientNumber),
+                fileName);
+
+        String md5sum = MD5Sum.md5(filePath);
+        String response = "Sending file " + fileName + " md5 sum";
+        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+                command,
+                String.valueOf(sourceClientNumber),
+                response,
+                md5sum); //TODO BACKLOG connect sending filename and md5sum
 
         FileInputStream fileInputStream = TCPConnectionUtils.createFileInputStream(file);
 
@@ -129,13 +147,46 @@ public class ActionUtils {
             e.printStackTrace();
         }
 
-        OutputStream outputStream = TCPConnectionUtils.getOutputStream(targetClientSocket);
+        OutputStream outputStream = TCPConnectionUtils.getOutputStream(hostConnectionSocket);
         TCPConnectionUtils.sendFileByStream(fileInputStream, outputStream);
         TCPConnectionUtils.closeFileInputStream(fileInputStream);
 
-        Logger.consoleLog("Resend file " + fileName + " from client " + sourceClientNumber);
+        Logger.consoleLog("Resend file " + fileName + " finished");
 
-        TCPConnectionUtils.closeSocket(targetClientSocket);
+        TCPConnectionUtils.closeSocket(hostConnectionSocket);
+
+        boolean reconnect = false;
+        TCPConnectionUtils.closeSocket(hostConnectionSocket);
+
+        for (int i = 0; i < Config.WAITING_TIME_SEC; i++) {
+            try {
+                Logger.clientDebugLog("Try reconnect with client " + targetClientNumber);
+                hostConnectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR + targetClientNumber);
+                reconnect = true;
+                break;
+            } catch (IOException e) {
+                ExceptionHandler.handle(e);
+            }
+
+            try { // TODO sleep
+                sleep(1000);
+            } catch (InterruptedException e) {
+                ExceptionHandler.handle(e);
+            }
+        }
+        if (reconnect) {
+            outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
+            command = String.valueOf(ClientCommand.CHECK_SENDING);
+            TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+                    command,
+                    String.valueOf(sourceClientNumber),
+                    fileName,
+                    MD5Sum.md5(filePath));
+        } else {
+            TCPConnectionUtils.closeSocket(hostConnectionSocket);
+
+            Logger.clientLog("Cannot reconnect with client " + sourceClientNumber);
+        }
 
         Logger.consoleLog("Finished");
     }

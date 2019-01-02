@@ -1,8 +1,8 @@
 package app.server;
 
-import app.client.ActionUtils;
 import app.client.host.ClientCommand;
 import app.config.Config;
+import app.utils.ActionUtils;
 import app.utils.Logger;
 import app.utils.SentenceUtils;
 import app.utils.TCPConnectionUtils;
@@ -24,7 +24,7 @@ class TCPServerAction {
             case REGISTER:
                 register(server, connectionSocket, sentence);
                 break;
-            case SERVER_FILE_LIST:
+            case SERVER_FILE_LIST: // TODO handle unconnected client selection
                 getServerFileList(server, connectionSocket);
                 break;
             case CONFIRM_CONNECTION:
@@ -77,7 +77,7 @@ class TCPServerAction {
         String response = "Client " + clientNumber + " connection confirmation";
         TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, response, String.valueOf(sourceClientConnected));
 
-        Logger.serverLog("Register client " + clientNumber);
+        Logger.serverLog("Client " + clientNumber + " is connected");
     }
 
     private static void getServerFileList(TCPServer server, Socket connectionSocket) {
