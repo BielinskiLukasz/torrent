@@ -12,10 +12,7 @@ import app.utils.connectionUtils.TCPConnectionUtils;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Socket;
-import java.util.Objects;
 
 class TCPConsoleActionH2H {
 
@@ -60,58 +57,24 @@ class TCPConsoleActionH2H {
     private static void getFileList(String command, int connectedHostPortNumber) {
         Logger.consoleDebugLog("fire getFileList");
 
-        Socket connectionSocket = null;
-        try {
-            connectionSocket = new Socket(Config.HOST_IP, connectedHostPortNumber);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, connectedHostPortNumber);
 
-        DataOutputStream outToServer = null;
-        try {
-            outToServer = new DataOutputStream(Objects.requireNonNull(connectionSocket).getOutputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+        TCPConnectionUtils.sendMessageToDataOutputStream(outToServer, command);
 
-        Logger.consoleDebugLog(command + " output: " + "no message");
-        try {
-            Objects.requireNonNull(outToServer).writeBytes(command + "\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        BufferedReader inFromServer = null;
-        try {
-            inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String response = null;
-        try {
-            response = Objects.requireNonNull(inFromServer).readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Logger.consoleDebugLog(command + " input: " + response);
+        BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
+        String response = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
 
         int serverFileListSize = SentenceUtils.getListSize(response);
         for (int i = 0; i < serverFileListSize; i++) {
-            try {
-                Logger.consoleLog(
-                        inFromServer.readLine().replaceAll("\\|", " ")
-                );
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Logger.consoleLog(
+                    TCPConnectionUtils.readBufferedReaderLine(inFromServer)
+                            .replaceAll(String.format("\\%s", Config.FILE_INFO_SPLITS_CHAR), " ")
+                    // TODO move getting better format to another place
+            );
         }
 
-        try {
-            connectionSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        TCPConnectionUtils.closeSocket(connectionSocket);
 
         Logger.consoleLog("Server file list was displayed");
     }
