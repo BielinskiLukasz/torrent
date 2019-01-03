@@ -10,8 +10,6 @@ import java.io.InputStreamReader;
 
 public class TCPConsoleConnectionH2H extends Thread {
 
-    // TODO REMEMBER don't need to update here
-
     private TCPClientH2H client;
 
     public TCPConsoleConnectionH2H(TCPClientH2H tcpClientH2H) {

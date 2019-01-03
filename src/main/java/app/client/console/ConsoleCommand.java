@@ -9,7 +9,7 @@ public enum ConsoleCommand {
     PULL,
     PUSH,
     MULTIPLE_PULL,
-    CLOSE, // Not used in h2h version
+    CLOSE, // TODO implement fire that command after close java program
     EMPTY_COMMAND,
     UNSUPPORTED_COMMAND
 }

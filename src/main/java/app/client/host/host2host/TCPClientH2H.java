@@ -6,8 +6,6 @@ import app.utils.Logger;
 
 public class TCPClientH2H extends Thread {
 
-    // TODO REMEMBER don't need to update here
-
     private int clientNumber;
     private int connectedClientNumber;
 

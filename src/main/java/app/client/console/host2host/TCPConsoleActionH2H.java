@@ -21,8 +21,11 @@ class TCPConsoleActionH2H {
     // TODO REMEMBER connecting with second host, not server!
 
     // TODO NOW IMPLEMENT H2H VERSION :)
-    //  and then write run scripts
-    //  and update README - max file size (Inreger.MAX_VALUE - 8 bytes)
+    //  update README - max file size (Inreger.MAX_VALUE - 8 bytes)
+    //  send message after pull = push request
+    //  close h2h connection
+    //  create console regex
+    //  handle wrong numbers in h2h console commands
 
     public static void perform(TCPClientH2H client, String userSentence, int connectedHostPortNumber) {
         Logger.consoleDebugLog("perform: " + userSentence);

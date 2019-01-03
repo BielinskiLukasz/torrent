@@ -48,11 +48,15 @@ pull 2 exampleFileFromClient2.txt
 
 Wysyła wybrany (lokalny) plik do wskazanego klienta. Przed wysłaniem sprawdza, czy wskazany klient połączony jest z serwerem i czy klient wysyłający udostępnia wskazany plik. Wznawia wysyłanie w przypadku przerwania połączenia oraz wstrzymania/wyłączenia na krótki czas jednego z klientów (ale nie dwóch, w przypadku wyłączenia dwóch klientów wysyłanie nie zostanie wznowione). Czas usiłowania nawiązania ponownego połączeniu można edytować w pliku konfiguracyjnym.
 
+W przypadku połączenia h2h nie jest wymagane podawanie numeru klienta. 
 ````
 push numer_klienta_odbierającego_plik(int) nazwa_pliku(string)
 
-przykład:
+przykład MH:
 push 2 otherFileFromCientEnteringCommand.txt
+
+przykład H2H:
+push otherFileFromCientEnteringCommand.txt
 ````
 
 - exit

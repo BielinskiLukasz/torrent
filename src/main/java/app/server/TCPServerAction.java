@@ -24,7 +24,7 @@ class TCPServerAction {
             case REGISTER:
                 register(server, connectionSocket, sentence);
                 break;
-            case SERVER_FILE_LIST: // TODO handle unconnected client selection
+            case SERVER_FILE_LIST: // TODO handle unconnected client selection by server
                 getServerFileList(server, connectionSocket);
                 break;
             case CONFIRM_CONNECTION:
