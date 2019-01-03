@@ -18,7 +18,7 @@ class TCPConsoleActionH2H {
 
     // TODO REMEMBER connecting with second host, not server!
 
-    // TODO NOW IMPLEMENT H2H VERSION :)
+    // TODO NOW IMPLEMENT MULTIPUSH FEATURE :)
     //  update README - max file size (Inreger.MAX_VALUE - 8 bytes)
     //  send message after pull = push request
     //  close h2h connection

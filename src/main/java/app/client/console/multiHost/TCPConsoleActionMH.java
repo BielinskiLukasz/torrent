@@ -32,6 +32,9 @@ class TCPConsoleActionMH {
             case PUSH:
                 push(clientNumber, userSentence);
                 break;
+            case MULTIPLE_PULL:
+                multiplePull(clientNumber, userSentence);
+                break;
             case CLOSE:
                 close(clientNumber);
                 break;
@@ -41,6 +44,23 @@ class TCPConsoleActionMH {
             default:
                 Logger.consoleLog("command is not supported");
                 break;
+
+            // TODO create function classes for each feature (CONNECT, FILE_LIST, PULL (MULTI_PULL), PUSH, CLOSE)
+            //  with have method connected with action e.g. ClientA sending message - PUSH (client number),
+            //  ClientB receiving - PULL (connectionSocket)
+
+            // TODO Handling restart pull and push there
+            //  Refactor restart push - use existing (could be closed) connection for get info about sent file,
+            //  and if it's finished successfully then do nothing, else repush - if client who check file was pull
+            //  initiator then he should fire pull action
+            //  e.g. method
+            //  PullUtils
+            //  pull
+            //  pullToRequest
+            //  rePull
+            //  rePullToRequest ??
+
+            // TODO create protocol message creators (Builder?), create also protocol reading methods
         }
     }
 
@@ -117,6 +137,10 @@ class TCPConsoleActionMH {
 
     private static boolean isClientChooseHisOwnNumber(int clientNumber, int targetClientNumber) {
         return targetClientNumber == clientNumber;
+    }
+
+    private static void multiplePull(int clientNumber, String userSentence) {
+
     }
 
     private static void close(int clientNumber) {

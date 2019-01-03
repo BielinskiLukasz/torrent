@@ -33,6 +33,17 @@ public class CommandUtils {
             case "U":
             case "UPLOAD":
                 return String.valueOf(ConsoleCommand.PUSH);
+            case "MULTIPLE_PULL":
+            case "MULTIPLE PULL":
+            case "MULTIPLEPULL":
+            case "MULTI_PULL":
+            case "MULTI PULL":
+            case "MULTIPULL":
+            case "M_PULL":
+            case "M PULL":
+            case "MPULL":
+            case "MP":
+                return String.valueOf(ConsoleCommand.MULTIPLE_PULL);
             case "C":
             case "CLOSE":
             case "E":

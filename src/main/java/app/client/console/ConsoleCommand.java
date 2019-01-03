@@ -8,7 +8,7 @@ public enum ConsoleCommand {
     FILE_LIST,
     PULL,
     PUSH,
-    MULTIPLE_PULL,
+    MULTIPLE_PULL, // only multihost
     CLOSE, // TODO implement fire that command after close java program
     EMPTY_COMMAND,
     UNSUPPORTED_COMMAND

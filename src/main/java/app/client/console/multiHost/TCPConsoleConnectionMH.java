@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 
 public class TCPConsoleConnectionMH extends Thread {
 
+    // TODO implements some connection protocol :)
+
     private final TCPClientMH client;
 
     public TCPConsoleConnectionMH(TCPClientMH tcpClientMH) {

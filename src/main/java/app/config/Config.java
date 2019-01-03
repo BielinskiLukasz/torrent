@@ -7,8 +7,8 @@ public class Config {
     public static final int PORT_NR = 10000;
 
     public static final int BUFFER_SIZE_IN_BYTES = 4096;
-
-    public static final int WAITING_TIME_SEC = 60; // TODO set to 30 or 60 after tests
+    public static final int PACTET_MIN_SIZE_IN_KB = 64;
+    public static final int PACTET_MAX_SIZE_IN_KB = 1024;
 
     public static final int MAX_NUMBER_OF_PARAMETERS = 3;
     private static final char EDITABLE_SPLITS_CHAR = '*';
@@ -16,6 +16,7 @@ public class Config {
     private static final char EDITABLE_FILE_INFO_SPLITS_CHAR = '|';
     public static final String FILE_INFO_SPLITS_CHAR = String.valueOf(EDITABLE_FILE_INFO_SPLITS_CHAR);
 
+    public static final int WAITING_TIME_SEC = 60; // TODO set to 30 or 60 after tests
     public static final int MILLISECONDS_OF_CONNECTION_LISTENER_WAITING = 1000;
     public static final int MAX_NUMBER_OF_RECONNECT = 5; // TODO implement usage
 
