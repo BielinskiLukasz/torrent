@@ -1,7 +1,5 @@
 package app.client.host.host2host;
 
-import app.client.host.ClientCommand;
-import app.client.host.multiHost.TCPClientConnectionActionMH;
 import app.config.Config;
 import app.utils.Logger;
 
@@ -10,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Objects;
 
 class TCPClientConnectionH2H extends Thread {
 
@@ -36,14 +35,14 @@ class TCPClientConnectionH2H extends Thread {
 
         while (true) {
             Socket connectionSocket;
-            BufferedReader inFromServer;
+            BufferedReader inFromHost;
             String clientSentence;
 
             try {
-                connectionSocket = hostServerSocket.accept();
+                connectionSocket = Objects.requireNonNull(hostServerSocket).accept();
                 if (!hostServerSocket.isClosed()) {
-                    inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-                    clientSentence = inFromServer.readLine();
+                    inFromHost = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+                    clientSentence = inFromHost.readLine();
 
                     TCPClientActionH2H.perform(client, connectionSocket, clientSentence);
                 }
@@ -69,12 +68,12 @@ class TCPClientConnectionH2H extends Thread {
             e.printStackTrace();
         }
 
-        String helloMessage = ClientCommand.CONNECT + Config.SPLITS_CHAR + client.getClientNumber() +
+        String helloMessage = HostCommand.CONNECT + Config.SPLITS_CHAR + client.getClientNumber() +
                 Config.SPLITS_CHAR + "Hello, I'm client " + client.getClientNumber();
-        TCPClientConnectionActionMH.perform(client.getClientNumber(), hostClientSocket, helloMessage);
+        TCPClientActionH2H.perform(client, hostClientSocket, helloMessage);
 
         try {
-            hostClientSocket.close();
+            Objects.requireNonNull(hostClientSocket).close();
         } catch (IOException e) {
             e.printStackTrace();
         }

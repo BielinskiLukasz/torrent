@@ -29,7 +29,7 @@ public class TCPConsoleConnectionH2H extends Thread {
                 inFromUser = new BufferedReader(new InputStreamReader(System.in));
                 userSentence = inFromUser.readLine();
 
-                TCPConsoleActionH2H.perform(client.getClientNumber(),
+                TCPConsoleActionH2H.perform(client,
                         userSentence,
                         Config.PORT_NR + client.getConnectedClientNumber());
             } catch (IOException e) {

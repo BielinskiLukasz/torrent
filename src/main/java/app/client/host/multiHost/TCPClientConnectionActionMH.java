@@ -1,6 +1,5 @@
 package app.client.host.multiHost;
 
-import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
 import app.utils.ActionUtils;
@@ -174,8 +173,6 @@ public class TCPClientConnectionActionMH {
             Logger.clientDebugLog("Repush request sended");
 
             TCPConnectionUtils.closeSocket(connectionSocket);
-
-//            handleNextRepush(clientNumber, connectionSocket, sentence, 0);
         }
     }
 
@@ -225,39 +222,8 @@ public class TCPClientConnectionActionMH {
             Logger.clientDebugLog("Repush request sended");
 
             TCPConnectionUtils.closeSocket(connectionSocket);
-//            handleNextRepush(clientNumber, connectionSocket, clientSentence, reconnectCounter);
         } else {
             Logger.clientLog("Cannot reconnect with client " + sourceClientNumber);
-        }
-    }
-
-    private static void handleNextRepush(int clientNumber,
-                                         Socket connectionSocket,
-                                         String clientSentence,
-                                         int reconnectCounter) {
-        Logger.clientDebugLog("fire handleNextRepush");
-
-        String fileName = SentenceUtils.getFileName(clientSentence);
-        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
-        File file = new File(filePath);
-
-        //TODO implement fileMD5Sum receiving
-        BufferedReader bufferedReader = TCPConnectionUtils.getBufferedReader(connectionSocket);
-        String response = TCPConnectionUtils.readBufferedReaderLine(bufferedReader);
-        String fileMD5Sum = SentenceUtils.getMD5Sum(response);
-
-        FileOutputStream fileOutputStream = TCPConnectionUtils.createFileOutputStream(file, true);
-        InputStream inputStream = TCPConnectionUtils.getInputStream(connectionSocket);
-        TCPConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
-        TCPConnectionUtils.closeFileOutputStream(fileOutputStream);
-        Logger.clientDebugLog("End downloading file " + fileName);
-
-        if (MD5Sum.check(filePath, fileMD5Sum)) {
-            Logger.clientLog("File downloaded successfully");
-        } else {
-            Logger.clientLog("Unsuccessful file download");
-            if (reconnectCounter++ > Config.MAX_NUMBER_OF_RECONNECT)
-                invokeRepush(clientNumber, connectionSocket, clientSentence, reconnectCounter);
         }
     }
 

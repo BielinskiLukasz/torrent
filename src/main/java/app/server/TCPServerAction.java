@@ -1,6 +1,6 @@
 package app.server;
 
-import app.client.host.ClientCommand;
+import app.client.host.multiHost.ClientCommand;
 import app.config.Config;
 import app.utils.ActionUtils;
 import app.utils.Logger;

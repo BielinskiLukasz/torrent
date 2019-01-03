@@ -1,17 +1,27 @@
 package app.client.host.host2host;
 
-import app.client.host.ClientCommand;
+import app.client.host.multiHost.ClientCommand;
 import app.config.Config;
+import app.utils.ActionUtils;
+import app.utils.ExceptionHandler;
 import app.utils.FileList;
 import app.utils.Logger;
+import app.utils.MD5Sum;
 import app.utils.SentenceUtils;
+import app.utils.TCPConnectionUtils;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.List;
+import java.util.Objects;
+
+import static java.lang.Thread.sleep;
 
 class TCPClientActionH2H {
 
@@ -19,14 +29,27 @@ class TCPClientActionH2H {
 
         String command = SentenceUtils.getCommand(clientSentence);
 
-        switch (ClientCommand.valueOf(command)) {
+        switch (HostCommand.valueOf(command)) {
             case CONNECT:
                 connect(client, connectionSocket, clientSentence);
-                // TODO REMEMBER this is important method with connect two hosts without server
-                //  do not replace it when you will working on other features in h2h app version
                 break;
-            case CLIENT_FILE_LIST:
+            case FILE_LIST:
                 getFileList(client.getClientNumber(), connectionSocket, clientSentence);
+                break;
+            case HANDLE_PUSH:
+                handlePush(client.getClientNumber(), connectionSocket, clientSentence);
+                break;
+            case PUSH_ON_DEMAND:
+                pushOnDemand(client.getClientNumber(), clientSentence);
+                break;
+            case REPUSH:
+                repush(client.getClientNumber(), clientSentence);
+                break;
+            case HANDLE_REPUSH:
+                handleRepush(client.getClientNumber(), connectionSocket, clientSentence);
+                break;
+            case CHECK_SENDING:
+                checkingSendingCorrectness(client.getClientNumber(), clientSentence);
                 break;
             default:
                 Logger.clientLog('"' + command + '"' + " command is not supported yet");
@@ -35,7 +58,7 @@ class TCPClientActionH2H {
     }
 
     private static void connect(TCPClientH2H client, Socket connectionSocket, String clientSentence) {
-        Logger.clientDebugLog("fire connect");
+        Logger.clientDebugLog("fire connect h2h");
 
         DataOutputStream outToServer = null;
         try {
@@ -45,13 +68,15 @@ class TCPClientActionH2H {
         }
 
         int connectedClientNumber = SentenceUtils.getClientNumber(clientSentence);
-        client.setConnectedClientNumber(connectedClientNumber);
+        if (client.getConnectedClientNumber() == Config.INT_SV) {
+            client.setConnectedClientNumber(connectedClientNumber);
+        }
 
         String command = SentenceUtils.getCommand(clientSentence);
         String message = SentenceUtils.getMessage(clientSentence);
         Logger.clientDebugLog(command + " output: " + message);
         try {
-            outToServer.writeBytes(command + Config.SPLITS_CHAR + client.getClientNumber() +
+            Objects.requireNonNull(outToServer).writeBytes(command + Config.SPLITS_CHAR + client.getClientNumber() +
                     Config.SPLITS_CHAR + message + "\n");
         } catch (IOException e) {
             e.printStackTrace();
@@ -66,7 +91,7 @@ class TCPClientActionH2H {
 
         String response = null;
         try {
-            response = inFromServer.readLine();
+            response = Objects.requireNonNull(inFromServer).readLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -93,7 +118,7 @@ class TCPClientActionH2H {
 
         String response = String.valueOf(clientFileList.size());
         try {
-            outToServer.writeBytes(command + Config.SPLITS_CHAR + response + "\n");
+            Objects.requireNonNull(outToServer).writeBytes(command + Config.SPLITS_CHAR + response + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -112,5 +137,162 @@ class TCPClientActionH2H {
         );
 
         Logger.clientLog("Client file list sent to server");
+    }
+
+    private static void handlePush(int clientNumber, Socket connectionSocket, String clientSentence) {
+        Logger.clientDebugLog("fire handlePush");
+
+        String command = SentenceUtils.getCommand(clientSentence);
+        int sourceClientNumber = SentenceUtils.getClientNumber(clientSentence);
+        String fileName = SentenceUtils.getFileName(clientSentence);
+        Logger.clientLog("Receiving file " + fileName + " from client " + sourceClientNumber);
+
+        BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(connectionSocket);
+        String sentence = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
+        String fileMD5Sum = SentenceUtils.getMD5Sum(sentence);
+
+        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+        File file = new File(filePath);
+        FileOutputStream fileOutputStream = TCPConnectionUtils.createFileOutputStream(file);
+        InputStream inputStream = TCPConnectionUtils.getInputStream(connectionSocket);
+        TCPConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
+        TCPConnectionUtils.closeFileOutputStream(fileOutputStream);
+
+        if (MD5Sum.check(filePath, fileMD5Sum)) {
+            Logger.clientLog("File downloaded successfully");
+        } else {
+            Logger.clientLog("Unsuccessful file download");
+            invokeRepush(clientNumber, connectionSocket, clientSentence, 0);
+        }
+
+        Logger.clientDebugLog(command + " downloading sequence ended");
+    }
+
+    private static void handleRepush(int clientNumber, Socket connectionSocket, String clientSentence) {
+        Logger.clientDebugLog("fire handlePush");
+
+        String command = SentenceUtils.getCommand(clientSentence);
+        int sourceClientNumber = SentenceUtils.getClientNumber(clientSentence);
+        String fileName = SentenceUtils.getFileName(clientSentence);
+        Logger.clientLog("Receiving file " + fileName + " from client " + sourceClientNumber);
+
+        BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(connectionSocket);
+        String sentence = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
+        String fileMD5Sum = SentenceUtils.getMD5Sum(sentence);
+
+        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+        File file = new File(filePath);
+        FileOutputStream fileOutputStream = TCPConnectionUtils.createFileOutputStream(file, true);
+        InputStream inputStream = TCPConnectionUtils.getInputStream(connectionSocket);
+        TCPConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
+        TCPConnectionUtils.closeFileOutputStream(fileOutputStream);
+
+        if (MD5Sum.check(filePath, fileMD5Sum)) {
+            Logger.clientLog("File downloaded successfully");
+        } else {
+            Logger.clientLog("Unsuccessful file download");
+            invokeRepush(clientNumber, connectionSocket, clientSentence, 0);
+        }
+
+        Logger.clientDebugLog(command + " downloading sequence ended");
+    }
+
+    private static void checkingSendingCorrectness(int clientNumber, String sentence) {
+        Logger.clientDebugLog("fire checkingSendingCorrectness");
+
+        String fileName = SentenceUtils.getFileName(sentence);
+        String fileMD5Sum = SentenceUtils.getMD5Sum(sentence);
+        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+        if (MD5Sum.check(filePath, fileMD5Sum)) {
+            Logger.clientLog("Confirmation of the correctness of sending");
+        } else {
+            int sourceClientNumber = SentenceUtils.getClientNumber(sentence);
+            Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,
+                    Config.PORT_NR + sourceClientNumber);
+
+            DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+            String command = String.valueOf(ClientCommand.REPUSH);
+            TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+                    command,
+                    String.valueOf(clientNumber),
+                    fileName,
+                    String.valueOf((new File(filePath)).length()));
+            Logger.clientDebugLog("Repush request sended");
+
+            TCPConnectionUtils.closeSocket(connectionSocket);
+        }
+    }
+
+    private static void invokeRepush(int clientNumber,
+                                     Socket connectionSocket,
+                                     String clientSentence,
+                                     int reconnectCounter) {
+        Logger.clientDebugLog("fire invokeRepush");
+
+        int sourceClientNumber = SentenceUtils.getClientNumber(clientSentence);
+        String fileName = SentenceUtils.getFileName(clientSentence);
+        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+        File file = new File(filePath);
+
+        TCPConnectionUtils.closeSocket(connectionSocket);
+        Long receivedFilePartSize = file.length();
+        Logger.clientDebugLog("Downloaded " + receivedFilePartSize + " bytes");
+
+        boolean reconnect = false;
+        for (int i = 0; i < Config.WAITING_TIME_SEC; i++) {
+            try {
+                Logger.clientDebugLog("Try reconnect with client " + sourceClientNumber);
+                connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR + sourceClientNumber);
+                reconnect = true;
+                break;
+            } catch (IOException e) {
+                ExceptionHandler.handle(e);
+            }
+
+            try { // TODO sleep
+                sleep(1000);
+            } catch (InterruptedException e) {
+                ExceptionHandler.handle(e);
+            }
+        }
+
+        if (reconnect) {
+            Logger.clientLog("Reconnected");
+
+            DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+            String command = String.valueOf(ClientCommand.REPUSH);
+            TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+                    command,
+                    String.valueOf(clientNumber),
+                    fileName,
+                    String.valueOf(receivedFilePartSize));
+            Logger.clientDebugLog("Repush request sended");
+
+            TCPConnectionUtils.closeSocket(connectionSocket);
+        } else {
+            Logger.clientLog("Cannot reconnect with client " + sourceClientNumber);
+        }
+    }
+
+    private static void pushOnDemand(int clientNumber, String clientSentence) {
+        Logger.clientDebugLog("fire pushOnDemand");
+
+        int targetClientNumber = SentenceUtils.getClientNumber(clientSentence);
+        String fileName = SentenceUtils.getFileName(clientSentence);
+
+        ActionUtils.uploadIfFileExist(clientNumber, targetClientNumber, fileName);
+    }
+
+    private static void repush(int clientNumber, String clientSentence) {
+        Logger.clientDebugLog("fire repush");
+
+        int targetClientNumber = SentenceUtils.getClientNumber(clientSentence);
+        String fileName = SentenceUtils.getFileName(clientSentence);
+        long receivedFilePartSize = SentenceUtils.getStartByteNumber(clientSentence);
+
+        ActionUtils.uploadIfFileExist(clientNumber,
+                targetClientNumber,
+                fileName,
+                receivedFilePartSize);
     }
 }

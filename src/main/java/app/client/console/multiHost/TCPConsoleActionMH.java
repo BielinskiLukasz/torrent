@@ -1,7 +1,7 @@
 package app.client.console.multiHost;
 
 import app.client.console.ConsoleCommand;
-import app.client.host.ClientCommand;
+import app.client.host.multiHost.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
 import app.utils.ActionUtils;
@@ -18,14 +18,14 @@ class TCPConsoleActionMH {
     public static void perform(int clientNumber, String userSentence) {
         Logger.consoleDebugLog("perform: " + userSentence);
 
-        userSentence = cleanUserSentence(userSentence);
+        userSentence = SentenceUtils.cleanUserSentence(userSentence);
         String command = SentenceUtils.getConsoleCommand(userSentence);
 
         switch (ConsoleCommand.valueOf(command)) {
             case FILE_LIST:
                 getFileList();
                 break;
-            case PULL: // TODO print message in console if host haven't file
+            case PULL: // TODO BACKLOG print message in console if host haven't file
                 pull(clientNumber, userSentence);
                 break;
             case PUSH:
@@ -41,21 +41,6 @@ class TCPConsoleActionMH {
                 Logger.consoleLog("command is not supported");
                 break;
         }
-    }
-
-    private static String cleanUserSentence(String userSentence) {
-        if (!userSentence.contains(Config.SPLITS_CHAR)) {
-            userSentence = addSplitChars(userSentence);
-        }
-        return userSentence.replaceAll("\"", "");
-    }
-
-    private static String addSplitChars(String userSentence) {
-        for (int i = 0; i < (Config.MAX_NUMBER_OF_PARAMETERS - 1); i++) {
-            userSentence = userSentence.replaceFirst(" ", Config.SPLITS_CHAR);
-        }
-
-        return userSentence;
     }
 
     private static void getFileList() {
@@ -105,6 +90,7 @@ class TCPConsoleActionMH {
 
                 TCPConnectionUtils.closeSocket(hostConnectionSocket);
 
+                Logger.consoleLog("Sending push request");
                 Logger.consoleLog("Finished");
             } else {
                 Logger.consoleLog("Client " + sourceClientNumber + " isn't connected");
