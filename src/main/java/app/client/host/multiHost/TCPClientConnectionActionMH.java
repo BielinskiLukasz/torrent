@@ -1,14 +1,16 @@
 package app.client.host.multiHost;
 
+import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
-import app.utils.ActionUtils;
 import app.utils.ExceptionHandler;
-import app.utils.FileList;
 import app.utils.Logger;
-import app.utils.MD5Sum;
-import app.utils.SentenceUtils;
-import app.utils.TCPConnectionUtils;
+import app.utils.connectionUtils.ActionUtils;
+import app.utils.connectionUtils.CommandUtils;
+import app.utils.connectionUtils.SentenceUtils;
+import app.utils.connectionUtils.TCPConnectionUtils;
+import app.utils.fileUtils.FileList;
+import app.utils.fileUtils.MD5Sum;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -26,7 +28,7 @@ public class TCPClientConnectionActionMH {
     public static void perform(int clientNumber, Socket connectionSocket, String sentence) {
         Logger.clientDebugLog("perform: " + sentence);
 
-        String command = SentenceUtils.getCommand(sentence);
+        String command = CommandUtils.getCommand(sentence);
 
         switch (ClientCommand.valueOf(command)) {
             case CONNECT:

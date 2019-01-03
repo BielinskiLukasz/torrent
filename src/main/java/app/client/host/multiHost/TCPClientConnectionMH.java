@@ -1,9 +1,10 @@
 package app.client.host.multiHost;
 
+import app.client.host.ClientCommand;
 import app.config.Config;
 import app.utils.ExceptionHandler;
 import app.utils.Logger;
-import app.utils.TCPConnectionUtils;
+import app.utils.connectionUtils.TCPConnectionUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

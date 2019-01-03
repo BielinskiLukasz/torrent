@@ -1,13 +1,14 @@
 package app.client.console.host2host;
 
 import app.client.console.ConsoleCommand;
+import app.client.host.ClientCommand;
 import app.client.host.host2host.TCPClientH2H;
-import app.client.host.multiHost.ClientCommand;
 import app.config.Config;
-import app.utils.ActionUtils;
 import app.utils.Logger;
-import app.utils.SentenceUtils;
-import app.utils.TCPConnectionUtils;
+import app.utils.connectionUtils.ActionUtils;
+import app.utils.connectionUtils.CommandUtils;
+import app.utils.connectionUtils.SentenceUtils;
+import app.utils.connectionUtils.TCPConnectionUtils;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -32,7 +33,7 @@ class TCPConsoleActionH2H {
 
         userSentence = SentenceUtils.cleanUserSentence(userSentence);
         userSentence = SentenceUtils.setClientNumber(userSentence, client.getConnectedClientNumber());
-        String command = SentenceUtils.getConsoleCommand(userSentence);
+        String command = CommandUtils.getConsoleCommand(userSentence);
 
         Logger.consoleDebugLog("perform: " + userSentence);
 

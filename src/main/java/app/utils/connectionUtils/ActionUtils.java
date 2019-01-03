@@ -1,9 +1,13 @@
-package app.utils;
+package app.utils.connectionUtils;
 
 import app.client.console.ConsoleCommand;
-import app.client.host.multiHost.ClientCommand;
+import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
+import app.utils.ExceptionHandler;
+import app.utils.Logger;
+import app.utils.fileUtils.FileList;
+import app.utils.fileUtils.MD5Sum;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

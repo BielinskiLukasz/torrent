@@ -1,6 +1,8 @@
-package app.utils;
+package app.utils.connectionUtils;
 
 import app.config.Config;
+import app.utils.ExceptionHandler;
+import app.utils.Logger;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -112,7 +114,7 @@ public class TCPConnectionUtils {
         Logger.utilsDebugLog("closeFileOutputStream");
     }
 
-    public static FileInputStream createFileInputStream(File file) {
+    static FileInputStream createFileInputStream(File file) {
         FileInputStream fileInputStream = null;
         try {
             fileInputStream = new FileInputStream(file);
@@ -124,7 +126,7 @@ public class TCPConnectionUtils {
         return fileInputStream;
     }
 
-    public static void closeFileInputStream(FileInputStream fileInputStream) {
+    static void closeFileInputStream(FileInputStream fileInputStream) {
         try {
             fileInputStream.close();
         } catch (IOException e) {
@@ -173,7 +175,7 @@ public class TCPConnectionUtils {
         return response;
     }
 
-    public static void sendFileByStream(FileInputStream fileInputStream, OutputStream outputStream) {
+    static void sendFileByStream(FileInputStream fileInputStream, OutputStream outputStream) {
         Logger.serverDebugLog("start sending file");
 
         int count;

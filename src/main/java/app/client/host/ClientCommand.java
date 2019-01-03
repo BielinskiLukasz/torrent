@@ -1,4 +1,4 @@
-package app.client.host.multiHost;
+package app.client.host;
 
 public enum ClientCommand {
 

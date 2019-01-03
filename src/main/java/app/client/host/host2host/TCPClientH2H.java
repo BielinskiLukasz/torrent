@@ -13,7 +13,7 @@ public class TCPClientH2H extends Thread {
         this.clientNumber = clientNumber;
         this.connectedClientNumber = Config.INT_SV;
 
-        Logger.clientDebugLog("TCPClientH2H: create first host");
+        Logger.clientDebugLog("TCPClientH2H: create host " + clientNumber);
     }
 
     public TCPClientH2H(int clientNumber, int connectedClientNumber) {

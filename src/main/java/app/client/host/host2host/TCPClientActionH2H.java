@@ -1,14 +1,15 @@
 package app.client.host.host2host;
 
-import app.client.host.multiHost.ClientCommand;
+import app.client.host.ClientCommand;
 import app.config.Config;
-import app.utils.ActionUtils;
 import app.utils.ExceptionHandler;
-import app.utils.FileList;
 import app.utils.Logger;
-import app.utils.MD5Sum;
-import app.utils.SentenceUtils;
-import app.utils.TCPConnectionUtils;
+import app.utils.connectionUtils.ActionUtils;
+import app.utils.connectionUtils.CommandUtils;
+import app.utils.connectionUtils.SentenceUtils;
+import app.utils.connectionUtils.TCPConnectionUtils;
+import app.utils.fileUtils.FileList;
+import app.utils.fileUtils.MD5Sum;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -27,13 +28,14 @@ class TCPClientActionH2H {
 
     public static void perform(TCPClientH2H client, Socket connectionSocket, String clientSentence) {
 
-        String command = SentenceUtils.getCommand(clientSentence);
+        String command = CommandUtils.getCommand(clientSentence);
+        command = CommandUtils.transformToH2HCommand(command);
 
-        switch (HostCommand.valueOf(command)) {
+        switch (ClientCommand.valueOf(command)) {
             case CONNECT:
                 connect(client, connectionSocket, clientSentence);
                 break;
-            case FILE_LIST:
+            case CLIENT_FILE_LIST:
                 getFileList(client.getClientNumber(), connectionSocket, clientSentence);
                 break;
             case HANDLE_PUSH:
@@ -103,7 +105,7 @@ class TCPClientActionH2H {
     private static void getFileList(int clientNumber, Socket connectionSocket, String clientSentence) {
         Logger.clientDebugLog("fire getFileList");
 
-        String command = SentenceUtils.getCommand(clientSentence);
+        String command = String.valueOf(ClientCommand.CLIENT_FILE_LIST);
         DataOutputStream outToServer = null;
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());

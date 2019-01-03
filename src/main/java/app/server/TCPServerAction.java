@@ -1,11 +1,11 @@
 package app.server;
 
-import app.client.host.multiHost.ClientCommand;
+import app.client.host.ClientCommand;
 import app.config.Config;
-import app.utils.ActionUtils;
 import app.utils.Logger;
-import app.utils.SentenceUtils;
-import app.utils.TCPConnectionUtils;
+import app.utils.connectionUtils.ActionUtils;
+import app.utils.connectionUtils.SentenceUtils;
+import app.utils.connectionUtils.TCPConnectionUtils;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

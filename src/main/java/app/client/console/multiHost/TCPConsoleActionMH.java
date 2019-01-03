@@ -1,13 +1,14 @@
 package app.client.console.multiHost;
 
 import app.client.console.ConsoleCommand;
-import app.client.host.multiHost.ClientCommand;
+import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
-import app.utils.ActionUtils;
 import app.utils.Logger;
-import app.utils.SentenceUtils;
-import app.utils.TCPConnectionUtils;
+import app.utils.connectionUtils.ActionUtils;
+import app.utils.connectionUtils.CommandUtils;
+import app.utils.connectionUtils.SentenceUtils;
+import app.utils.connectionUtils.TCPConnectionUtils;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -19,7 +20,7 @@ class TCPConsoleActionMH {
         Logger.consoleDebugLog("perform: " + userSentence);
 
         userSentence = SentenceUtils.cleanUserSentence(userSentence);
-        String command = SentenceUtils.getConsoleCommand(userSentence);
+        String command = CommandUtils.getConsoleCommand(userSentence);
 
         switch (ConsoleCommand.valueOf(command)) {
             case FILE_LIST:

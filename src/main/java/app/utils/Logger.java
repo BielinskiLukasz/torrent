@@ -5,7 +5,7 @@ public class Logger {
     private static final boolean SERVER_LOG_DISPLAY = true;
     private static final boolean CLIENT_LOG_DISPLAY = true;
     private static final boolean CONSOLE_LOG_DISPLAY = true;
-    private static final boolean DEBUG_LOG_DISPLAY = true;
+    private static final boolean DEBUG_LOG_DISPLAY = false;
 
     public static void serverLog(String message) {
         if (SERVER_LOG_DISPLAY)
@@ -37,7 +37,7 @@ public class Logger {
             System.out.println("Console: " + message);
     }
 
-    static void utilsDebugLog(String message) {
+    public static void utilsDebugLog(String message) {
         if (DEBUG_LOG_DISPLAY)
             System.out.println("Utils: " + message);
     }
