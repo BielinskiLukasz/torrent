@@ -2,7 +2,7 @@ package app.utils.fileUtils;
 
 import app.config.Config;
 
-class FileInfo {
+public class FileInfo {
 
     final int clientId;
     final String name;
@@ -22,5 +22,17 @@ class FileInfo {
         this.clientId = Integer.parseInt(splittedData[0]);
         this.name = splittedData[1];
         this.md5 = splittedData[2];
+    }
+
+    public int getClientId() {
+        return clientId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getMd5() {
+        return md5;
     }
 }

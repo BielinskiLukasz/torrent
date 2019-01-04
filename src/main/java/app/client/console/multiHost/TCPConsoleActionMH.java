@@ -13,6 +13,8 @@ import app.utils.connectionUtils.TCPConnectionUtils;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.util.HashSet;
+import java.util.Set;
 
 class TCPConsoleActionMH {
 
@@ -21,6 +23,9 @@ class TCPConsoleActionMH {
 
         userSentence = SentenceUtils.cleanUserSentence(userSentence);
         String command = CommandUtils.getConsoleCommand(userSentence);
+        userSentence = SentenceUtils.setClientNumber(userSentence, 0);
+
+        Logger.consoleDebugLog("perform after clean: " + userSentence);
 
         switch (ConsoleCommand.valueOf(command)) {
             case FILE_LIST:
@@ -140,7 +145,48 @@ class TCPConsoleActionMH {
     }
 
     private static void multiplePull(int clientNumber, String userSentence) {
+        Logger.consoleDebugLog("fire close");
 
+        Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
+
+        DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+        String command = String.valueOf(ServerCommand.CLIENTS_WHO_SHARING_FILE);
+        String fileName = SentenceUtils.getFileName(userSentence);
+        if (SentenceUtils.getSentenceSize(userSentence) > 3) {
+            String fileMD5Sum = SentenceUtils.getMD5Sum(userSentence);
+            TCPConnectionUtils.sendMessageToDataOutputStream(outToServer,
+                    command,
+                    String.valueOf(clientNumber),
+                    fileName,
+                    fileMD5Sum);
+        } else {
+            TCPConnectionUtils.sendMessageToDataOutputStream(outToServer,
+                    command,
+                    String.valueOf(clientNumber),
+                    fileName);
+        }
+
+        BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
+        String response = TCPConnectionUtils.readBufferedReaderLine(inFromServer); // info about file doubles
+
+        Boolean isAnyDifferentFileWithTheSameName = SentenceUtils.getBoolean(response);
+        if (isAnyDifferentFileWithTheSameName) {
+            Logger.consoleLog("There are different files with the same file name. You must specify md5sum in request");
+        } else {
+            response = TCPConnectionUtils.readBufferedReaderLine(inFromServer); // info about list size
+
+            int serverFileListSize = SentenceUtils.getListSize(response);
+            Set<Integer> usersWithFile = new HashSet<>();
+            for (int i = 0; i < serverFileListSize; i++) {
+                String user = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
+                usersWithFile.add(Integer.parseInt(user));
+                Logger.consoleLog(user);
+            }
+
+
+        }
+
+        TCPConnectionUtils.closeSocket(connectionSocket);
     }
 
     private static void close(int clientNumber) {

@@ -211,14 +211,14 @@ public class ActionUtils {
         return sourceClientConnected;
     }
 
-    public static void sendList(Socket connectionSocket, List<String> serverFileList) {
+    public static void sendList(Socket connectionSocket, List serverFileList) {
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        String response = String.valueOf(serverFileList.size());
+        int listSize = serverFileList.size();
         String command = String.valueOf(ConsoleCommand.FILE_LIST);
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, command, response);
+        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(listSize));
 
         serverFileList.forEach(
-                fileData -> TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, fileData)
+                fileData -> TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, String.valueOf(fileData))
         );
     }
 }

@@ -6,6 +6,8 @@ import app.utils.Logger;
 import app.utils.connectionUtils.ActionUtils;
 import app.utils.connectionUtils.SentenceUtils;
 import app.utils.connectionUtils.TCPConnectionUtils;
+import app.utils.fileUtils.FileInfo;
+import app.utils.fileUtils.FileList;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -26,9 +28,13 @@ class TCPServerAction {
                 break;
             case SERVER_FILE_LIST: // TODO handle unconnected client selection by server
                 getServerFileList(server, connectionSocket);
+                ActionUtils.sendList(connectionSocket, server.getFileList());
                 break;
             case CONFIRM_CONNECTION:
                 confirmConnection(server, connectionSocket, sentence);
+                break;
+            case CLIENTS_WHO_SHARING_FILE:
+                getClientsWithFile(server, connectionSocket, sentence);
                 break;
             case UNREGISTER:
                 close(server, connectionSocket, sentence);
@@ -110,9 +116,32 @@ class TCPServerAction {
 
         server.setFileList(serverFileList);
 
-        ActionUtils.sendList(connectionSocket, serverFileList);
+//        ActionUtils.sendList(connectionSocket, serverFileList); //TODO separate getting and sending file list to reuse getting in multi host part
 
         Logger.serverLog("Server file list sent to client ");
+    }
+
+    private static void getClientsWithFile(TCPServer server, Socket connectionSocket, String sentence) { // TODO create method to handle request with md5sum
+        getServerFileList(server, connectionSocket);
+
+        String fileName = SentenceUtils.getFileName(sentence);
+        String md5sum = FileList.unpackFileInfo(server.getFileList().get(0)).getMd5();
+        List<Integer> usersWithFile = new ArrayList<>();
+
+        server.getFileList().forEach(
+                fileData -> {
+                    FileInfo fileInfo = FileList.unpackFileInfo(fileData);
+                    if (fileInfo.getName().equals(fileName) && fileInfo.getMd5().equals(md5sum)) {
+                        usersWithFile.add(fileInfo.getClientId());
+                    }
+                }
+        );
+
+        //TODO implements file doubles (same name, other md5sum) searching / verification
+        DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, "", String.valueOf(false));
+
+        ActionUtils.sendList(connectionSocket, usersWithFile);
     }
 
     private static void close(TCPServer server, Socket connectionSocket, String clientSentence) {

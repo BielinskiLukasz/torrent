@@ -5,7 +5,7 @@ public class Logger {
     private static final boolean SERVER_LOG_DISPLAY = true;
     private static final boolean CLIENT_LOG_DISPLAY = true;
     private static final boolean CONSOLE_LOG_DISPLAY = true;
-    private static final boolean DEBUG_LOG_DISPLAY = false;
+    private static final boolean DEBUG_LOG_DISPLAY = true;
 
     public static void serverLog(String message) {
         if (SERVER_LOG_DISPLAY)

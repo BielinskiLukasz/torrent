@@ -27,7 +27,7 @@ public class SentenceUtils {
         return Integer.parseInt(Objects.requireNonNull(getElement(sentence, 1)));
     }
 
-    static Boolean getBoolean(String sentence) {
+    public static Boolean getBoolean(String sentence) {
         return Boolean.parseBoolean(getElement(sentence, 1));
     }
 
@@ -60,8 +60,14 @@ public class SentenceUtils {
     }
 
     private static String addSplitChars(String userSentence) {
-        for (int i = 0; i < (Config.MAX_NUMBER_OF_PARAMETERS - 1); i++) {
-            userSentence = userSentence.replaceFirst(" ", Config.SPLITS_CHAR);
+        if (isClientNumberInSentence(userSentence)) {
+            for (int i = 0; i < (Config.MAX_NUMBER_OF_PARAMETERS - 1); i++) {
+                userSentence = userSentence.replaceFirst(" ", Config.SPLITS_CHAR);
+            }
+        } else {
+            for (int i = 0; i < (Config.MAX_NUMBER_OF_PARAMETERS - 2); i++) {
+                userSentence = userSentence.replaceFirst(" ", Config.SPLITS_CHAR);
+            }
         }
 
         return userSentence;
@@ -87,5 +93,9 @@ public class SentenceUtils {
             clientSentence = clientSentence.replaceFirst(String.format("\\%s", Config.SPLITS_CHAR),
                     Config.SPLITS_CHAR + clientNumber + Config.SPLITS_CHAR);
         return clientSentence;
+    }
+
+    public static int getSentenceSize(String clientSentence) {
+        return splitSentence(clientSentence).length;
     }
 }
