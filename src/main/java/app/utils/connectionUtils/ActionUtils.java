@@ -57,14 +57,14 @@ public class ActionUtils {
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
         String command = String.valueOf(ClientCommand.HANDLE_PUSH);
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                 command,
                 String.valueOf(sourceClientNumber),
                 fileName);
 
         String md5sum = MD5Sum.md5(filePath);
         String response = "Sending file " + fileName + " md5 sum";
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                 command,
                 String.valueOf(sourceClientNumber),
                 response,
@@ -99,7 +99,7 @@ public class ActionUtils {
         if (reconnect) {
             outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
             command = String.valueOf(ClientCommand.CHECK_SENDING);
-            TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                     command,
                     String.valueOf(sourceClientNumber),
                     fileName,
@@ -129,14 +129,14 @@ public class ActionUtils {
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
         String command = String.valueOf(ClientCommand.HANDLE_REPUSH);
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                 command,
                 String.valueOf(sourceClientNumber),
                 fileName);
 
         String md5sum = MD5Sum.md5(filePath);
         String response = "Sending file " + fileName + " md5 sum";
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                 command,
                 String.valueOf(sourceClientNumber),
                 response,
@@ -181,7 +181,7 @@ public class ActionUtils {
         if (reconnect) {
             outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
             command = String.valueOf(ClientCommand.CHECK_SENDING);
-            TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                     command,
                     String.valueOf(sourceClientNumber),
                     fileName,
@@ -199,7 +199,7 @@ public class ActionUtils {
         Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
 
         DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToServer,
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToServer,
                 String.valueOf(ServerCommand.CONFIRM_CONNECTION),
                 String.valueOf(sourceClientNumber));
 
@@ -215,10 +215,10 @@ public class ActionUtils {
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         int listSize = serverFileList.size();
         String command = String.valueOf(ConsoleCommand.FILE_LIST);
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(listSize));
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, command, String.valueOf(listSize));
 
         serverFileList.forEach(
-                fileData -> TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, String.valueOf(fileData))
+                fileData -> TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, String.valueOf(fileData))
         );
     }
 }

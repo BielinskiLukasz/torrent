@@ -70,7 +70,7 @@ class TCPServerAction {
     private static void sendConnectionConfirmation(Socket connectionSocket, int clientNumber) {
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String response = "Hello client " + clientNumber;
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, response);
     }
 
     private static void confirmConnection(TCPServer server, Socket connectionSocket, String clientSentence) {
@@ -81,7 +81,7 @@ class TCPServerAction {
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String response = "Client " + clientNumber + " connection confirmation";
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, response, String.valueOf(sourceClientConnected));
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, response, String.valueOf(sourceClientConnected));
 
         Logger.serverLog("Client " + clientNumber + " is connected");
     }
@@ -96,7 +96,7 @@ class TCPServerAction {
 
                     DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(userSocket);
                     String command = String.valueOf(ClientCommand.CLIENT_FILE_LIST);
-                    TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, command);
+                    TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, command);
 
                     BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(userSocket);
                     String response = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
@@ -125,21 +125,32 @@ class TCPServerAction {
         getServerFileList(server, connectionSocket);
 
         String fileName = SentenceUtils.getFileName(sentence);
-        String md5sum = FileList.unpackFileInfo(server.getFileList().get(0)).getMd5();
+        final String[] md5sum = new String[1];
+        server.getFileList().forEach( //TODO refactor it !!!
+                packedFileData -> {
+                    if (FileList.unpackFileInfo(packedFileData).getName().equals(fileName)) {
+                        md5sum[0] = FileList.unpackFileInfo(packedFileData).getMd5();
+                    }
+                }
+        );
         List<Integer> usersWithFile = new ArrayList<>();
 
         server.getFileList().forEach(
                 fileData -> {
                     FileInfo fileInfo = FileList.unpackFileInfo(fileData);
-                    if (fileInfo.getName().equals(fileName) && fileInfo.getMd5().equals(md5sum)) {
+                    Logger.serverDebugLog("Look file " + fileName + " in " + fileInfo.getName());
+                    if (fileInfo.getName().equals(fileName) && fileInfo.getMd5().equals(md5sum[0])) {
                         usersWithFile.add(fileInfo.getClientId());
+                        Logger.serverDebugLog("Found " + fileName + " in " + fileInfo.getName());
+//                    } else if (fileInfo.getName().equals(fileName) && !fileInfo.getMd5().equals(md5sum[0])) {
+                        // TODO inform about file doubles
                     }
                 }
         );
 
         //TODO implements file doubles (same name, other md5sum) searching / verification
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, "", String.valueOf(false));
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, "", String.valueOf(false));
 
         ActionUtils.sendList(connectionSocket, usersWithFile);
     }
@@ -154,7 +165,7 @@ class TCPServerAction {
         String response = "Bye client " + clientNumber;
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, response);
 
         Logger.serverLog("Unregister client " + clientNumber);
     }
@@ -164,7 +175,7 @@ class TCPServerAction {
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String response = '"' + command + '"' + " command is not supported yet";
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, response);
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, response);
 
         Logger.serverLog("Not supported command message sent");
     }

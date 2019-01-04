@@ -60,4 +60,8 @@ public class FileList {
     public static FileInfo unpackFileInfo(String packedFileInfo) {
         return new FileInfo(packedFileInfo);
     }
+
+    public static String packFullFileInfo(FileInfo fileInfo) {
+        return fileInfo.clientId + "|" + fileInfo.name + "|" + fileInfo.md5 + "|" + fileInfo.fileSize;
+    }
 }

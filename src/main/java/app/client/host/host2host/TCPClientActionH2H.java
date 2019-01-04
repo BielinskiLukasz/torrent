@@ -214,7 +214,7 @@ class TCPClientActionH2H {
 
             DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
             String command = String.valueOf(ClientCommand.REPUSH);
-            TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                     command,
                     String.valueOf(clientNumber),
                     fileName,
@@ -263,7 +263,7 @@ class TCPClientActionH2H {
 
             DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
             String command = String.valueOf(ClientCommand.REPUSH);
-            TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                     command,
                     String.valueOf(clientNumber),
                     fileName,

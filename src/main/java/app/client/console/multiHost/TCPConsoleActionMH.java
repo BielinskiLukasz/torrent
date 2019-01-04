@@ -76,7 +76,7 @@ class TCPConsoleActionMH {
 
         DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String command = String.valueOf(ServerCommand.SERVER_FILE_LIST);
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToServer, command);
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToServer, command);
 
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
         String response = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
@@ -112,7 +112,7 @@ class TCPConsoleActionMH {
                 DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
                 String command = String.valueOf(ClientCommand.PUSH_ON_DEMAND);
                 String fileName = SentenceUtils.getFileName(userSentence);
-                TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
+                TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
 
                 TCPConnectionUtils.closeSocket(hostConnectionSocket);
 
@@ -154,13 +154,13 @@ class TCPConsoleActionMH {
         String fileName = SentenceUtils.getFileName(userSentence);
         if (SentenceUtils.getSentenceSize(userSentence) > 3) {
             String fileMD5Sum = SentenceUtils.getMD5Sum(userSentence);
-            TCPConnectionUtils.sendMessageToDataOutputStream(outToServer,
+            TCPConnectionUtils.writeMessageToDataOutputStream(outToServer,
                     command,
                     String.valueOf(clientNumber),
                     fileName,
                     fileMD5Sum);
         } else {
-            TCPConnectionUtils.sendMessageToDataOutputStream(outToServer,
+            TCPConnectionUtils.writeMessageToDataOutputStream(outToServer,
                     command,
                     String.valueOf(clientNumber),
                     fileName);
@@ -172,15 +172,49 @@ class TCPConsoleActionMH {
         Boolean isAnyDifferentFileWithTheSameName = SentenceUtils.getBoolean(response);
         if (isAnyDifferentFileWithTheSameName) {
             Logger.consoleLog("There are different files with the same file name. You must specify md5sum in request");
+            TCPConnectionUtils.closeSocket(connectionSocket);
         } else {
             response = TCPConnectionUtils.readBufferedReaderLine(inFromServer); // info about list size
 
             int serverFileListSize = SentenceUtils.getListSize(response);
+            Logger.consoleLog(serverFileListSize + " users have file " + fileName);
+
             Set<Integer> usersWithFile = new HashSet<>();
             for (int i = 0; i < serverFileListSize; i++) {
                 String user = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
                 usersWithFile.add(Integer.parseInt(user));
                 Logger.consoleLog(user);
+            }
+
+            TCPConnectionUtils.closeSocket(connectionSocket);
+
+            //get file size
+            int clientWithFile = (!usersWithFile.stream().findFirst().isPresent() ? 0 :
+                    usersWithFile.stream().findFirst().get());
+            //TODO ignore when clientWithFile = 0
+            connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + clientWithFile);
+
+            DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+            command = String.valueOf(ClientCommand.CLIENT_FILE_INFO);
+            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+                    command,
+                    String.valueOf(clientWithFile),
+                    fileName);
+
+            BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(connectionSocket);
+            response = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
+            Long fileSize = Long.parseLong(SentenceUtils.getFileSize(response));
+
+            int position = 0;
+            int usersWithFileNumber = usersWithFile.size();
+            long stepSize = fileSize / usersWithFileNumber;
+            for (int userWithFile : usersWithFile) {
+                long startByteNum = stepSize * position++;
+                long endByteNum = stepSize * position - 1;
+                // TODO ignore packet where endByte <= startByte (remove half of users/download all file from one user
+                //  when file size is less than config.min)
+
+                Logger.consoleDebugLog(startByteNum + " " + endByteNum);
             }
 
 
@@ -196,7 +230,7 @@ class TCPConsoleActionMH {
 
         DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String command = String.valueOf(ServerCommand.UNREGISTER);
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToServer, command, String.valueOf(clientNumber));
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToServer, command, String.valueOf(clientNumber));
 
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
         TCPConnectionUtils.readBufferedReaderLine(inFromServer);

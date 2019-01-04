@@ -1,5 +1,6 @@
 package app.client.host.multiHost;
 
+import app.client.console.ConsoleCommand;
 import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
@@ -37,8 +38,14 @@ public class TCPClientConnectionActionMH {
             case CLIENT_FILE_LIST:
                 getClientFileList(clientNumber, connectionSocket, sentence);
                 break;
+            case CLIENT_FILE_INFO:
+                getFileInfo(clientNumber, connectionSocket, sentence);
+                break;
             case HANDLE_PUSH:
                 handlePush(clientNumber, connectionSocket, sentence);
+                break;
+            case HANDLE_PUSH_PACK:
+                handlePushPack(clientNumber, connectionSocket, sentence);
                 break;
             case PUSH_ON_DEMAND:
                 pushOnDemand(clientNumber, sentence);
@@ -71,7 +78,7 @@ public class TCPClientConnectionActionMH {
         DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String command = String.valueOf(ServerCommand.REGISTER);
         String message = SentenceUtils.getMessage(clientSentence);
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToServer, command, String.valueOf(clientNumber), message);
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToServer, command, String.valueOf(clientNumber), message);
     }
 
     private static void receiveConfirmationOfConnection(Socket connectionSocket) {
@@ -92,6 +99,27 @@ public class TCPClientConnectionActionMH {
         ActionUtils.sendList(connectionSocket, clientFileList);
 
         Logger.clientLog("Client file list sent to server");
+    }
+
+    private static void getFileInfo(int clientNumber, Socket connectionSocket, String clientSentence) {
+        Logger.clientDebugLog("fire getFileInfo");
+
+        String command = SentenceUtils.getCommand(clientSentence);
+        Logger.clientDebugLog(command + " input: " + clientSentence);
+
+        String fileName = SentenceUtils.getFileName(clientSentence);
+        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+        File file = new File(filePath);
+        Long fileSize = file.length();
+
+        DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+                String.valueOf(ConsoleCommand.MULTIPLE_PULL),
+                String.valueOf(clientNumber),
+                fileName,
+                String.valueOf(fileSize));
+
+        Logger.clientLog("Client file info sent");
     }
 
     private static void handlePush(int clientNumber, Socket connectionSocket, String clientSentence) {
@@ -121,6 +149,11 @@ public class TCPClientConnectionActionMH {
         }
 
         Logger.clientDebugLog(command + " downloading sequence ended");
+    }
+
+    private static void handlePushPack(int clientNumber, Socket connectionSocket, String sentence) {
+
+
     }
 
     private static void handleRepush(int clientNumber, Socket connectionSocket, String clientSentence) {
@@ -167,7 +200,7 @@ public class TCPClientConnectionActionMH {
 
             DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
             String command = String.valueOf(ClientCommand.REPUSH);
-            TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                     command,
                     String.valueOf(clientNumber),
                     fileName,
@@ -216,7 +249,7 @@ public class TCPClientConnectionActionMH {
 
             DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
             String command = String.valueOf(ClientCommand.REPUSH);
-            TCPConnectionUtils.sendMessageToDataOutputStream(outToClient,
+            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                     command,
                     String.valueOf(clientNumber),
                     fileName,

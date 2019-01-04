@@ -60,7 +60,7 @@ class TCPConsoleActionH2H {
         Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, connectedHostPortNumber);
 
         DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        TCPConnectionUtils.sendMessageToDataOutputStream(outToServer, command);
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToServer, command);
 
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
         String response = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
@@ -94,7 +94,7 @@ class TCPConsoleActionH2H {
             DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
             String command = String.valueOf(ClientCommand.PUSH_ON_DEMAND);
             String fileName = SentenceUtils.getFileName(userSentence);
-            TCPConnectionUtils.sendMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
+            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
 
             TCPConnectionUtils.closeSocket(hostConnectionSocket);
 

@@ -136,7 +136,7 @@ public class TCPConnectionUtils {
         Logger.utilsDebugLog("closeFileInputStream");
     }
 
-    public static void sendMessageToDataOutputStream(DataOutputStream dataOutputStream, String message, String... furtherPartOfMessage) {
+    public static void writeMessageToDataOutputStream(DataOutputStream dataOutputStream, String message, String... furtherPartOfMessage) {
         if (furtherPartOfMessage.length > 0) {
             message += createAttachedMessage(furtherPartOfMessage);
         }
@@ -147,7 +147,7 @@ public class TCPConnectionUtils {
             ExceptionHandler.handle(e);
         }
 
-        Logger.utilsDebugLog("sendMessageToDataOutputStream");
+        Logger.utilsDebugLog("writeMessageToDataOutputStream");
         Logger.utilsDebugLog("send: " + message);
     }
 

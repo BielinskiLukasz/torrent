@@ -35,6 +35,10 @@ public class SentenceUtils {
         return getElement(sentence, 3);
     }
 
+    public static String getFileSize(String sentence) {
+        return getElement(sentence, 3);
+    }
+
     public static long getStartByteNumber(String sentence) {
         return Long.parseLong(Objects.requireNonNull(getElement(sentence, 3)));
     }
