@@ -332,10 +332,10 @@ public class TCPClientConnectionActionMH {
         }
     }
 
-    private static void invokeRepush(int clientNumber,
-                                     Socket connectionSocket,
-                                     String clientSentence,
-                                     int reconnectCounter) {
+    public static void invokeRepush(int clientNumber,
+                                    Socket connectionSocket,
+                                    String clientSentence,
+                                    int reconnectCounter) {
         Logger.clientDebugLog("fire invokeRepush");
 
         int sourceClientNumber = SentenceUtils.getClientNumber(clientSentence);

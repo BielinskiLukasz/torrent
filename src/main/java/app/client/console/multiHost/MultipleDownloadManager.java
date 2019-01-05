@@ -1,6 +1,7 @@
-package app.client.host.multiHost;
+package app.client.console.multiHost;
 
 import app.client.host.ClientCommand;
+import app.client.host.multiHost.TCPClientConnectionActionMH;
 import app.config.Config;
 import app.utils.Logger;
 import app.utils.connectionUtils.SentenceUtils;
@@ -13,8 +14,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.Socket;
+import java.util.List;
 
-public class MultipleSender extends Thread {
+public class MultipleDownloadManager extends Thread {
 
     private int clientNumber;
     private String fileName;
@@ -22,12 +24,20 @@ public class MultipleSender extends Thread {
     private int position;
     private long stepSize;
 
-    public MultipleSender(int clientNumber, String fileName, int userWithFile, int position, long stepSize) {
+    private List<Integer> usersWithFile;
+
+    MultipleDownloadManager(int clientNumber,
+                            String fileName,
+                            int userWithFile,
+                            int position,
+                            long stepSize,
+                            List<Integer> usersWithFile) {
         this.clientNumber = clientNumber;
         this.fileName = fileName;
         this.position = position;
         this.userWithFile = userWithFile;
         this.stepSize = stepSize;
+        this.usersWithFile = usersWithFile;
     }
 
     public void run() {
@@ -67,8 +77,20 @@ public class MultipleSender extends Thread {
             Logger.clientDebugLog("File part downloaded successfully");
         } else {
             Logger.clientDebugLog("Unsuccessful file part download");
-//                    invokeRepush(clientNumber, connectionSocket, clientSentence, 0); // TODO BACKLOG implements restart downloading part
+            invokeRePushPart(connectionSocket, packetNumber, file.length(), 0); // invoke repush from same client
+            if (MD5Sum.check(targetPath, filePartMD5Sum)) {
+                Logger.clientDebugLog("File part downloaded successfully");
+            } else {
+                while (!MD5Sum.check(targetPath, filePartMD5Sum) && usersWithFile.size() > 1) {
+                    Logger.clientDebugLog("Unsuccessful file part download");
+                    usersWithFile.remove(userWithFile);
+                    userWithFile = usersWithFile.get(0);
+                    invokeRePushPart(connectionSocket, packetNumber, file.length(), 0); // invoke repush from other client
+                }
+            }
         }
+
+        //TODO implement restart send part (after sender check request with also need be implemented here)
 
         Logger.clientDebugLog(command + " downloading parts sequence ended");
 
@@ -76,4 +98,23 @@ public class MultipleSender extends Thread {
 
         Logger.consoleDebugLog(startByteNum + " " + endByteNum);
     }
+
+    private void invokeRePushPart(Socket connectionSocket, long packetNumber, long receivedFilePartSize, int reconnectCounter) {
+        Logger.clientDebugLog("fire invokeRePushPart");
+
+        String command = String.valueOf(ClientCommand.REPUSH);
+        int sourceClientNumber = userWithFile;
+        String partFileName = fileName + ".part_" + packetNumber;
+        String clientSentence = command + Config.SPLITS_CHAR + sourceClientNumber + Config.SPLITS_CHAR + partFileName +
+                Config.SPLITS_CHAR + receivedFilePartSize + "\n";
+
+        Logger.clientDebugLog("sentence: " + clientSentence);
+        TCPClientConnectionActionMH.invokeRepush(clientNumber,
+                connectionSocket,
+                clientSentence,
+                reconnectCounter);
+
+        TCPConnectionUtils.closeSocket(connectionSocket);
+    }
+    //TODO rename all repush to rePush and repull to rePull
 }

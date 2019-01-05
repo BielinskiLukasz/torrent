@@ -19,7 +19,7 @@ class TCPConsoleActionH2H {
     // TODO NOW
     //  update README - max file size (Inreger.MAX_VALUE - 8 bytes)
     //  send message after pull = push request
-    //  close h2h connection
+    //  BACKLOG close h2h connection
     //  create console regex
     //  handle wrong numbers in h2h console commands
 

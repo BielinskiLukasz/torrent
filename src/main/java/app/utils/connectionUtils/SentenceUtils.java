@@ -64,6 +64,10 @@ public class SentenceUtils {
         return sentence.split(String.format("\\%s", Config.SPLITS_CHAR));
     }
 
+    private static String[] splitSentenceWithSpaces(String sentence) {
+        return sentence.split(String.format("\\%s", " "));
+    }
+
     public static String cleanUserSentence(String userSentence) {
         if (!userSentence.contains(Config.SPLITS_CHAR)) {
             userSentence = addSplitChars(userSentence);
@@ -72,7 +76,7 @@ public class SentenceUtils {
     }
 
     private static String addSplitChars(String userSentence) {
-        if (isClientNumberInSentence(userSentence)) {
+        if (isClientNumberInSentenceWittoutSplitChars(userSentence)) {
             for (int i = 0; i < (Config.MAX_NUMBER_OF_PARAMETERS - 1); i++) {
                 userSentence = userSentence.replaceFirst(" ", Config.SPLITS_CHAR);
             }
@@ -83,6 +87,12 @@ public class SentenceUtils {
         }
 
         return userSentence;
+    }
+
+    private static boolean isClientNumberInSentenceWittoutSplitChars(String userSentence) {
+        return splitSentenceWithSpaces(userSentence).length > 1 &&
+                isInteger(splitSentenceWithSpaces(userSentence)[1]) &&
+                Integer.parseInt(splitSentenceWithSpaces(userSentence)[1]) >= 0;
     }
 
     private static boolean isClientNumberInSentence(String userSentence) {

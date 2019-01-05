@@ -2,7 +2,6 @@ package app.client.console.multiHost;
 
 import app.client.console.ConsoleCommand;
 import app.client.host.ClientCommand;
-import app.client.host.multiHost.MultipleSender;
 import app.config.Config;
 import app.server.ServerCommand;
 import app.utils.Logger;
@@ -28,10 +27,11 @@ class TCPConsoleActionMH {
         Logger.consoleDebugLog("perform: " + userSentence);
 
         userSentence = SentenceUtils.cleanUserSentence(userSentence);
+        Logger.consoleDebugLog("perform after clean: " + userSentence);
         String command = CommandUtils.getConsoleCommand(userSentence);
         userSentence = SentenceUtils.setClientNumber(userSentence, 0);
 
-        Logger.consoleDebugLog("perform after clean: " + userSentence);
+        Logger.consoleDebugLog("perform after set number: " + userSentence);
 
         switch (ConsoleCommand.valueOf(command)) {
             case FILE_LIST:
@@ -44,7 +44,11 @@ class TCPConsoleActionMH {
                 push(clientNumber, userSentence);
                 break;
             case MULTIPLE_PULL:
-                multiplePull(clientNumber, userSentence);
+                if (SentenceUtils.getSentenceSize(userSentence) == 4) {
+                    multiplePullSpecificFile(clientNumber, userSentence);
+                } else {
+                    multiplePull(clientNumber, userSentence);
+                }
                 break;
             case CLOSE:
                 close(clientNumber);
@@ -175,10 +179,10 @@ class TCPConsoleActionMH {
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
         String response = TCPConnectionUtils.readBufferedReaderLine(inFromServer); // info about file doubles
 
-        Boolean isAnyDifferentFileWithTheSameName = SentenceUtils.getBoolean(response);
-        if (isAnyDifferentFileWithTheSameName) {
-            Logger.consoleLog("There are different files with the same file name. You must specify md5sum in request " +
-                    "<<NOT IMPLEMENTED>>"); // TODO remove after implementation
+        Boolean diffrentFileWithSameName = SentenceUtils.getBoolean(response);
+        if (diffrentFileWithSameName) {
+            Logger.consoleLog("There are different files with the same file name. You must specify md5sum in request. " +
+                    "Use MULTIPLE_PUSH_SPECIFIC command");
             TCPConnectionUtils.closeSocket(connectionSocket);
         } else {
             response = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
@@ -195,72 +199,81 @@ class TCPConsoleActionMH {
 
             TCPConnectionUtils.closeSocket(connectionSocket);
 
-            //get file size
             int clientWithFile = (!usersWithFile.stream().findFirst().isPresent() ? 0 :
                     usersWithFile.stream().findFirst().get());
-            //TODO (ignore/send message) when clientWithFile = 0
-            connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + clientWithFile);
+            if (clientWithFile == 0) {
+                Logger.consoleLog("No one share a " + fileName + " file");
+            } else {
+                connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + clientWithFile);
 
-            DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-            command = String.valueOf(ClientCommand.CLIENT_FILE_INFO);
-            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
-                    command,
-                    String.valueOf(clientWithFile),
-                    fileName);
+                DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+                command = String.valueOf(ClientCommand.CLIENT_FILE_INFO);
+                TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+                        command,
+                        String.valueOf(clientWithFile),
+                        fileName);
 
-            BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(connectionSocket);
-            response = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
-            Long fileSize = Long.parseLong(SentenceUtils.getFileSize(response));
-            String fileMD5Sum = SentenceUtils.getMD5Sum(response);
+                BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(connectionSocket);
+                response = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
+                Long fileSize = Long.parseLong(SentenceUtils.getFileSize(response));
+                String fileMD5Sum = SentenceUtils.getMD5Sum(response);
 
-            TCPConnectionUtils.closeSocket(connectionSocket);
+                TCPConnectionUtils.closeSocket(connectionSocket);
 
-            int position = 0;
-            int usersWithFileNumber = usersWithFile.size();
-            long stepSize = fileSize / usersWithFileNumber + 1;
-            Thread[] multipleSenders = new Thread[usersWithFileNumber];
+                int position = 0;
+                int usersWithFileNumber = usersWithFile.size();
+                long stepSize = fileSize / usersWithFileNumber + 1;
+                Thread[] multipleSenders = new Thread[usersWithFileNumber];
 
-            for (int i = 0; i < usersWithFile.size(); i++) {
-                int userWithFile = usersWithFile.get(i);
-                multipleSenders[i] = new MultipleSender(clientNumber, fileName, userWithFile, position++, stepSize);
-                multipleSenders[i].start();
-            }
+                for (int i = 0; i < usersWithFile.size(); i++) {
+                    int userWithFile = usersWithFile.get(i);
+                    multipleSenders[i] = new MultipleDownloadManager(clientNumber,
+                            fileName,
+                            userWithFile,
+                            position++,
+                            stepSize,
+                            usersWithFile
+                    );
+                    multipleSenders[i].start();
+                }
 
-            for (int i = 0; i < usersWithFileNumber; i++) {
-                try {
-                    multipleSenders[i].join();
-                } catch (InterruptedException e) {
+                for (int i = 0; i < usersWithFileNumber; i++) {
+                    try {
+                        multipleSenders[i].join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+
+                try (FileOutputStream stream = new FileOutputStream(filePath, true)) {
+                    for (int i = 0; i < usersWithFileNumber; i++) {
+                        File partFile = new File(filePath + ".part_" + i);
+                        byte[] fileContent = Files.readAllBytes(partFile.toPath());
+                        stream.write(fileContent);
+                        if (partFile.delete())
+                            Logger.clientDebugLog("Remove part " + i);
+                        Logger.consoleDebugLog("Combine part " + i);
+                    }
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
 
-            String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
-//            File file = new File(filePath);
-
-            try (FileOutputStream stream = new FileOutputStream(filePath, true)) {
-                for (int i = 0; i < usersWithFileNumber; i++) {
-                    File partFile = new File(filePath + ".part_" + i);
-                    byte[] fileContent = Files.readAllBytes(partFile.toPath());
-                    stream.write(fileContent);
-                    if (partFile.delete())
-                        Logger.clientDebugLog("Remove part " + i);
-                    Logger.consoleDebugLog("Combine part " + i);
+                if (MD5Sum.check(filePath, fileMD5Sum)) {
+                    Logger.clientDebugLog("File downloaded successfully");
+                } else {
+                    Logger.clientDebugLog("Unsuccessful file download");
+                    multiplePull(clientNumber, userSentence);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
-
-            if (MD5Sum.check(filePath, fileMD5Sum)) {
-                Logger.clientDebugLog("File downloaded successfully");
-            } else {
-                Logger.clientDebugLog("Unsuccessful file download");
-//                    invokeRepush(clientNumber, connectionSocket, clientSentence, 0); // TODO implements start new multiple downloading
-            }
-
-
         }
 
         TCPConnectionUtils.closeSocket(connectionSocket);
+    }
+
+    private static void multiplePullSpecificFile(int clientNumber, String userSentence) {
+        //TODO copy multiplePull and use CLIENTS_WHO_SHARING_SPECIFIC_FILE command (without CLIENTS_WHO_SHARING_FILE)
     }
 
     private static void close(int clientNumber) {
