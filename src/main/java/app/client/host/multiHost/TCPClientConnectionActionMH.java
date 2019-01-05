@@ -16,9 +16,11 @@ import app.utils.fileUtils.MD5Sum;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.Socket;
 import java.nio.channels.FileChannel;
@@ -176,7 +178,7 @@ public class TCPClientConnectionActionMH {
         String selectedPartPath = parts.get(packetNumber);
         File file = new File(selectedPartPath);
 
-        /*DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+        DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String command = String.valueOf(ConsoleCommand.MULTIPLE_PULL);
         String md5sum = MD5Sum.md5(selectedPartPath);
         String response = "Sending file " + fileName + " md5 sum";
@@ -191,8 +193,10 @@ public class TCPClientConnectionActionMH {
         TCPConnectionUtils.writeFileToStream(fileInputStream, outputStream);
         TCPConnectionUtils.closeFileInputStream(fileInputStream);
 
+        TCPConnectionUtils.closeSocket(connectionSocket);
+
         Logger.consoleLog("Sending file parts " + fileName + " " + packetNumber + " to client " + targetClientNumber +
-                " ends");*/
+                " ends");
 
 
 
