@@ -16,9 +16,7 @@ import java.net.Socket;
 
 class TCPConsoleActionH2H {
 
-    // TODO REMEMBER connecting with second host, not server!
-
-    // TODO NOW IMPLEMENT MULTIPUSH FEATURE :)
+    // TODO NOW
     //  update README - max file size (Inreger.MAX_VALUE - 8 bytes)
     //  send message after pull = push request
     //  close h2h connection
@@ -46,7 +44,7 @@ class TCPConsoleActionH2H {
                 break;
             case EMPTY_COMMAND:
                 break;
-            //TODO Add close option (setting both connectedClientNumber to -1)
+            //TODO BACKLOG Add close option (setting both connectedClientNumber to -1)
             case UNSUPPORTED_COMMAND:
             default:
                 Logger.consoleLog("command is not supported");
@@ -70,7 +68,7 @@ class TCPConsoleActionH2H {
             Logger.consoleLog(
                     TCPConnectionUtils.readBufferedReaderLine(inFromServer)
                             .replaceAll(String.format("\\%s", Config.FILE_INFO_SPLITS_CHAR), " ")
-                    // TODO move getting better format to another place
+                    // TODO BACKLOG move getting better format to another place
             );
         }
 

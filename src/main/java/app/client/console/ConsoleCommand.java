@@ -9,7 +9,7 @@ public enum ConsoleCommand {
     PULL,
     PUSH,
     MULTIPLE_PULL, // only multihost
-    CLOSE, // TODO implement fire that command after close java program
+    CLOSE, // TODO BACKLOG implement fire that command after close java program
     EMPTY_COMMAND,
     UNSUPPORTED_COMMAND
 }

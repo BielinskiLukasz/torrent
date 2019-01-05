@@ -19,8 +19,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 class TCPConsoleActionMH {
 
@@ -56,11 +56,11 @@ class TCPConsoleActionMH {
                 Logger.consoleLog("command is not supported");
                 break;
 
-            // TODO create function classes for each feature (CONNECT, FILE_LIST, PULL (MULTI_PULL), PUSH, CLOSE)
+            // TODO BACKLOG create function classes for each feature (CONNECT, FILE_LIST, PULL (MULTI_PULL), PUSH, CLOSE)
             //  with have method connected with action e.g. ClientA sending message - PUSH (client number),
             //  ClientB receiving - PULL (connectionSocket)
 
-            // TODO Handling restart pull and push there
+            // TODO BACKLOG Handling restart pull and push there
             //  Refactor restart push - use existing (could be closed) connection for get info about sent file,
             //  and if it's finished successfully then do nothing, else repush - if client who check file was pull
             //  initiator then he should fire pull action
@@ -71,7 +71,7 @@ class TCPConsoleActionMH {
             //  rePull
             //  rePullToRequest ??
 
-            // TODO create protocol message creators (Builder?), create also protocol reading methods
+            // TODO BACKLOG create protocol message creators (Builder?), create also protocol reading methods
         }
     }
 
@@ -92,7 +92,7 @@ class TCPConsoleActionMH {
             Logger.consoleLog(
                     TCPConnectionUtils.readBufferedReaderLine(inFromServer)
                             .replaceAll(String.format("\\%s", Config.FILE_INFO_SPLITS_CHAR), " ")
-                    // TODO move getting better format to another place
+                    // TODO BACKLOG move getting better format to another place
             );
         }
 
@@ -186,7 +186,7 @@ class TCPConsoleActionMH {
             int serverFileListSize = SentenceUtils.getListSize(response);
             Logger.consoleLog(serverFileListSize + " users have file " + fileName);
 
-            Set<Integer> usersWithFile = new HashSet<>();
+            List<Integer> usersWithFile = new ArrayList<>();
             for (int i = 0; i < serverFileListSize; i++) {
                 String user = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
                 usersWithFile.add(Integer.parseInt(user));
@@ -198,7 +198,7 @@ class TCPConsoleActionMH {
             //get file size
             int clientWithFile = (!usersWithFile.stream().findFirst().isPresent() ? 0 :
                     usersWithFile.stream().findFirst().get());
-            //TODO ignore when clientWithFile = 0
+            //TODO (ignore/send message) when clientWithFile = 0
             connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + clientWithFile);
 
             DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
@@ -220,55 +220,10 @@ class TCPConsoleActionMH {
             long stepSize = fileSize / usersWithFileNumber + 1;
             Thread[] multipleSenders = new Thread[usersWithFileNumber];
 
-            int temp = 0;
-            for (int userWithFile : usersWithFile) { //TODO tests, implements threads in future
-                multipleSenders[temp] = new MultipleSender(clientNumber, fileName, userWithFile, position++, stepSize);
-                multipleSenders[temp++].start();
-
-                /*int packetNumber = position;
-                long startByteNum = stepSize * position++;
-                long endByteNum = stepSize * position - 1;
-                // TODO ignore packet where endByte <= startByte (remove half of users/download all file from one user
-                //  when file size is less than config.min)
-
-                connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + userWithFile);
-
-                outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-                command = String.valueOf(ClientCommand.HANDLE_PUSH_PACK);
-                TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
-                        command,
-                        String.valueOf(clientNumber),
-                        fileName,
-                        String.valueOf(startByteNum),
-                        String.valueOf(endByteNum),
-                        String.valueOf(packetNumber)); // TODO better send part size and packet number
-
-                inFromClient = TCPConnectionUtils.getBufferedReader(connectionSocket);
-                String sentence = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
-                String filePartMD5Sum = SentenceUtils.getMD5Sum(sentence);
-
-                String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
-                String suffix = ".part_";
-                String targetPath = filePath + suffix + packetNumber;
-
-                File file = new File(targetPath);
-                FileOutputStream fileOutputStream = TCPConnectionUtils.createFileOutputStream(file);
-                InputStream inputStream = TCPConnectionUtils.getInputStream(connectionSocket);
-                TCPConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
-                TCPConnectionUtils.closeFileOutputStream(fileOutputStream);
-
-                if (MD5Sum.check(targetPath, filePartMD5Sum)) {
-                    Logger.clientDebugLog("File part downloaded successfully");
-                } else {
-                    Logger.clientDebugLog("Unsuccessful file part download");
-//                    invokeRepush(clientNumber, connectionSocket, clientSentence, 0); // TODO implements restart downloading part
-                }
-
-                Logger.clientDebugLog(command + " downloading parts sequence ended");
-
-                TCPConnectionUtils.closeSocket(connectionSocket);
-
-                Logger.consoleDebugLog(startByteNum + " " + endByteNum);*/
+            for (int i = 0; i < usersWithFile.size(); i++) {
+                int userWithFile = usersWithFile.get(i);
+                multipleSenders[i] = new MultipleSender(clientNumber, fileName, userWithFile, position++, stepSize);
+                multipleSenders[i].start();
             }
 
             for (int i = 0; i < usersWithFileNumber; i++) {

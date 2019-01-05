@@ -34,7 +34,7 @@ public class MultipleSender extends Thread {
         int packetNumber = position;
         long startByteNum = stepSize * position++;
         long endByteNum = stepSize * position - 1;
-        // TODO ignore packet where endByte <= startByte (remove half of users/download all file from one user
+        // TODO BACKLOG ignore packet where endByte <= startByte (remove half of users/download all file from one user
         //  when file size is less than config.min)
 
         Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + userWithFile);
@@ -47,7 +47,7 @@ public class MultipleSender extends Thread {
                 fileName,
                 String.valueOf(startByteNum),
                 String.valueOf(endByteNum),
-                String.valueOf(packetNumber)); // TODO better send part size and packet number
+                String.valueOf(packetNumber)); // TODO BACKLOG better send part size and packet number
 
         BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(connectionSocket);
         String sentence = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
@@ -67,7 +67,7 @@ public class MultipleSender extends Thread {
             Logger.clientDebugLog("File part downloaded successfully");
         } else {
             Logger.clientDebugLog("Unsuccessful file part download");
-//                    invokeRepush(clientNumber, connectionSocket, clientSentence, 0); // TODO implements restart downloading part
+//                    invokeRepush(clientNumber, connectionSocket, clientSentence, 0); // TODO BACKLOG implements restart downloading part
         }
 
         Logger.clientDebugLog(command + " downloading parts sequence ended");

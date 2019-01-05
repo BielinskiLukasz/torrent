@@ -26,7 +26,7 @@ class TCPServerAction {
             case REGISTER:
                 register(server, connectionSocket, sentence);
                 break;
-            case SERVER_FILE_LIST: // TODO handle unconnected client selection by server
+            case SERVER_FILE_LIST: // TODO BACKLOG handle unconnected client selection by server
                 getServerFileList(server, connectionSocket);
                 ActionUtils.sendList(connectionSocket, server.getFileList());
                 break;
@@ -116,8 +116,6 @@ class TCPServerAction {
 
         server.setFileList(serverFileList);
 
-//        ActionUtils.sendList(connectionSocket, serverFileList); //TODO separate getting and sending file list to reuse getting in multi host part
-
         Logger.serverLog("Server file list sent to client ");
     }
 
@@ -126,7 +124,7 @@ class TCPServerAction {
 
         String fileName = SentenceUtils.getFileName(sentence);
         final String[] md5sum = new String[1];
-        server.getFileList().forEach( //TODO refactor it !!!
+        server.getFileList().forEach( //TODO BACKLOG refactor it !!!
                 packedFileData -> {
                     if (FileList.unpackFileInfo(packedFileData).getName().equals(fileName)) {
                         md5sum[0] = FileList.unpackFileInfo(packedFileData).getMd5();
