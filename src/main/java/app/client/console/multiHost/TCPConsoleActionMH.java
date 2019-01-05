@@ -205,14 +205,34 @@ class TCPConsoleActionMH {
             response = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
             Long fileSize = Long.parseLong(SentenceUtils.getFileSize(response));
 
+            TCPConnectionUtils.closeSocket(connectionSocket);
+
             int position = 0;
             int usersWithFileNumber = usersWithFile.size();
             long stepSize = fileSize / usersWithFileNumber;
-            for (int userWithFile : usersWithFile) {
+            for (int userWithFile : usersWithFile) { //TODO tests, implements threads in future
                 long startByteNum = stepSize * position++;
                 long endByteNum = stepSize * position - 1;
+                int packetNumber = position;
                 // TODO ignore packet where endByte <= startByte (remove half of users/download all file from one user
                 //  when file size is less than config.min)
+
+                /*connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + userWithFile);
+
+                outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+                command = String.valueOf(ClientCommand.HANDLE_PUSH_PACK);
+                TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+                        command,
+                        String.valueOf(packetNumber),
+                        String.valueOf(startByteNum),
+                        String.valueOf(endByteNum));
+
+
+
+
+
+
+                TCPConnectionUtils.closeSocket(connectionSocket);*/
 
                 Logger.consoleDebugLog(startByteNum + " " + endByteNum);
             }

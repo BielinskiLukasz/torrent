@@ -39,8 +39,16 @@ public class SentenceUtils {
         return getElement(sentence, 3);
     }
 
+    public static int getPacketNumber(String sentence) {
+        return Integer.parseInt(Objects.requireNonNull(getElement(sentence, 2)));
+    }
+
     public static long getStartByteNumber(String sentence) {
         return Long.parseLong(Objects.requireNonNull(getElement(sentence, 3)));
+    }
+
+    public static long getEndByteNumber(String sentence) {
+        return Long.parseLong(Objects.requireNonNull(getElement(sentence, 4)));
     }
 
     private static String getElement(String sentence, int elementId) {
