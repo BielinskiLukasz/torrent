@@ -209,7 +209,7 @@ class TCPConsoleActionMH {
 
             int position = 0;
             int usersWithFileNumber = usersWithFile.size();
-            long stepSize = fileSize / usersWithFileNumber;
+            long stepSize = fileSize / usersWithFileNumber + 1;
             for (int userWithFile : usersWithFile) { //TODO tests, implements threads in future
                 long startByteNum = stepSize * position++;
                 long endByteNum = stepSize * position - 1;
@@ -217,22 +217,31 @@ class TCPConsoleActionMH {
                 // TODO ignore packet where endByte <= startByte (remove half of users/download all file from one user
                 //  when file size is less than config.min)
 
-                /*connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + userWithFile);
+                connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + userWithFile);
 
                 outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
                 command = String.valueOf(ClientCommand.HANDLE_PUSH_PACK);
                 TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                         command,
-                        String.valueOf(packetNumber),
+                        String.valueOf(clientNumber),
+                        fileName,
                         String.valueOf(startByteNum),
-                        String.valueOf(endByteNum));
+                        String.valueOf(endByteNum),
+                        String.valueOf(packetNumber)); // TODO better send part size and packet number
+
+                /*inFromClient = TCPConnectionUtils.getBufferedReader(connectionSocket);
+                String sentence = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
+                String fileMD5Sum = SentenceUtils.getMD5Sum(sentence);
+
+                String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+                File file = new File(filePath);
+                FileOutputStream fileOutputStream = TCPConnectionUtils.createFileOutputStream(file);
+                InputStream inputStream = TCPConnectionUtils.getInputStream(connectionSocket);
+                TCPConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
+                TCPConnectionUtils.closeFileOutputStream(fileOutputStream);*/
 
 
-
-
-
-
-                TCPConnectionUtils.closeSocket(connectionSocket);*/
+                TCPConnectionUtils.closeSocket(connectionSocket);
 
                 Logger.consoleDebugLog(startByteNum + " " + endByteNum);
             }

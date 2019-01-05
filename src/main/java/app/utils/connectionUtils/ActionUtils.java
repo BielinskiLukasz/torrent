@@ -72,7 +72,7 @@ public class ActionUtils {
 
         FileInputStream fileInputStream = TCPConnectionUtils.createFileInputStream(file);
         OutputStream outputStream = TCPConnectionUtils.getOutputStream(hostConnectionSocket);
-        TCPConnectionUtils.sendFileByStream(fileInputStream, outputStream);
+        TCPConnectionUtils.writeFileToStream(fileInputStream, outputStream);
         TCPConnectionUtils.closeFileInputStream(fileInputStream);
 
         Logger.consoleLog("Sending file " + fileName + " to client " + targetClientNumber + " ends");
@@ -152,7 +152,7 @@ public class ActionUtils {
         }
 
         OutputStream outputStream = TCPConnectionUtils.getOutputStream(hostConnectionSocket);
-        TCPConnectionUtils.sendFileByStream(fileInputStream, outputStream);
+        TCPConnectionUtils.writeFileToStream(fileInputStream, outputStream);
         TCPConnectionUtils.closeFileInputStream(fileInputStream);
 
         Logger.consoleLog("Resend file " + fileName + " finished");

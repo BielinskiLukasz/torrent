@@ -19,7 +19,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.net.Socket;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Thread.sleep;
@@ -151,9 +157,122 @@ public class TCPClientConnectionActionMH {
         Logger.clientDebugLog(command + " downloading sequence ended");
     }
 
-    private static void handlePushPack(int clientNumber, Socket connectionSocket, String sentence) {
+    private static void handlePushPack(int clientNumber, Socket connectionSocket, String clientSentence) {
+        Logger.clientDebugLog("fire handlePushPack");
+
+        int targetClientNumber = SentenceUtils.getClientNumber(clientSentence);
+        String fileName = SentenceUtils.getFileName(clientSentence);
+        int packetNumber = SentenceUtils.getPacketNumber(clientSentence);
+        long startByteNum = SentenceUtils.getStartByteNumber(clientSentence);
+        long endByteNum = SentenceUtils.getEndByteNumber(clientSentence);
+        Logger.clientDebugLog("file " + fileName + " start at " + startByteNum + " end at " + endByteNum);
+
+        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+        int packetSize = (int) (endByteNum - startByteNum + 1);
+        Logger.clientDebugLog("packet size is " + packetSize);
+
+        List<String> parts = splitFile(fileName, packetSize, clientNumber);
+
+        String selectedPartPath = parts.get(packetNumber);
+        File file = new File(selectedPartPath);
+
+        /*DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+        String command = String.valueOf(ConsoleCommand.MULTIPLE_PULL);
+        String md5sum = MD5Sum.md5(selectedPartPath);
+        String response = "Sending file " + fileName + " md5 sum";
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+                command,
+                String.valueOf(clientNumber),
+                response,
+                md5sum);
+
+        FileInputStream fileInputStream = TCPConnectionUtils.createFileInputStream(file);
+        OutputStream outputStream = TCPConnectionUtils.getOutputStream(connectionSocket);
+        TCPConnectionUtils.writeFileToStream(fileInputStream, outputStream);
+        TCPConnectionUtils.closeFileInputStream(fileInputStream);
+
+        Logger.consoleLog("Sending file parts " + fileName + " " + packetNumber + " to client " + targetClientNumber +
+                " ends");*/
 
 
+
+
+
+
+
+
+
+
+
+    }
+
+    private static List<String> splitFile(final String fileName, final int packetSize, int clientNumber) {
+
+        if (packetSize <= 0) {
+            throw new IllegalArgumentException("mBperSplit must be more than zero");
+        }
+
+        List<String> partFiles = new ArrayList<>();
+        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+        long sourceSize = 0;
+        try {
+            sourceSize = Files.size(Paths.get(filePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        final long bytesPerSplit = packetSize;
+        final long numSplits = sourceSize / bytesPerSplit;
+        final long remainingBytes = sourceSize % bytesPerSplit;
+        int position = 0;
+        int partNumber = 1;
+
+        try (RandomAccessFile sourceFile = new RandomAccessFile(filePath, "r");
+             FileChannel sourceChannel = sourceFile.getChannel()) {
+
+            for (; position < numSplits; position++) {
+                writePartToFile(fileName,
+                        clientNumber,
+                        partNumber++,
+                        bytesPerSplit,
+                        position * bytesPerSplit,
+                        sourceChannel,
+                        partFiles);
+            }
+
+            if (remainingBytes > 0) {
+                writePartToFile(fileName,
+                        clientNumber,
+                        partNumber,
+                        remainingBytes,
+                        position * bytesPerSplit,
+                        sourceChannel,
+                        partFiles);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return partFiles;
+    }
+
+    private static void writePartToFile(String fileName,
+                                        int clientNumber,
+                                        int partNumber,
+                                        long byteSize,
+                                        long position,
+                                        FileChannel sourceChannel,
+                                        List<String> partFiles) throws IOException {
+        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+        String basicTargetPath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+        String suffix = ".part_";
+        String targetPath = basicTargetPath + suffix + partNumber;
+        Path partFilePath = Paths.get(targetPath);
+
+        try (RandomAccessFile toFile = new RandomAccessFile(partFilePath.toFile(), "rw");
+             FileChannel toChannel = toFile.getChannel()) {
+            sourceChannel.position(position);
+            toChannel.transferFrom(sourceChannel, 0, byteSize);
+        }
+        partFiles.add(targetPath);
     }
 
     private static void handleRepush(int clientNumber, Socket connectionSocket, String clientSentence) {

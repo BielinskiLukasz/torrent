@@ -40,7 +40,7 @@ public class SentenceUtils {
     }
 
     public static int getPacketNumber(String sentence) {
-        return Integer.parseInt(Objects.requireNonNull(getElement(sentence, 2)));
+        return Integer.parseInt(Objects.requireNonNull(getElement(sentence, 4)));
     }
 
     public static long getStartByteNumber(String sentence) {

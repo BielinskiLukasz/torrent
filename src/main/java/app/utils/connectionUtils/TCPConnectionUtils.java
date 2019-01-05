@@ -114,7 +114,7 @@ public class TCPConnectionUtils {
         Logger.utilsDebugLog("closeFileOutputStream");
     }
 
-    static FileInputStream createFileInputStream(File file) {
+    public static FileInputStream createFileInputStream(File file) {
         FileInputStream fileInputStream = null;
         try {
             fileInputStream = new FileInputStream(file);
@@ -126,7 +126,7 @@ public class TCPConnectionUtils {
         return fileInputStream;
     }
 
-    static void closeFileInputStream(FileInputStream fileInputStream) {
+    public static void closeFileInputStream(FileInputStream fileInputStream) {
         try {
             fileInputStream.close();
         } catch (IOException e) {
@@ -175,7 +175,7 @@ public class TCPConnectionUtils {
         return response;
     }
 
-    static void sendFileByStream(FileInputStream fileInputStream, OutputStream outputStream) {
+    public static void writeFileToStream(FileInputStream fileInputStream, OutputStream outputStream) {
         Logger.serverDebugLog("start sending file");
 
         int count;
