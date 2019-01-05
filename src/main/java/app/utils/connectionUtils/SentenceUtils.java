@@ -36,7 +36,7 @@ public class SentenceUtils {
     }
 
     public static String getFileSize(String sentence) {
-        return getElement(sentence, 3);
+        return getElement(sentence, 4);
     }
 
     public static int getPacketNumber(String sentence) {

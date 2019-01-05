@@ -9,13 +9,16 @@ import app.utils.connectionUtils.ActionUtils;
 import app.utils.connectionUtils.CommandUtils;
 import app.utils.connectionUtils.SentenceUtils;
 import app.utils.connectionUtils.TCPConnectionUtils;
+import app.utils.fileUtils.MD5Sum;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -174,10 +177,11 @@ class TCPConsoleActionMH {
 
         Boolean isAnyDifferentFileWithTheSameName = SentenceUtils.getBoolean(response);
         if (isAnyDifferentFileWithTheSameName) {
-            Logger.consoleLog("There are different files with the same file name. You must specify md5sum in request");
+            Logger.consoleLog("There are different files with the same file name. You must specify md5sum in request " +
+                    "<<NOT IMPLEMENTED>>"); // TODO remove after implementation
             TCPConnectionUtils.closeSocket(connectionSocket);
         } else {
-            response = TCPConnectionUtils.readBufferedReaderLine(inFromServer); // info about list size
+            response = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
 
             int serverFileListSize = SentenceUtils.getListSize(response);
             Logger.consoleLog(serverFileListSize + " users have file " + fileName);
@@ -207,6 +211,7 @@ class TCPConsoleActionMH {
             BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(connectionSocket);
             response = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
             Long fileSize = Long.parseLong(SentenceUtils.getFileSize(response));
+            String fileMD5Sum = SentenceUtils.getMD5Sum(response);
 
             TCPConnectionUtils.closeSocket(connectionSocket);
 
@@ -234,11 +239,11 @@ class TCPConsoleActionMH {
 
                 inFromClient = TCPConnectionUtils.getBufferedReader(connectionSocket);
                 String sentence = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
-                String fileMD5Sum = SentenceUtils.getMD5Sum(sentence);
+                String filePartMD5Sum = SentenceUtils.getMD5Sum(sentence);
 
-                String basicTargetPath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+                String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
                 String suffix = ".part_";
-                String targetPath = basicTargetPath + suffix + packetNumber + "TEST" + userWithFile; // TODO remove after TEST string (include TEST)
+                String targetPath = filePath + suffix + packetNumber;
 
                 File file = new File(targetPath);
                 FileOutputStream fileOutputStream = TCPConnectionUtils.createFileOutputStream(file);
@@ -246,23 +251,43 @@ class TCPConsoleActionMH {
                 TCPConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
                 TCPConnectionUtils.closeFileOutputStream(fileOutputStream);
 
+                if (MD5Sum.check(targetPath, filePartMD5Sum)) {
+                    Logger.clientDebugLog("File part downloaded successfully");
+                } else {
+                    Logger.clientDebugLog("Unsuccessful file part download");
+//                    invokeRepush(clientNumber, connectionSocket, clientSentence, 0); // TODO implements restart downloading part
+                }
 
-
-
-
-
-
-
-
-
-
-
-
+                Logger.clientDebugLog(command + " downloading parts sequence ended");
 
                 TCPConnectionUtils.closeSocket(connectionSocket);
 
                 Logger.consoleDebugLog(startByteNum + " " + endByteNum);
             }
+
+            String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+//            File file = new File(filePath);
+
+            try (FileOutputStream stream = new FileOutputStream(filePath, true)) {
+                for (int i = 0; i < usersWithFileNumber; i++) {
+                    File partFile = new File(filePath + ".part_" + i);
+                    byte[] fileContent = Files.readAllBytes(partFile.toPath());
+                    stream.write(fileContent);
+                    Logger.consoleDebugLog("Combine part " + i);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (MD5Sum.check(filePath, fileMD5Sum)) {
+                Logger.clientDebugLog("File downloaded successfully");
+            } else {
+                Logger.clientDebugLog("Unsuccessful file download");
+                Logger.clientDebugLog(fileMD5Sum);
+                Logger.clientDebugLog(MD5Sum.md5(filePath));
+//                    invokeRepush(clientNumber, connectionSocket, clientSentence, 0); // TODO implements start new multiple downloading
+            }
+
 
 
         }

@@ -119,12 +119,14 @@ public class TCPClientConnectionActionMH {
         String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
         File file = new File(filePath);
         Long fileSize = file.length();
+        String md5Sum = MD5Sum.md5(filePath);
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                 String.valueOf(ConsoleCommand.MULTIPLE_PULL),
                 String.valueOf(clientNumber),
                 fileName,
+                md5Sum,
                 String.valueOf(fileSize));
 
         Logger.clientLog("Client file info sent");
@@ -197,17 +199,6 @@ public class TCPClientConnectionActionMH {
 
         Logger.consoleLog("Sending file parts " + fileName + " " + packetNumber + " to client " + targetClientNumber +
                 " ends");
-
-
-
-
-
-
-
-
-
-
-
     }
 
     private static List<String> splitFile(final String fileName, final int packetSize, int clientNumber) {
