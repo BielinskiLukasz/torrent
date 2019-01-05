@@ -2,6 +2,7 @@ package app.client.console.multiHost;
 
 import app.client.console.ConsoleCommand;
 import app.client.host.ClientCommand;
+import app.client.host.multiHost.MultipleSender;
 import app.config.Config;
 import app.server.ServerCommand;
 import app.utils.Logger;
@@ -16,7 +17,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.util.HashSet;
@@ -218,8 +218,14 @@ class TCPConsoleActionMH {
             int position = 0;
             int usersWithFileNumber = usersWithFile.size();
             long stepSize = fileSize / usersWithFileNumber + 1;
+            Thread[] multipleSenders = new Thread[usersWithFileNumber];
+
+            int temp = 0;
             for (int userWithFile : usersWithFile) { //TODO tests, implements threads in future
-                int packetNumber = position;
+                multipleSenders[temp] = new MultipleSender(clientNumber, fileName, userWithFile, position++, stepSize);
+                multipleSenders[temp++].start();
+
+                /*int packetNumber = position;
                 long startByteNum = stepSize * position++;
                 long endByteNum = stepSize * position - 1;
                 // TODO ignore packet where endByte <= startByte (remove half of users/download all file from one user
@@ -262,7 +268,15 @@ class TCPConsoleActionMH {
 
                 TCPConnectionUtils.closeSocket(connectionSocket);
 
-                Logger.consoleDebugLog(startByteNum + " " + endByteNum);
+                Logger.consoleDebugLog(startByteNum + " " + endByteNum);*/
+            }
+
+            for (int i = 0; i < usersWithFileNumber; i++) {
+                try {
+                    multipleSenders[i].join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
             String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
