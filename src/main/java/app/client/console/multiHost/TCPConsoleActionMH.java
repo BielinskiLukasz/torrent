@@ -273,6 +273,8 @@ class TCPConsoleActionMH {
                     File partFile = new File(filePath + ".part_" + i);
                     byte[] fileContent = Files.readAllBytes(partFile.toPath());
                     stream.write(fileContent);
+                    if (partFile.delete())
+                        Logger.clientDebugLog("Remove part " + i);
                     Logger.consoleDebugLog("Combine part " + i);
                 }
             } catch (IOException e) {
@@ -283,11 +285,8 @@ class TCPConsoleActionMH {
                 Logger.clientDebugLog("File downloaded successfully");
             } else {
                 Logger.clientDebugLog("Unsuccessful file download");
-                Logger.clientDebugLog(fileMD5Sum);
-                Logger.clientDebugLog(MD5Sum.md5(filePath));
 //                    invokeRepush(clientNumber, connectionSocket, clientSentence, 0); // TODO implements start new multiple downloading
             }
-
 
 
         }

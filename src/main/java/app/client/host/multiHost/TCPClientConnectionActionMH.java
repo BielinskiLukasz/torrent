@@ -197,6 +197,12 @@ public class TCPClientConnectionActionMH {
 
         TCPConnectionUtils.closeSocket(connectionSocket);
 
+        for (int i = 0; i < parts.size(); i++) {
+            File partFile = new File(filePath + ".part_" + i);
+            if (partFile.delete())
+                Logger.clientDebugLog("Remove part " + i);
+        }
+
         Logger.consoleLog("Sending file parts " + fileName + " " + packetNumber + " to client " + targetClientNumber +
                 " ends");
     }
@@ -219,7 +225,7 @@ public class TCPClientConnectionActionMH {
         final long numSplits = sourceSize / bytesPerSplit;
         final long remainingBytes = sourceSize % bytesPerSplit;
         int position = 0;
-        int partNumber = 1;
+        int partNumber = 0;
 
         try (RandomAccessFile sourceFile = new RandomAccessFile(filePath, "r");
              FileChannel sourceChannel = sourceFile.getChannel()) {
@@ -232,6 +238,7 @@ public class TCPClientConnectionActionMH {
                         position * bytesPerSplit,
                         sourceChannel,
                         partFiles);
+                Logger.clientDebugLog("Create part " + position);
             }
 
             if (remainingBytes > 0) {
@@ -242,6 +249,7 @@ public class TCPClientConnectionActionMH {
                         position * bytesPerSplit,
                         sourceChannel,
                         partFiles);
+                Logger.clientDebugLog("Create part " + position);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -256,7 +264,6 @@ public class TCPClientConnectionActionMH {
                                         long position,
                                         FileChannel sourceChannel,
                                         List<String> partFiles) throws IOException {
-        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
         String basicTargetPath = Config.BASIC_PATH + clientNumber + "//" + fileName;
         String suffix = ".part_";
         String targetPath = basicTargetPath + suffix + partNumber;
