@@ -9,6 +9,8 @@ public enum ClientCommand {
     HANDLE_PUSH_PACK,
     PUSH_ON_DEMAND,
     REPUSH,
+    REPULL,
     HANDLE_REPUSH,
-    CHECK_SENDING
+    CHECK_SENDING,
+    CREATE_PART_OF_FILE
 }

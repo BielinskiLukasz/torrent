@@ -77,7 +77,8 @@ public class MultipleDownloadManager extends Thread {
             Logger.clientDebugLog("File part downloaded successfully");
         } else {
             Logger.clientDebugLog("Unsuccessful file part download");
-            invokeRePushPart(connectionSocket, packetNumber, file.length(), 0); // invoke repush from same client
+            invokeRePushPart(connectionSocket, packetNumber, file.length(), 0);
+            // TODO inform about possibility of destroy sourcePart of file
             if (MD5Sum.check(targetPath, filePartMD5Sum)) {
                 Logger.clientDebugLog("File part downloaded successfully");
             } else {
@@ -85,7 +86,22 @@ public class MultipleDownloadManager extends Thread {
                     Logger.clientDebugLog("Unsuccessful file part download");
                     usersWithFile.remove(userWithFile);
                     userWithFile = usersWithFile.get(0);
-                    invokeRePushPart(connectionSocket, packetNumber, file.length(), 0); // invoke repush from other client
+
+                    connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,
+                            Config.PORT_NR + userWithFile);
+
+                    command = String.valueOf(ClientCommand.CREATE_PART_OF_FILE);
+                    outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+                    TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+                            command,
+                            String.valueOf(clientNumber),
+                            fileName,
+                            String.valueOf(startByteNum),
+                            String.valueOf(endByteNum),
+                            String.valueOf(packetNumber));
+
+                    invokeRePushPart(connectionSocket, packetNumber, file.length(), 0);
+                    // TODO inform about possibility of destroy sourcePart of file
                 }
             }
         }
@@ -106,15 +122,13 @@ public class MultipleDownloadManager extends Thread {
         int sourceClientNumber = userWithFile;
         String partFileName = fileName + ".part_" + packetNumber;
         String clientSentence = command + Config.SPLITS_CHAR + sourceClientNumber + Config.SPLITS_CHAR + partFileName +
-                Config.SPLITS_CHAR + receivedFilePartSize + "\n";
+                Config.SPLITS_CHAR + receivedFilePartSize;
 
         Logger.clientDebugLog("sentence: " + clientSentence);
         TCPClientConnectionActionMH.invokeRepush(clientNumber,
                 connectionSocket,
                 clientSentence,
                 reconnectCounter);
-
-        TCPConnectionUtils.closeSocket(connectionSocket);
     }
     //TODO rename all repush to rePush and repull to rePull
 }
