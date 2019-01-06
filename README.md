@@ -8,10 +8,12 @@
 Istrukcja:
 -
 - Aplikacja umożliwia wymianę plików między dwoma klientami (wersja h2h) jak i wieloma (mh);
+- Aplikacja pracuje pod nadzorem protokołu TCP;
 - Każda instancja aplikacji ma domyślny folder z pobieranymi/udostępnianymi plikami (możliwa zmiana folderu w konfiguracji aplikacji);
 - Zakłada się, że powyższy folder (foldery) został wcześniej utworzony
-- Ścieżki i zmienne globalne mogą być konfigurowane w pliku config/Config.java;
-- Wyświetlanie logów może być konfigurowane w pliku utils/Logger.java;
+- Ścieżki i zmienne globalne mogą być konfigurowane przed skompilowaniem w pliku config/Config.java;
+- Wyświetlanie logów może być konfigurowane przed skompilowaniem w pliku utils/Logger.java;
+- Maksymalny rozmiar przesyłanych plików to 2047MB
 
 ***API***
 - Wszystkie argumenty uruchamianych klientów muszą być oddzielone spacjami;
@@ -38,6 +40,13 @@ list
 Pobiera wybrany plik od wskazanego klienta. Przed pobraniem sprawdza, czy wskazany klient połączony jest z serwerem i udostępnia wskazany plik. Wznawia pobieranie w przypadku przerwania połączenia oraz wstrzymania/wyłączenia na krótki czas jednego z klientów (ale nie dwóch, w przypadku wyłączenia dwóch klientów pobieranie nie zostanie wznowione). Czas usiłowania nawiązania ponownego połączeniu można edytować w pliku konfiguracyjnym.
 
 ````
+Host2host:
+pull nazwa_pliku(string)
+
+przykład:
+pull exampleFileFromClient2.txt
+
+Mutli host:
 pull numer_klienta_udostępniającego_plik(int) nazwa_pliku(string)
 
 przykład:
@@ -50,13 +59,28 @@ Wysyła wybrany (lokalny) plik do wskazanego klienta. Przed wysłaniem sprawdza,
 
 W przypadku połączenia h2h nie jest wymagane podawanie numeru klienta. 
 ````
-push numer_klienta_odbierającego_plik(int) nazwa_pliku(string)
+Host2host:
+push nazwa_pliku(string)
 
-przykład MH:
+przykład:
+push otherFileFromCientEnteringCommand.txt
+
+Mutli host:
 push 2 otherFileFromCientEnteringCommand.txt
 
-przykład H2H:
-push otherFileFromCientEnteringCommand.txt
+przykład:
+push 2 otherFileFromCientEnteringCommand.txt
+````
+
+- multiple_pull
+
+Pobiera wybrany plik od udostępniających go klientów. Przed pobraniem sprawdza, którzy klienci aktualnie udostępniają wskazany plik. Wznawia pobieranie w przypadku przerwania połączenia oraz wstrzymania/wyłączenia na krótki czas jednego z klientów (w przypadku dłuższego czasu oczekiwania zacznie pobierać fragment pliku od innego, połączonego klienta). Czas usiłowania nawiązania ponownego połączeniu można edytować w pliku konfiguracyjnym. Polecenie obsługiwane jedynie w wersji multi host.
+````
+Host2host:
+multiple_pull nazwa_pliku(string)
+
+przykład:
+multiple_pull exampleFileFromClients.txt
 ````
 
 - exit

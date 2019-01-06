@@ -22,3 +22,6 @@ public class Config {
 
     public static final int INT_SV = -1; // used to creating first client in host2host version
 }
+
+
+//TODO TEST ALL (also in other machine)
