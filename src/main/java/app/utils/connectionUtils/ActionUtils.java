@@ -90,12 +90,13 @@ public class ActionUtils {
                 ExceptionHandler.handle(e);
             }
 
-            try { // TODO sleep
+            try {
                 sleep(1000);
             } catch (InterruptedException e) {
                 ExceptionHandler.handle(e);
             }
         }
+
         if (reconnect) {
             outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
             command = String.valueOf(ClientCommand.CHECK_SENDING);
@@ -140,7 +141,7 @@ public class ActionUtils {
                 command,
                 String.valueOf(sourceClientNumber),
                 response,
-                md5sum); //TODO BACKLOG connect sending filename and md5sum
+                md5sum);
 
         FileInputStream fileInputStream = TCPConnectionUtils.createFileInputStream(file);
 
@@ -148,7 +149,7 @@ public class ActionUtils {
             Logger.clientDebugLog("Skip " + receivedFilePartSize + " bytes");
             fileInputStream.skip(receivedFilePartSize);
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         OutputStream outputStream = TCPConnectionUtils.getOutputStream(hostConnectionSocket);
@@ -172,12 +173,13 @@ public class ActionUtils {
                 ExceptionHandler.handle(e);
             }
 
-            try { // TODO sleep
+            try {
                 sleep(1000);
             } catch (InterruptedException e) {
                 ExceptionHandler.handle(e);
             }
         }
+
         if (reconnect) {
             outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
             command = String.valueOf(ClientCommand.CHECK_SENDING);
@@ -208,6 +210,7 @@ public class ActionUtils {
         boolean sourceClientConnected = SentenceUtils.getBoolean(response);
 
         TCPConnectionUtils.closeSocket(connectionSocket);
+
         return sourceClientConnected;
     }
 

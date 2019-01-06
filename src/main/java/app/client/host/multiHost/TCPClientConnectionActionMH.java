@@ -213,7 +213,6 @@ public class TCPClientConnectionActionMH {
                                       final long startByteNum,
                                       long endByteNum,
                                       int clientNumber) {
-
         if (endByteNum <= startByteNum) {
             throw new IllegalArgumentException("size must be more than zero");
         }
@@ -224,7 +223,7 @@ public class TCPClientConnectionActionMH {
         try {
             sourceSize = Files.size(Paths.get(filePath));
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         try (RandomAccessFile sourceFile = new RandomAccessFile(filePath, "r");
@@ -251,8 +250,9 @@ public class TCPClientConnectionActionMH {
                 Logger.clientDebugLog("Create last part " + packetNumber);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
+
         return selectedPartPath;
     }
 
@@ -273,6 +273,7 @@ public class TCPClientConnectionActionMH {
             toChannel.transferFrom(sourceChannel, 0, byteSize);
             Logger.clientDebugLog("Send " + byteSize + " bytes to part " + packetNumber);
         }
+
         return targetPath;
     }
 
@@ -356,7 +357,7 @@ public class TCPClientConnectionActionMH {
                 ExceptionHandler.handle(e);
             }
 
-            try { // TODO sleep
+            try {
                 sleep(1000);
             } catch (InterruptedException e) {
                 ExceptionHandler.handle(e);
@@ -404,6 +405,7 @@ public class TCPClientConnectionActionMH {
     }
 
     private static void rePull(int clientNumber, Socket connectionSocket, String sentence) {
+        Logger.clientDebugLog("fire rePull");
 
         String fileName = SentenceUtils.getFileName(sentence);
         long receivedFilePartSize = SentenceUtils.getStartByteNumber(sentence);
@@ -420,7 +422,7 @@ public class TCPClientConnectionActionMH {
                 command,
                 String.valueOf(clientNumber),
                 fileName,
-                md5sum); //TODO BACKLOG connect sending filename and md5sum
+                md5sum);
 
         FileInputStream fileInputStream = TCPConnectionUtils.createFileInputStream(file);
 
@@ -428,7 +430,7 @@ public class TCPClientConnectionActionMH {
             Logger.clientDebugLog("Skip " + receivedFilePartSize + " bytes");
             fileInputStream.skip(receivedFilePartSize);
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         OutputStream outputStream = TCPConnectionUtils.getOutputStream(connectionSocket);
@@ -439,7 +441,9 @@ public class TCPClientConnectionActionMH {
 
         TCPConnectionUtils.closeSocket(connectionSocket);
 
-        file.delete();
+        if (file.delete()) {
+            Logger.consoleDebugLog("Part deleted");
+        }
 
         Logger.consoleLog("Finished");
     }

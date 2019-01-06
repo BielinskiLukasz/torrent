@@ -4,6 +4,7 @@ import app.client.console.ConsoleCommand;
 import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
+import app.utils.ExceptionHandler;
 import app.utils.Logger;
 import app.utils.connectionUtils.ActionUtils;
 import app.utils.connectionUtils.CommandUtils;
@@ -38,7 +39,7 @@ class TCPConsoleActionMH {
             case FILE_LIST:
                 getFileList();
                 break;
-            case PULL: // TODO BACKLOG print message in console if host haven't file
+            case PULL:
                 pull(clientNumber, userSentence);
                 break;
             case PUSH:
@@ -60,23 +61,6 @@ class TCPConsoleActionMH {
             default:
                 Logger.consoleLog("command is not supported");
                 break;
-
-            // TODO BACKLOG create function classes for each feature (CONNECT, FILE_LIST, PULL (MULTI_PULL), PUSH, CLOSE)
-            //  with have method connected with action e.g. ClientA sending message - PUSH (client number),
-            //  ClientB receiving - PULL (connectionSocket)
-
-            // TODO BACKLOG Handling restart pull and push there
-            //  Refactor restart push - use existing (could be closed) connection for get info about sent file,
-            //  and if it's finished successfully then do nothing, else rePush - if client who check file was pull
-            //  initiator then he should fire pull action
-            //  e.g. method
-            //  PullUtils
-            //  pull
-            //  pullToRequest
-            //  rePull
-            //  rePullToRequest ??
-
-            // TODO BACKLOG create protocol message creators (Builder?), create also protocol reading methods
         }
     }
 
@@ -97,7 +81,6 @@ class TCPConsoleActionMH {
             Logger.consoleLog(
                     TCPConnectionUtils.readBufferedReaderLine(inFromServer)
                             .replaceAll(String.format("\\%s", Config.FILE_INFO_SPLITS_CHAR), " ")
-                    // TODO BACKLOG move getting better format to another place
             );
         }
 
@@ -267,7 +250,7 @@ class TCPConsoleActionMH {
                             try {
                                 multipleSenders[i].join();
                             } catch (InterruptedException e) {
-                                e.printStackTrace();
+                                ExceptionHandler.handle(e);
                             }
                         }
 
@@ -283,7 +266,7 @@ class TCPConsoleActionMH {
                                 Logger.consoleDebugLog("Combine part " + i);
                             }
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            ExceptionHandler.handle(e);
                         }
 
                         if (MD5Sum.check(filePath, fileMD5Sum)) {

@@ -27,7 +27,6 @@ import static java.lang.Thread.sleep;
 class TCPClientActionH2H {
 
     public static void perform(TCPClientH2H client, Socket connectionSocket, String clientSentence) {
-
         String command = CommandUtils.getCommand(clientSentence);
         command = CommandUtils.transformToH2HCommand(command);
 
@@ -66,7 +65,7 @@ class TCPClientActionH2H {
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         int connectedClientNumber = SentenceUtils.getClientNumber(clientSentence);
@@ -81,21 +80,21 @@ class TCPClientActionH2H {
             Objects.requireNonNull(outToServer).writeBytes(command + Config.SPLITS_CHAR + client.getClientNumber() +
                     Config.SPLITS_CHAR + message + "\n");
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         BufferedReader inFromServer = null;
         try {
             inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
 
         String response = null;
         try {
             response = Objects.requireNonNull(inFromServer).readLine();
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
         Logger.clientDebugLog(command + " input: " + response);
 
@@ -110,7 +109,7 @@ class TCPClientActionH2H {
         try {
             outToServer = new DataOutputStream(connectionSocket.getOutputStream());
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
         Logger.clientDebugLog(command + " input: " + clientSentence);
 
@@ -122,7 +121,7 @@ class TCPClientActionH2H {
         try {
             Objects.requireNonNull(outToServer).writeBytes(command + Config.SPLITS_CHAR + response + "\n");
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.handle(e);
         }
         Logger.clientDebugLog(command + " input: " + response);
 
@@ -130,9 +129,9 @@ class TCPClientActionH2H {
         clientFileList.forEach(
                 fileData -> {
                     try {
-                        finalOutToServer.writeBytes(fileData + "\n");
+                        Objects.requireNonNull(finalOutToServer).writeBytes(fileData + "\n");
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        ExceptionHandler.handle(e);
                     }
                     Logger.clientDebugLog(command + " input: " + fileData);
                 }
@@ -250,7 +249,7 @@ class TCPClientActionH2H {
                 ExceptionHandler.handle(e);
             }
 
-            try { // TODO sleep
+            try {
                 sleep(1000);
             } catch (InterruptedException e) {
                 ExceptionHandler.handle(e);

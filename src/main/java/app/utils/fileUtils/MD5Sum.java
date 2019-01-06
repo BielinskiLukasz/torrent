@@ -40,8 +40,6 @@ public class MD5Sum {
     }
 
     public static boolean check(String filePath, String md5Sum) {
-        String checksum = md5(filePath);
-
-        return checksum.equals(md5Sum);
+        return md5(filePath).equals(md5Sum);
     }
 }

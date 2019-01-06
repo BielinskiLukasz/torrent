@@ -2,6 +2,7 @@ package app.client.console.host2host;
 
 import app.client.host.host2host.TCPClientH2H;
 import app.config.Config;
+import app.utils.ExceptionHandler;
 import app.utils.Logger;
 
 import java.io.BufferedReader;
@@ -31,14 +32,14 @@ public class TCPConsoleConnectionH2H extends Thread {
                         userSentence,
                         Config.PORT_NR + client.getConnectedClientNumber());
             } catch (IOException e) {
-                e.printStackTrace();
+                ExceptionHandler.handle(e);
                 this.interrupt();
             }
 
-            try { // TODO sleep
+            try {
                 sleep(Config.MILLISECONDS_OF_CONNECTION_LISTENER_WAITING);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                ExceptionHandler.handle(e);
             }
         }
     }
