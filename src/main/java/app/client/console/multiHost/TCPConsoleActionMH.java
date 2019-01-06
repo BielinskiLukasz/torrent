@@ -77,6 +77,14 @@ class TCPConsoleActionMH {
             //  rePullToRequest ??
 
             // TODO BACKLOG create protocol message creators (Builder?), create also protocol reading methods
+
+            // TODO BACKLOG to handle exception without cpu dead
+            //      synchronized (this) {
+            //                    this.wait();
+            //                }
+            //            }catch (InterruptedException e){
+            //            }
+            //        }
         }
     }
 
