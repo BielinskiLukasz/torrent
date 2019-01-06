@@ -205,7 +205,7 @@ class TCPClientActionH2H {
         String fileMD5Sum = SentenceUtils.getMD5Sum(sentence);
         String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
         if (MD5Sum.check(filePath, fileMD5Sum)) {
-            Logger.clientLog("Confirmation of the correctness of sending");
+            Logger.clientDebugLog("Confirmation of the correctness of sending");
         } else {
             int sourceClientNumber = SentenceUtils.getClientNumber(sentence);
             Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,

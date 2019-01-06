@@ -50,7 +50,7 @@ public class ActionUtils {
         String filePath = Config.BASIC_PATH + sourceClientNumber + "//" + fileName;
         File file = new File(filePath);
 
-        Logger.consoleLog("Resend file " + fileName + " started");
+        Logger.consoleLog("Sending file " + fileName + " to client " + targetClientNumber + " started");
 
         Socket hostConnectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,
                 Config.PORT_NR + targetClientNumber);
@@ -113,7 +113,7 @@ public class ActionUtils {
 
         TCPConnectionUtils.closeSocket(hostConnectionSocket);
 
-        Logger.consoleLog("Finished");
+        Logger.consoleLog("Finished successfully");
     }
 
     private static void upload(int sourceClientNumber,

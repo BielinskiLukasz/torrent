@@ -134,7 +134,7 @@ public class TCPClientConnectionActionMH {
                 md5Sum,
                 String.valueOf(fileSize));
 
-        Logger.clientLog("Client file info sent");
+        Logger.clientDebugLog("Client file info sent");
     }
 
     private static void handlePush(int clientNumber, Socket connectionSocket, String clientSentence) {
