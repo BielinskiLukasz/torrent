@@ -24,7 +24,6 @@ class MultipleDownloadManager extends Thread {
     private int userWithFile;
     private int position;
     private final long stepSize;
-
     private final List<Integer> usersWithFile;
 
     MultipleDownloadManager(int clientNumber,
@@ -108,7 +107,6 @@ class MultipleDownloadManager extends Thread {
                 Logger.clientLog("Cannot reconnect with client " + userWithFile);
             }
 
-            // TODO inform about possibility of destroy sourcePart of file
             if (MD5Sum.check(targetPath, filePartMD5Sum)) {
                 Logger.clientDebugLog("File part downloaded successfully");
             } else {
@@ -135,7 +133,6 @@ class MultipleDownloadManager extends Thread {
                             Config.PORT_NR + userWithFile);
 
                     invokeRePullPart(connectionSocket, packetNumber, file.length());
-                    // TODO inform about possibility of destroy sourcePart of file
                 }
             }
         }
@@ -174,12 +171,11 @@ class MultipleDownloadManager extends Thread {
         TCPConnectionUtils.closeFileOutputStream(fileOutputStream);
 
         if (MD5Sum.check(filePath, fileMD5Sum)) {
-            Logger.clientLog("File downloaded successfully");
+            Logger.clientDebugLog("File part downloaded successfully");
         } else {
-            Logger.clientLog("Unsuccessful file download");
+            Logger.clientLog("Unsuccessful file part download");
         }
+
+        // TODO BACKLOG inform about possibility of destroy sourcePart of file
     }
 }
-
-
-// TODO secure after sending client number when he ask about clients who have file (if he have inform him and don't send request to server)

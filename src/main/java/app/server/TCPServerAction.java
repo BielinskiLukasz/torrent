@@ -27,7 +27,7 @@ class TCPServerAction {
                 register(server, connectionSocket, sentence);
                 break;
             case SERVER_FILE_LIST: // TODO BACKLOG handle unconnected client selection by server
-                getServerFileList(server, connectionSocket);
+                getServerFileList(server, connectionSocket); // TODO BACKLOG getting file list for all users in the same time (threads);
                 ActionUtils.sendList(connectionSocket, server.getFileList());
                 break;
             case CONFIRM_CONNECTION:

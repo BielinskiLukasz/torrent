@@ -17,8 +17,7 @@ import java.net.Socket;
 class TCPConsoleActionH2H {
 
     // TODO NOW
-    //  update README - max file size (Integer.MAX_VALUE - 8 bytes)
-    //  send message after pull = push request
+    //  BACKLOG send message after pull = push request
     //  BACKLOG close h2h connection
     //  BACKLOG create console regex
     //  BACKLOG handle wrong numbers in h2h console commands

@@ -111,7 +111,7 @@ public class TCPClientConnectionActionMH {
 
         ActionUtils.sendList(connectionSocket, clientFileList);
 
-        Logger.clientLog("Client file list sent to server");
+        Logger.clientDebugLog("Client file list sent to server");
     }
 
     private static void getFileInfo(int clientNumber, Socket connectionSocket, String clientSentence) {
@@ -312,7 +312,7 @@ public class TCPClientConnectionActionMH {
         String fileMD5Sum = SentenceUtils.getMD5Sum(sentence);
         String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
         if (MD5Sum.check(filePath, fileMD5Sum)) {
-            Logger.clientLog("Confirmation of the correctness of sending");
+            Logger.clientDebugLog("Confirmation of the correctness of sending");
         } else {
             int sourceClientNumber = SentenceUtils.getClientNumber(sentence);
             Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,

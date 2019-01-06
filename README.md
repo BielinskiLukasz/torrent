@@ -9,6 +9,7 @@ Istrukcja:
 -
 - Aplikacja umożliwia wymianę plików między dwoma klientami (wersja h2h) jak i wieloma (mh);
 - Aplikacja pracuje pod nadzorem protokołu TCP;
+- Klienci aplikacji realizują polecenia z konsoli jednowątkowo (każdy niezależnie); 
 - Każda instancja aplikacji ma domyślny folder z pobieranymi/udostępnianymi plikami (możliwa zmiana folderu w konfiguracji aplikacji);
 - Zakłada się, że powyższy folder (foldery) został wcześniej utworzony
 - Ścieżki i zmienne globalne mogą być konfigurowane przed skompilowaniem w pliku config/Config.java;
