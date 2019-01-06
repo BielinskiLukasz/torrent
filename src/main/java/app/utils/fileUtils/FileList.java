@@ -27,11 +27,11 @@ public class FileList {
     private static List<String> getFileList(String directoryPath) {
         List<String> directoryFileList = new ArrayList<>();
         File folder = new File(directoryPath);
-        File[] listOfFiles = folder.listFiles();
+        File[] files = folder.listFiles();
 
-        for (File listOfFile : Objects.requireNonNull(listOfFiles)) {
-            if (listOfFile.isFile()) {
-                directoryFileList.add(listOfFile.getName());
+        for (File file : Objects.requireNonNull(files)) {
+            if (file.isFile()) {
+                directoryFileList.add(file.getName());
             }
         }
 
