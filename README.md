@@ -5,7 +5,7 @@
 ***for English please see below (from the next thick line)***
 ****
 
-Istrukcja:
+Instrukcja:
 -
 - Aplikacja umożliwia wymianę plików między dwoma klientami (wersja h2h) jak i wieloma (mh);
 - Aplikacja pracuje pod nadzorem protokołu TCP;

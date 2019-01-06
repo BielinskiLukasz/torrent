@@ -137,7 +137,7 @@ class TCPClientActionH2H {
                 }
         );
 
-        Logger.clientLog("Client file list sent to server");
+        Logger.clientDebugLog("Client file list sent to server");
     }
 
     private static void handlePush(int clientNumber, Socket connectionSocket, String clientSentence) {
