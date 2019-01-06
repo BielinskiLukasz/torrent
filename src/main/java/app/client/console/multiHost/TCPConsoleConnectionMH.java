@@ -30,12 +30,12 @@ public class TCPConsoleConnectionMH extends Thread {
                 inFromUser = new BufferedReader(new InputStreamReader(System.in));
                 userSentence = inFromUser.readLine();
 
-                //TODO add regex of incoming user sentence
+                //TODO BACKLOG add regex of incoming user sentence
 
                 TCPConsoleActionMH.perform(client.getClientNumber(), userSentence);
             } catch (IOException e) {
                 ExceptionHandler.handle(e);
-                this.interrupt(); // TODO if (regex is added) remove this line
+                this.interrupt(); // TODO BACKLOG if (regex is added) remove this line
             }
 
             try { // TODO sleep

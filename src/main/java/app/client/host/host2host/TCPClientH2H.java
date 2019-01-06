@@ -6,7 +6,7 @@ import app.utils.Logger;
 
 public class TCPClientH2H extends Thread {
 
-    private int clientNumber;
+    private final int clientNumber;
     private int connectedClientNumber;
 
     public TCPClientH2H(int clientNumber) {

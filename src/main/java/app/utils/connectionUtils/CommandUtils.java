@@ -43,6 +43,7 @@ public class CommandUtils {
             case "M PULL":
             case "MPULL":
             case "MP":
+            case "M":
                 return String.valueOf(ConsoleCommand.MULTIPLE_PULL);
             case "C":
             case "CLOSE":

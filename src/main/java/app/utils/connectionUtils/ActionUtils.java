@@ -128,7 +128,7 @@ public class ActionUtils {
                 Config.PORT_NR + targetClientNumber);
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
-        String command = String.valueOf(ClientCommand.HANDLE_REPUSH);
+        String command = String.valueOf(ClientCommand.HANDLE_RE_PUSH);
         TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                 command,
                 String.valueOf(sourceClientNumber),

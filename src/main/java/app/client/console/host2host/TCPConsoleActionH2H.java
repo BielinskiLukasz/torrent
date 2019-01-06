@@ -17,11 +17,11 @@ import java.net.Socket;
 class TCPConsoleActionH2H {
 
     // TODO NOW
-    //  update README - max file size (Inreger.MAX_VALUE - 8 bytes)
+    //  update README - max file size (Integer.MAX_VALUE - 8 bytes)
     //  send message after pull = push request
     //  BACKLOG close h2h connection
-    //  create console regex
-    //  handle wrong numbers in h2h console commands
+    //  BACKLOG create console regex
+    //  BACKLOG handle wrong numbers in h2h console commands
 
     public static void perform(TCPClientH2H client, String userSentence, int connectedHostPortNumber) {
         Logger.consoleDebugLog("perform: " + userSentence);

@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 
 public class TCPConsoleConnectionH2H extends Thread {
 
-    private TCPClientH2H client;
+    private final TCPClientH2H client;
 
     public TCPConsoleConnectionH2H(TCPClientH2H tcpClientH2H) {
         this.client = tcpClientH2H;

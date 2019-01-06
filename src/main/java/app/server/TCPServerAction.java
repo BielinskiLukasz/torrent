@@ -89,7 +89,7 @@ class TCPServerAction {
         Logger.serverLog("Client " + clientNumber + " is connected");
     }
 
-    private static void getServerFileList(TCPServer server, Socket connectionSocket) { // TODO secure after unconnected client (stopped)
+    private static void getServerFileList(TCPServer server, Socket connectionSocket) { // TODO BACKLOG secure after unconnected client (stopped)
         Logger.serverDebugLog("fire getServerFileList");
 
         List<String> serverFileList = new ArrayList<>();
@@ -128,7 +128,7 @@ class TCPServerAction {
 
         String fileName = SentenceUtils.getFileName(sentence);
         final String[] md5sum = new String[1];
-        server.getFileList().forEach( //TODO BACKLOG refactor it !!!
+        server.getFileList().forEach(
                 packedFileData -> {
                     if (FileList.unpackFileInfo(packedFileData).getName().equals(fileName)) {
                         md5sum[0] = FileList.unpackFileInfo(packedFileData).getMd5();
@@ -137,7 +137,7 @@ class TCPServerAction {
         );
         List<Integer> usersWithFile = new ArrayList<>();
 
-        boolean diffrentFileWithSameName = false;
+        boolean differentFileWithSameName = false;
         for (String fileData : server.getFileList()) {
             FileInfo fileInfo = FileList.unpackFileInfo(fileData);
             Logger.serverDebugLog("Look file " + fileName + " in " + fileInfo.getName());
@@ -146,14 +146,14 @@ class TCPServerAction {
                 Logger.serverDebugLog("Found " + fileName + " in " + fileInfo.getName());
             } else if (fileInfo.getName().equals(fileName) && !fileInfo.getMd5().equals(md5sum[0])) {
                 Logger.serverDebugLog("Found doubles");
-                diffrentFileWithSameName = true;
+                differentFileWithSameName = true;
             }
         }
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                 "",
-                String.valueOf(diffrentFileWithSameName));
+                String.valueOf(differentFileWithSameName));
 
         ActionUtils.sendList(connectionSocket, usersWithFile);
     }
@@ -165,7 +165,7 @@ class TCPServerAction {
         String md5sum = SentenceUtils.getMD5Sum(sentence);
         List<Integer> usersWithFile = new ArrayList<>();
 
-        boolean diffrentFileWithSameName = false;
+        boolean differentFileWithSameName = false;
         for (String fileData : server.getFileList()) {
             FileInfo fileInfo = FileList.unpackFileInfo(fileData);
             Logger.serverDebugLog("Look file " + fileName + " in " + fileInfo.getName());
@@ -174,14 +174,14 @@ class TCPServerAction {
                 Logger.serverDebugLog("Found " + fileName + " in " + fileInfo.getName());
             } else if (fileInfo.getName().equals(fileName) && !fileInfo.getMd5().equals(md5sum)) {
                 Logger.serverDebugLog("Found doubles");
-                diffrentFileWithSameName = true;
+                differentFileWithSameName = true;
             }
         }
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                 "",
-                String.valueOf(diffrentFileWithSameName));
+                String.valueOf(differentFileWithSameName));
 
         ActionUtils.sendList(connectionSocket, usersWithFile);
     }

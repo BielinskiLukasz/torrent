@@ -13,7 +13,7 @@ import java.util.Objects;
 
 class TCPClientConnectionH2H extends Thread {
 
-    private TCPClientH2H client;
+    private final TCPClientH2H client;
 
     TCPClientConnectionH2H(TCPClientH2H tcpClientH2h) {
         this.client = tcpClientH2h;

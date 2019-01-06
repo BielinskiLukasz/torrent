@@ -1,7 +1,6 @@
 package app.client.console.multiHost;
 
 import app.client.host.ClientCommand;
-import app.client.host.multiHost.TCPClientConnectionActionMH;
 import app.config.Config;
 import app.utils.ExceptionHandler;
 import app.utils.Logger;
@@ -18,15 +17,15 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.util.List;
 
-public class MultipleDownloadManager extends Thread {
+class MultipleDownloadManager extends Thread {
 
-    private int clientNumber;
-    private String fileName;
+    private final int clientNumber;
+    private final String fileName;
     private int userWithFile;
     private int position;
-    private long stepSize;
+    private final long stepSize;
 
-    private List<Integer> usersWithFile;
+    private final List<Integer> usersWithFile;
 
     MultipleDownloadManager(int clientNumber,
                             String fileName,
@@ -81,7 +80,7 @@ public class MultipleDownloadManager extends Thread {
             Logger.clientDebugLog("Unsuccessful file part " + targetPath + " download");
 
 
-            Long receivedFilePartSize = file.length();
+            long receivedFilePartSize = file.length();
             Logger.clientDebugLog("Downloaded " + receivedFilePartSize + " bytes");
 
             boolean reconnect = false;
@@ -104,11 +103,10 @@ public class MultipleDownloadManager extends Thread {
 
             if (reconnect) {
                 Logger.clientLog("Reconnect with client " + userWithFile);
-                invokeRePullPart(connectionSocket, packetNumber, file.length(), 0);
+                invokeRePullPart(connectionSocket, packetNumber, file.length());
             } else {
                 Logger.clientLog("Cannot reconnect with client " + userWithFile);
             }
-
 
             // TODO inform about possibility of destroy sourcePart of file
             if (MD5Sum.check(targetPath, filePartMD5Sum)) {
@@ -136,47 +134,24 @@ public class MultipleDownloadManager extends Thread {
                     connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,
                             Config.PORT_NR + userWithFile);
 
-                    invokeRePullPart(connectionSocket, packetNumber, file.length(), 0);
+                    invokeRePullPart(connectionSocket, packetNumber, file.length());
                     // TODO inform about possibility of destroy sourcePart of file
                 }
             }
         }
 
-        //TODO implement restart send part (after sender check request with also need be implemented here)
-
-        Logger.clientDebugLog(command + " downloading parts sequence ended");
-
         TCPConnectionUtils.closeSocket(connectionSocket);
 
+        Logger.clientDebugLog(command + " downloading parts sequence ended");
         Logger.consoleDebugLog(startByteNum + " " + endByteNum);
     }
 
-    private void invokeRePushPart(Socket connectionSocket, long packetNumber, long receivedFilePartSize, int reconnectCounter) {
-        Logger.clientDebugLog("fire invokeRePushPart");
-
-        String command = String.valueOf(ClientCommand.REPUSH);
-        int sourceClientNumber = userWithFile;
-        String partFileName = fileName + ".part_" + packetNumber;
-        String clientSentence = command + Config.SPLITS_CHAR + sourceClientNumber + Config.SPLITS_CHAR + partFileName +
-                Config.SPLITS_CHAR + receivedFilePartSize;
-
-        Logger.clientDebugLog("sentence: " + clientSentence);
-        TCPClientConnectionActionMH.invokeRepush(clientNumber,
-                connectionSocket,
-                clientSentence,
-                reconnectCounter);
-
-        TCPConnectionUtils.closeSocket(connectionSocket);
-    }
-    //TODO rename all repush to rePush and repull to rePull
-
     private void invokeRePullPart(Socket connectionSocket,
                                   long packetNumber,
-                                  long receivedFilePartSize,
-                                  int reconnectCounter) {
+                                  long receivedFilePartSize) {
         Logger.clientDebugLog("fire invokeRePullPart");
 
-        String command = String.valueOf(ClientCommand.REPULL);
+        String command = String.valueOf(ClientCommand.RE_PULL);
         int sourceClientNumber = userWithFile;
         String partFileName = fileName + ".part_" + packetNumber;
 

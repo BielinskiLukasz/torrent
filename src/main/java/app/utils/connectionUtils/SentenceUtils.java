@@ -76,7 +76,7 @@ public class SentenceUtils {
     }
 
     private static String addSplitChars(String userSentence) {
-        if (isClientNumberInSentenceWittoutSplitChars(userSentence)) {
+        if (isClientNumberInSentenceWithoutSplitChars(userSentence)) {
             for (int i = 0; i < (Config.MAX_NUMBER_OF_PARAMETERS - 1); i++) {
                 userSentence = userSentence.replaceFirst(" ", Config.SPLITS_CHAR);
             }
@@ -89,7 +89,7 @@ public class SentenceUtils {
         return userSentence;
     }
 
-    private static boolean isClientNumberInSentenceWittoutSplitChars(String userSentence) {
+    private static boolean isClientNumberInSentenceWithoutSplitChars(String userSentence) {
         return splitSentenceWithSpaces(userSentence).length > 1 &&
                 isInteger(splitSentenceWithSpaces(userSentence)[1]) &&
                 Integer.parseInt(splitSentenceWithSpaces(userSentence)[1]) >= 0;

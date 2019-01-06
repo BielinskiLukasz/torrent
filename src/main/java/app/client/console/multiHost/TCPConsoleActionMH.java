@@ -45,9 +45,9 @@ class TCPConsoleActionMH {
                 break;
             case MULTIPLE_PULL:
                 if (SentenceUtils.getSentenceSize(userSentence) == 4) {
-                    multiplePullSpecificFile(clientNumber, userSentence);
+                    multiplePull(clientNumber, userSentence, true);
                 } else {
-                    multiplePull(clientNumber, userSentence);
+                    multiplePull(clientNumber, userSentence, false);
                 }
                 break;
             case CLOSE:
@@ -66,7 +66,7 @@ class TCPConsoleActionMH {
 
             // TODO BACKLOG Handling restart pull and push there
             //  Refactor restart push - use existing (could be closed) connection for get info about sent file,
-            //  and if it's finished successfully then do nothing, else repush - if client who check file was pull
+            //  and if it's finished successfully then do nothing, else rePush - if client who check file was pull
             //  initiator then he should fire pull action
             //  e.g. method
             //  PullUtils
@@ -154,13 +154,18 @@ class TCPConsoleActionMH {
         return targetClientNumber == clientNumber;
     }
 
-    private static void multiplePull(int clientNumber, String userSentence) {
+    private static void multiplePull(int clientNumber, String userSentence, boolean md5SumDefined) {
         Logger.consoleDebugLog("fire close");
 
         Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
 
         DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        String command = String.valueOf(ServerCommand.CLIENTS_WHO_SHARING_FILE);
+        String command;
+        if (md5SumDefined) {
+            command = String.valueOf(ServerCommand.CLIENTS_WHO_SHARING_SPECIFIC_FILE);
+        } else {
+            command = String.valueOf(ServerCommand.CLIENTS_WHO_SHARING_FILE);
+        }
         String fileName = SentenceUtils.getFileName(userSentence);
         if (SentenceUtils.getSentenceSize(userSentence) > 3) {
             String fileMD5Sum = SentenceUtils.getMD5Sum(userSentence);
@@ -179,8 +184,8 @@ class TCPConsoleActionMH {
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
         String response = TCPConnectionUtils.readBufferedReaderLine(inFromServer); // info about file doubles
 
-        Boolean diffrentFileWithSameName = SentenceUtils.getBoolean(response);
-        if (diffrentFileWithSameName) {
+        Boolean differentFileWithSameName = SentenceUtils.getBoolean(response);
+        if (differentFileWithSameName) {
             Logger.consoleLog("There are different files with the same file name. You must specify md5sum in request. " +
                     "Use MULTIPLE_PUSH_SPECIFIC command");
             TCPConnectionUtils.closeSocket(connectionSocket);
@@ -264,7 +269,7 @@ class TCPConsoleActionMH {
                     Logger.clientDebugLog("File downloaded successfully");
                 } else {
                     Logger.clientDebugLog("Unsuccessful file download");
-                    multiplePull(clientNumber, userSentence);
+                    multiplePull(clientNumber, userSentence, md5SumDefined);
                 }
             }
         }
@@ -272,9 +277,7 @@ class TCPConsoleActionMH {
         TCPConnectionUtils.closeSocket(connectionSocket);
     }
 
-    private static void multiplePullSpecificFile(int clientNumber, String userSentence) {
-        //TODO copy multiplePull and use CLIENTS_WHO_SHARING_SPECIFIC_FILE command (without CLIENTS_WHO_SHARING_FILE)
-    }
+    // TODO inform when user try download file which is actually in his dir
 
     private static void close(int clientNumber) {
         Logger.consoleDebugLog("fire close");

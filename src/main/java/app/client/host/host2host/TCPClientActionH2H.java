@@ -44,11 +44,11 @@ class TCPClientActionH2H {
             case PUSH_ON_DEMAND:
                 pushOnDemand(client.getClientNumber(), clientSentence);
                 break;
-            case REPUSH:
-                repush(client.getClientNumber(), clientSentence);
+            case RE_PUSH:
+                rePush(client.getClientNumber(), clientSentence);
                 break;
-            case HANDLE_REPUSH:
-                handleRepush(client.getClientNumber(), connectionSocket, clientSentence);
+            case HANDLE_RE_PUSH:
+                handleRePush(client.getClientNumber(), connectionSocket, clientSentence);
                 break;
             case CHECK_SENDING:
                 checkingSendingCorrectness(client.getClientNumber(), clientSentence);
@@ -164,13 +164,13 @@ class TCPClientActionH2H {
             Logger.clientLog("File downloaded successfully");
         } else {
             Logger.clientLog("Unsuccessful file download");
-            invokeRepush(clientNumber, connectionSocket, clientSentence, 0);
+            invokeRePush(clientNumber, connectionSocket, clientSentence);
         }
 
         Logger.clientDebugLog(command + " downloading sequence ended");
     }
 
-    private static void handleRepush(int clientNumber, Socket connectionSocket, String clientSentence) {
+    private static void handleRePush(int clientNumber, Socket connectionSocket, String clientSentence) {
         Logger.clientDebugLog("fire handlePush");
 
         String command = SentenceUtils.getCommand(clientSentence);
@@ -193,7 +193,7 @@ class TCPClientActionH2H {
             Logger.clientLog("File downloaded successfully");
         } else {
             Logger.clientLog("Unsuccessful file download");
-            invokeRepush(clientNumber, connectionSocket, clientSentence, 0);
+            invokeRePush(clientNumber, connectionSocket, clientSentence);
         }
 
         Logger.clientDebugLog(command + " downloading sequence ended");
@@ -213,23 +213,22 @@ class TCPClientActionH2H {
                     Config.PORT_NR + sourceClientNumber);
 
             DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-            String command = String.valueOf(ClientCommand.REPUSH);
+            String command = String.valueOf(ClientCommand.RE_PUSH);
             TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                     command,
                     String.valueOf(clientNumber),
                     fileName,
                     String.valueOf((new File(filePath)).length()));
-            Logger.clientDebugLog("Repush request sended");
+            Logger.clientDebugLog("RePush request sended");
 
             TCPConnectionUtils.closeSocket(connectionSocket);
         }
     }
 
-    private static void invokeRepush(int clientNumber,
+    private static void invokeRePush(int clientNumber,
                                      Socket connectionSocket,
-                                     String clientSentence,
-                                     int reconnectCounter) {
-        Logger.clientDebugLog("fire invokeRepush");
+                                     String clientSentence) {
+        Logger.clientDebugLog("fire invokeRePush");
 
         int sourceClientNumber = SentenceUtils.getClientNumber(clientSentence);
         String fileName = SentenceUtils.getFileName(clientSentence);
@@ -262,7 +261,7 @@ class TCPClientActionH2H {
             Logger.clientLog("Reconnected");
 
             DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-            String command = String.valueOf(ClientCommand.REPUSH);
+            String command = String.valueOf(ClientCommand.RE_PUSH);
             TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                     command,
                     String.valueOf(clientNumber),
@@ -285,8 +284,8 @@ class TCPClientActionH2H {
         ActionUtils.uploadIfFileExist(clientNumber, targetClientNumber, fileName);
     }
 
-    private static void repush(int clientNumber, String clientSentence) {
-        Logger.clientDebugLog("fire repush");
+    private static void rePush(int clientNumber, String clientSentence) {
+        Logger.clientDebugLog("fire rePush");
 
         int targetClientNumber = SentenceUtils.getClientNumber(clientSentence);
         String fileName = SentenceUtils.getFileName(clientSentence);
