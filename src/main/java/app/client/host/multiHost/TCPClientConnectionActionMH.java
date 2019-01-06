@@ -70,7 +70,7 @@ public class TCPClientConnectionActionMH {
                 checkingSendingCorrectness(clientNumber, sentence);
                 break;
             case CREATE_PART_OF_FILE:
-                createPartOfFile(clientNumber, sentence);
+                createPartOfFile(clientNumber, connectionSocket, sentence);
                 break;
             default:
                 Logger.clientLog('"' + command + '"' + " command is not supported yet");
@@ -412,21 +412,15 @@ public class TCPClientConnectionActionMH {
         String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
         File file = new File(filePath);
 
-        Logger.consoleLog("Resend file " + fileName + " started");
+        Logger.clientLog("Resend file " + fileName + " started");
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String command = String.valueOf(ClientCommand.HANDLE_REPUSH);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
-                command,
-                String.valueOf(clientNumber),
-                fileName);
-
         String md5sum = MD5Sum.md5(filePath);
-        String response = "Sending file " + fileName + " md5 sum";
         TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                 command,
                 String.valueOf(clientNumber),
-                response,
+                fileName,
                 md5sum); //TODO BACKLOG connect sending filename and md5sum
 
         FileInputStream fileInputStream = TCPConnectionUtils.createFileInputStream(file);
@@ -446,10 +440,12 @@ public class TCPClientConnectionActionMH {
 
         TCPConnectionUtils.closeSocket(connectionSocket);
 
+        file.delete(); //TODO test
+
         Logger.consoleLog("Finished");
     }
 
-    private static void createPartOfFile(int clientNumber, String sentence) {
+    private static void createPartOfFile(int clientNumber, Socket connectionSocket, String sentence) {
         Logger.clientDebugLog("fire createPartOfFile");
 
         String fileName = SentenceUtils.getFileName(sentence);

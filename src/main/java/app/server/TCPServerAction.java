@@ -89,13 +89,14 @@ class TCPServerAction {
         Logger.serverLog("Client " + clientNumber + " is connected");
     }
 
-    private static void getServerFileList(TCPServer server, Socket connectionSocket) {
+    private static void getServerFileList(TCPServer server, Socket connectionSocket) { // TODO secure after unconnected client (stopped)
         Logger.serverDebugLog("fire getServerFileList");
 
         List<String> serverFileList = new ArrayList<>();
         server.getUserList().forEach(
                 userNumber -> {
-                    Socket userSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + userNumber);
+                    Socket userSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,
+                            Config.PORT_NR + userNumber);
 
                     DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(userSocket);
                     String command = String.valueOf(ClientCommand.CLIENT_FILE_LIST);
