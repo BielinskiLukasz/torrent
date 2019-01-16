@@ -80,6 +80,12 @@ public class ActionUtils {
         boolean reconnect = false;
         TCPConnectionUtils.closeSocket(hostConnectionSocket);
 
+        try {
+            sleep(5);
+        } catch (InterruptedException e) {
+            ExceptionHandler.handle(e);
+        }
+
         for (int i = 0; i < Config.WAITING_TIME_SEC; i++) {
             try {
                 Logger.clientDebugLog("Try reconnect with client " + targetClientNumber);
