@@ -73,7 +73,7 @@ class TCPConsoleActionH2H {
 
         TCPConnectionUtils.closeSocket(connectionSocket);
 
-        Logger.consoleLog("File list was displayed");
+        Logger.consoleLog("Server file list was displayed");
     }
 
     private static void pull(int clientNumber, String userSentence) {
