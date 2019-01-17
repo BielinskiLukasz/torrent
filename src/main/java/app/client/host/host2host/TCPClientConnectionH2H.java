@@ -2,7 +2,6 @@ package app.client.host.host2host;
 
 import app.client.host.ClientCommand;
 import app.config.Config;
-import app.utils.ExceptionHandler;
 import app.utils.Logger;
 
 import java.io.BufferedReader;
@@ -27,10 +26,10 @@ class TCPClientConnectionH2H extends Thread {
         try {
             hostServerSocket = new ServerSocket(Config.PORT_NR + client.getClientNumber());
             if (client.getConnectedClientNumber() != Config.INT_SV) {
-                connectWithHost(client.getConnectedClientNumber());
+                connectWithHost(client.getClientNumber(), client.getConnectedClientNumber());
             }
         } catch (IOException e) {
-            ExceptionHandler.handle(e);
+            e.printStackTrace();
         }
 
         while (true) {
@@ -47,25 +46,25 @@ class TCPClientConnectionH2H extends Thread {
                     TCPClientActionH2H.perform(client, connectionSocket, clientSentence);
                 }
             } catch (IOException e) {
-                ExceptionHandler.handle(e);
+                e.printStackTrace();
             }
 
-            try {
+            try { // TODO sleep
                 sleep(Config.MILLISECONDS_OF_CONNECTION_LISTENER_WAITING);
             } catch (InterruptedException e) {
-                ExceptionHandler.handle(e);
+                e.printStackTrace();
             }
         }
     }
 
-    private void connectWithHost(int connectedClientNumber) {
+    private void connectWithHost(int clientNumber, int connectedClientNumber) {
         Logger.clientDebugLog("TCPClientConnectionH2H: fire connectWithHost");
 
         Socket hostClientSocket = null;
         try {
             hostClientSocket = new Socket(Config.HOST_IP, Config.PORT_NR + connectedClientNumber);
         } catch (IOException e) {
-            ExceptionHandler.handle(e);
+            e.printStackTrace();
         }
 
         String helloMessage = ClientCommand.CONNECT + Config.SPLITS_CHAR + client.getClientNumber() +
@@ -75,7 +74,7 @@ class TCPClientConnectionH2H extends Thread {
         try {
             Objects.requireNonNull(hostClientSocket).close();
         } catch (IOException e) {
-            ExceptionHandler.handle(e);
+            e.printStackTrace();
         }
 
         Logger.clientDebugLog("TCPClientConnectionH2H: connectWithHost successfully");

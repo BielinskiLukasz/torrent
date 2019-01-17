@@ -44,6 +44,8 @@ class MultipleDownloadManager extends Thread {
         int packetNumber = position;
         long startByteNum = stepSize * position++;
         long endByteNum = stepSize * position - 1;
+        // TODO BACKLOG ignore packet where endByte <= startByte (remove half of users/download all file from one user
+        //  when file size is less than config.min)
 
         Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR + userWithFile);
 
@@ -55,7 +57,7 @@ class MultipleDownloadManager extends Thread {
                 fileName,
                 String.valueOf(startByteNum),
                 String.valueOf(endByteNum),
-                String.valueOf(packetNumber));
+                String.valueOf(packetNumber)); // TODO BACKLOG better send part size and packet number
 
         BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(connectionSocket);
         String sentence = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
@@ -76,6 +78,7 @@ class MultipleDownloadManager extends Thread {
         } else {
             Logger.clientDebugLog("Unsuccessful file part " + targetPath + " download");
 
+
             long receivedFilePartSize = file.length();
             Logger.clientDebugLog("Downloaded " + receivedFilePartSize + " bytes");
 
@@ -90,7 +93,7 @@ class MultipleDownloadManager extends Thread {
                     ExceptionHandler.handle(e);
                 }
 
-                try {
+                try { // TODO sleep
                     sleep(1000);
                 } catch (InterruptedException e) {
                     ExceptionHandler.handle(e);
@@ -161,6 +164,7 @@ class MultipleDownloadManager extends Thread {
         Logger.clientDebugLog("fire invokeRePullPart");
 
         String command = String.valueOf(ClientCommand.RE_PULL);
+        int sourceClientNumber = userWithFile;
         String partFileName = fileName + ".part_" + packetNumber;
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
@@ -186,5 +190,7 @@ class MultipleDownloadManager extends Thread {
         } else {
             Logger.clientLog("Unsuccessful file part download");
         }
+
+        // TODO BACKLOG inform about possibility of destroy sourcePart of file
     }
 }

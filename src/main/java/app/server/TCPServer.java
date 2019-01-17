@@ -46,7 +46,7 @@ public class TCPServer extends Thread {
                 ExceptionHandler.handle(e);
             }
 
-            try {
+            try { // TODO sleep
                 sleep(Config.MILLISECONDS_OF_CONNECTION_LISTENER_WAITING);
             } catch (InterruptedException e) {
                 ExceptionHandler.handle(e);
@@ -66,7 +66,7 @@ public class TCPServer extends Thread {
         return userList;
     }
 
-    List<String> getFileList() {
+    public List<String> getFileList() {
         return fileList;
     }
 

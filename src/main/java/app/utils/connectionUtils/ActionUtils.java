@@ -102,7 +102,7 @@ public class ActionUtils {
                 ExceptionHandler.handle(e);
             }
 
-            try {
+            try { // TODO sleep
                 sleep(1000);
             } catch (InterruptedException e) {
                 ExceptionHandler.handle(e);
@@ -194,7 +194,7 @@ public class ActionUtils {
                 ExceptionHandler.handle(e);
             }
 
-            try {
+            try { // TODO sleep
                 sleep(1000);
             } catch (InterruptedException e) {
                 ExceptionHandler.handle(e);

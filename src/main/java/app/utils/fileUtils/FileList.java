@@ -51,5 +51,4 @@ public class FileList {
     public static FileInfo unpackFileInfo(String packedFileInfo) {
         return new FileInfo(packedFileInfo);
     }
-
 }

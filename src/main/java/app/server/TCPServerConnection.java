@@ -44,7 +44,7 @@ class TCPServerConnection extends Thread {
                 TCPServerAction.perform(server, connectionSocket, clientSentence);
             }
 
-            try {
+            try { // TODO sleep
                 sleep(Config.MILLISECONDS_OF_CONNECTION_LISTENER_WAITING);
             } catch (InterruptedException e) {
                 ExceptionHandler.handle(e);

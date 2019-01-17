@@ -16,6 +16,12 @@ import java.net.Socket;
 
 class TCPConsoleActionH2H {
 
+    // TODO NOW
+    //  BACKLOG send message after pull = push request
+    //  BACKLOG close h2h connection
+    //  BACKLOG create console regex
+    //  BACKLOG handle wrong numbers in h2h console commands
+
     public static void perform(TCPClientH2H client, String userSentence, int connectedHostPortNumber) {
         Logger.consoleDebugLog("perform: " + userSentence);
 
@@ -37,6 +43,7 @@ class TCPConsoleActionH2H {
                 break;
             case EMPTY_COMMAND:
                 break;
+            //TODO BACKLOG Add close option (setting both connectedClientNumber to -1)
             case UNSUPPORTED_COMMAND:
             default:
                 Logger.consoleLog("command is not supported");
@@ -60,6 +67,7 @@ class TCPConsoleActionH2H {
             Logger.consoleLog(
                     TCPConnectionUtils.readBufferedReaderLine(inFromServer)
                             .replaceAll(String.format("\\%s", Config.FILE_INFO_SPLITS_CHAR), " ")
+                    // TODO BACKLOG move getting better format to another place
             );
         }
 
@@ -83,10 +91,7 @@ class TCPConsoleActionH2H {
             DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
             String command = String.valueOf(ClientCommand.PUSH_ON_DEMAND);
             String fileName = SentenceUtils.getFileName(userSentence);
-            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
-                    command,
-                    String.valueOf(clientNumber),
-                    fileName);
+            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
 
             TCPConnectionUtils.closeSocket(hostConnectionSocket);
 

@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 
 public class TCPConsoleConnectionMH extends Thread {
 
+    // TODO BACKLOG implements some connection protocol :)
+
     private final TCPClientMH client;
 
     public TCPConsoleConnectionMH(TCPClientMH tcpClientMH) {
@@ -28,13 +30,15 @@ public class TCPConsoleConnectionMH extends Thread {
                 inFromUser = new BufferedReader(new InputStreamReader(System.in));
                 userSentence = inFromUser.readLine();
 
+                //TODO BACKLOG add regex of incoming user sentence
+
                 TCPConsoleActionMH.perform(client.getClientNumber(), userSentence);
             } catch (IOException e) {
                 ExceptionHandler.handle(e);
-                this.interrupt();
+                this.interrupt(); // TODO BACKLOG if (regex is added) remove this line
             }
 
-            try {
+            try { // TODO sleep
                 sleep(Config.MILLISECONDS_OF_CONNECTION_LISTENER_WAITING);
             } catch (InterruptedException e) {
                 ExceptionHandler.handle(e);
