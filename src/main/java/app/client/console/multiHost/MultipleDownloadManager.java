@@ -164,7 +164,6 @@ class MultipleDownloadManager extends Thread {
         Logger.clientDebugLog("fire invokeRePullPart");
 
         String command = String.valueOf(ClientCommand.RE_PULL);
-        int sourceClientNumber = userWithFile;
         String partFileName = fileName + ".part_" + packetNumber;
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);

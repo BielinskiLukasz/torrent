@@ -31,7 +31,7 @@ import java.util.List;
 
 import static java.lang.Thread.sleep;
 
-public class TCPClientConnectionActionMH {
+class TCPClientConnectionActionMH {
 
     public static void perform(int clientNumber, Socket connectionSocket, String sentence) {
         Logger.clientDebugLog("perform: " + sentence);

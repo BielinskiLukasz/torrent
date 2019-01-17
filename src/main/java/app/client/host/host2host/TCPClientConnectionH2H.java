@@ -26,7 +26,7 @@ class TCPClientConnectionH2H extends Thread {
         try {
             hostServerSocket = new ServerSocket(Config.PORT_NR + client.getClientNumber());
             if (client.getConnectedClientNumber() != Config.INT_SV) {
-                connectWithHost(client.getClientNumber(), client.getConnectedClientNumber());
+                connectWithHost(client.getConnectedClientNumber());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -57,7 +57,7 @@ class TCPClientConnectionH2H extends Thread {
         }
     }
 
-    private void connectWithHost(int clientNumber, int connectedClientNumber) {
+    private void connectWithHost(int connectedClientNumber) {
         Logger.clientDebugLog("TCPClientConnectionH2H: fire connectWithHost");
 
         Socket hostClientSocket = null;

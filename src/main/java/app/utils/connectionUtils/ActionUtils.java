@@ -143,20 +143,12 @@ public class ActionUtils {
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
         String command = String.valueOf(ClientCommand.HANDLE_RE_PUSH);
         String md5sum = MD5Sum.md5(filePath);
-        String response = "Sending file " + fileName + " md5 sum";
 
         TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                 command,
                 String.valueOf(sourceClientNumber),
                 fileName,
                 md5sum);
-
-//        String md5sum = MD5Sum.md5(filePath);
-//        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
-//                command,
-//                String.valueOf(sourceClientNumber),
-//                response,
-//                md5sum);
 
         FileInputStream fileInputStream = TCPConnectionUtils.createFileInputStream(file);
 
