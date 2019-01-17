@@ -102,6 +102,21 @@ class MultipleDownloadManager extends Thread {
 
             if (reconnect) {
                 Logger.clientLog("Reconnect with client " + userWithFile);
+
+                command = String.valueOf(ClientCommand.CREATE_PART_OF_FILE);
+                outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+                TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+                        command,
+                        String.valueOf(clientNumber),
+                        fileName,
+                        String.valueOf(startByteNum),
+                        String.valueOf(endByteNum),
+                        String.valueOf(packetNumber));
+
+                TCPConnectionUtils.closeSocket(connectionSocket);
+                connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,
+                        Config.PORT_NR + userWithFile);
+
                 invokeRePullPart(connectionSocket, packetNumber, file.length());
             } else {
                 Logger.clientLog("Cannot reconnect with client " + userWithFile);

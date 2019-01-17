@@ -50,7 +50,7 @@ public class ActionUtils {
         String filePath = Config.BASIC_PATH + sourceClientNumber + "//" + fileName;
         File file = new File(filePath);
 
-        Logger.consoleLog("Resend file " + fileName + " started");
+        Logger.consoleLog("Sending file " + fileName + " to client " + targetClientNumber + " started");
 
         Socket hostConnectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,
                 Config.PORT_NR + targetClientNumber);
@@ -70,6 +70,12 @@ public class ActionUtils {
                 response,
                 md5sum);
 
+        try {
+            sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         FileInputStream fileInputStream = TCPConnectionUtils.createFileInputStream(file);
         OutputStream outputStream = TCPConnectionUtils.getOutputStream(hostConnectionSocket);
         TCPConnectionUtils.writeFileToStream(fileInputStream, outputStream);
@@ -79,6 +85,12 @@ public class ActionUtils {
 
         boolean reconnect = false;
         TCPConnectionUtils.closeSocket(hostConnectionSocket);
+
+        try {
+            sleep(5);
+        } catch (InterruptedException e) {
+            ExceptionHandler.handle(e);
+        }
 
         for (int i = 0; i < Config.WAITING_TIME_SEC; i++) {
             try {
@@ -96,6 +108,7 @@ public class ActionUtils {
                 ExceptionHandler.handle(e);
             }
         }
+
         if (reconnect) {
             outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
             command = String.valueOf(ClientCommand.CHECK_SENDING);
@@ -112,7 +125,7 @@ public class ActionUtils {
 
         TCPConnectionUtils.closeSocket(hostConnectionSocket);
 
-        Logger.consoleLog("Finished");
+        Logger.consoleLog("Finished successfully");
     }
 
     private static void upload(int sourceClientNumber,
@@ -129,18 +142,21 @@ public class ActionUtils {
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
         String command = String.valueOf(ClientCommand.HANDLE_RE_PUSH);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
-                command,
-                String.valueOf(sourceClientNumber),
-                fileName);
-
         String md5sum = MD5Sum.md5(filePath);
         String response = "Sending file " + fileName + " md5 sum";
+
         TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                 command,
                 String.valueOf(sourceClientNumber),
-                response,
-                md5sum); //TODO BACKLOG connect sending filename and md5sum
+                fileName,
+                md5sum);
+
+//        String md5sum = MD5Sum.md5(filePath);
+//        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+//                command,
+//                String.valueOf(sourceClientNumber),
+//                response,
+//                md5sum);
 
         FileInputStream fileInputStream = TCPConnectionUtils.createFileInputStream(file);
 
@@ -148,6 +164,12 @@ public class ActionUtils {
             Logger.clientDebugLog("Skip " + receivedFilePartSize + " bytes");
             fileInputStream.skip(receivedFilePartSize);
         } catch (IOException e) {
+            ExceptionHandler.handle(e);
+        }
+
+        try {
+            sleep(2000);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -178,6 +200,7 @@ public class ActionUtils {
                 ExceptionHandler.handle(e);
             }
         }
+
         if (reconnect) {
             outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
             command = String.valueOf(ClientCommand.CHECK_SENDING);
@@ -208,6 +231,7 @@ public class ActionUtils {
         boolean sourceClientConnected = SentenceUtils.getBoolean(response);
 
         TCPConnectionUtils.closeSocket(connectionSocket);
+
         return sourceClientConnected;
     }
 

@@ -95,8 +95,8 @@ class TCPConsoleActionH2H {
 
             TCPConnectionUtils.closeSocket(hostConnectionSocket);
 
-            Logger.consoleLog("Sending push request");
-            Logger.consoleLog("Finished");
+            Logger.consoleLog("Sending push request. " +
+                    "Downloading starts only if selected client share selected file (check file list).");
         }
     }
 

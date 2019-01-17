@@ -114,7 +114,7 @@ class TCPServerAction {
 
                     TCPConnectionUtils.closeSocket(userSocket);
 
-                    Logger.serverLog("A file list from the client " + userNumber + " was received");
+                    Logger.serverDebugLog("A file list from the client " + userNumber + " was received");
                 }
         );
 

@@ -136,7 +136,6 @@ class TCPConsoleActionMH {
                 TCPConnectionUtils.closeSocket(hostConnectionSocket);
 
                 Logger.consoleLog("Sending push request");
-                Logger.consoleLog("Finished");
             } else {
                 Logger.consoleLog("Client " + sourceClientNumber + " isn't connected");
             }
@@ -207,14 +206,14 @@ class TCPConsoleActionMH {
                 response = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
 
                 int serverFileListSize = SentenceUtils.getListSize(response);
-                Logger.consoleLog(serverFileListSize + " users have file " + fileName);
+                Logger.consoleDebugLog(serverFileListSize + " users have file " + fileName);
 
                 List<Integer> usersWithFile = new ArrayList<>();
 
                 for (int i = 0; i < serverFileListSize; i++) {
                     String user = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
                     usersWithFile.add(Integer.parseInt(user));
-                    Logger.consoleLog(user);
+                    Logger.consoleDebugLog(user);
                 }
                 usersWithFile.remove(new Integer(clientNumber));
 

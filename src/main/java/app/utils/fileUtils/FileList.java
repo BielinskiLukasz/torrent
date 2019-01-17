@@ -5,6 +5,7 @@ import app.config.Config;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class FileList {
 
@@ -28,7 +29,7 @@ public class FileList {
         File folder = new File(directoryPath);
         File[] files = folder.listFiles();
 
-        for (File file : files) {
+        for (File file : Objects.requireNonNull(files)) {
             if (file.isFile()) {
                 directoryFileList.add(file.getName());
             }
@@ -47,21 +48,7 @@ public class FileList {
         return readyToSendList;
     }
 
-    static List<FileInfo> unpackFileInfoList(List<String> packedList) {
-        List<FileInfo> unpackList = new ArrayList<>();
-
-        packedList.forEach(
-                data -> unpackList.add(new FileInfo(data))
-        );
-
-        return unpackList;
-    }
-
     public static FileInfo unpackFileInfo(String packedFileInfo) {
         return new FileInfo(packedFileInfo);
-    }
-
-    public static String packFullFileInfo(FileInfo fileInfo) {
-        return fileInfo.clientId + "|" + fileInfo.name + "|" + fileInfo.md5 + "|" + fileInfo.fileSize;
     }
 }
