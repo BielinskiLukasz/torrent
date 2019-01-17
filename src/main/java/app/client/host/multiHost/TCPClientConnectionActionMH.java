@@ -193,6 +193,12 @@ public class TCPClientConnectionActionMH {
                 response,
                 md5sum);
 
+        try {
+            sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         FileInputStream fileInputStream = TCPConnectionUtils.createFileInputStream(file);
         OutputStream outputStream = TCPConnectionUtils.getOutputStream(connectionSocket);
         TCPConnectionUtils.writeFileToStream(fileInputStream, outputStream);
@@ -285,9 +291,9 @@ public class TCPClientConnectionActionMH {
         String fileName = SentenceUtils.getFileName(clientSentence);
         Logger.clientLog("Receiving file " + fileName + " from client " + sourceClientNumber);
 
-        BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(connectionSocket);
-        String sentence = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
-        String fileMD5Sum = SentenceUtils.getMD5Sum(sentence);
+//        BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(connectionSocket);
+//        String sentence = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
+        String fileMD5Sum = SentenceUtils.getMD5Sum(clientSentence);
 
         String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
         File file = new File(filePath);
@@ -431,6 +437,12 @@ public class TCPClientConnectionActionMH {
             fileInputStream.skip(receivedFilePartSize);
         } catch (IOException e) {
             ExceptionHandler.handle(e);
+        }
+
+        try {
+            sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         OutputStream outputStream = TCPConnectionUtils.getOutputStream(connectionSocket);

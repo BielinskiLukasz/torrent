@@ -70,6 +70,12 @@ public class ActionUtils {
                 response,
                 md5sum);
 
+        try {
+            sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         FileInputStream fileInputStream = TCPConnectionUtils.createFileInputStream(file);
         OutputStream outputStream = TCPConnectionUtils.getOutputStream(hostConnectionSocket);
         TCPConnectionUtils.writeFileToStream(fileInputStream, outputStream);
@@ -136,18 +142,21 @@ public class ActionUtils {
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
         String command = String.valueOf(ClientCommand.HANDLE_RE_PUSH);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
-                command,
-                String.valueOf(sourceClientNumber),
-                fileName);
-
         String md5sum = MD5Sum.md5(filePath);
         String response = "Sending file " + fileName + " md5 sum";
+
         TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
                 command,
                 String.valueOf(sourceClientNumber),
-                response,
+                fileName,
                 md5sum);
+
+//        String md5sum = MD5Sum.md5(filePath);
+//        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+//                command,
+//                String.valueOf(sourceClientNumber),
+//                response,
+//                md5sum);
 
         FileInputStream fileInputStream = TCPConnectionUtils.createFileInputStream(file);
 
@@ -156,6 +165,12 @@ public class ActionUtils {
             fileInputStream.skip(receivedFilePartSize);
         } catch (IOException e) {
             ExceptionHandler.handle(e);
+        }
+
+        try {
+            sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         OutputStream outputStream = TCPConnectionUtils.getOutputStream(hostConnectionSocket);

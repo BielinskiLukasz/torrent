@@ -1,6 +1,7 @@
 package app.utils.fileUtils;
 
 import app.utils.ExceptionHandler;
+import app.utils.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,6 +41,8 @@ public class MD5Sum {
     }
 
     public static boolean check(String filePath, String md5Sum) {
+        Logger.clientDebugLog("Check sum for " + filePath + ": " + md5(filePath) + " = " + md5Sum);
+
         return md5(filePath).equals(md5Sum);
     }
 }
