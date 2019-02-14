@@ -1,0 +1,9 @@
+del /Q TORrent_1\*
+del /Q TORrent_2\*
+del /Q TORrent_3\*
+copy files\01.jpg TORrent_1\01.jpg
+copy files\03.jpg TORrent_1\03.jpg
+copy files\04.jpg TORrent_1\04.jpg
+copy files\02.jpg TORrent_2\02.jpg
+copy files\05.jpg TORrent_2\05.jpg
+copy files\03.jpg TORrent_3\03.jpg

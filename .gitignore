@@ -35,3 +35,9 @@ target/
 logs/
 tools/
 *.log
+#################
+## Other
+#################
+src/test/testScripts/TORrent_1/
+src/test/testScripts/TORrent_2/
+src/test/testScripts/TORrent_3/

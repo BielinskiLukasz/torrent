@@ -1,0 +1,33 @@
+Mo¿e pracowaæ w wersjach:
+- host2host (H2H): w systemie istniej¹ tylko dwa hosty wymieniaj¹ce pliki miêdzy sob¹
+- multihost (MH): w systemie istnieje wiele hostów (co najmniej 3) wymieniaj¹ce pliki miêdzy sob¹.
+
+Funkcjonalnoœci:
+1. Wymiana list udostêpnianych plików miêdzy hostami -  chcemy wiedzieæ gdzie (na jakim hoœcie) jakie pliki siê znajduj¹, wraz z ich sumami kontrolnymi MD5 – wersje (H2H, MH, TCP)
+2. Przesy³anie plików typu PULL – œci¹gamy z wybranego hosta plik o zadanej nazwie - wersje (H2H, MH, TCP)
+3. Przesy³anie plików typu PUSH – wrzucamy na wybrany host pliku o zadanej nazwie – wersje (H2H, MH, TCP)
+4. Wznawianie transmisji pliku w przypadku jej przerwania lub roz³¹czenia – wersje (H2H, MH, TCP)
+5. Œci¹ganie tego samego pliku (ale ró¿nych jego czêœci) z wielu hostów jednoczeœnie – wersja (MH, TCP)
+
+Aby uruchomiæ dan¹ funkcjonalnoœæ nale¿y uruchomiæ skrypty w okreœlonej kolejnoœci:
+1. reset_dirs.bat
+3. run_MH.bat lub run_H2H w zale¿noœci od testowanej wersji
+
+Podane komendy dzia³aj¹ dla klienta 2 oraz za³¹czonej struktury katalogów i zawartych w nich plików.
+Komendy dla danych funkcjonalnoœci (MH) (numer_funkcjonalnoœci komenda):
+1. list
+2. pull 1 01.jpg
+3. push 3 02.jpg
+4. brak komendy, wznawianie transmisji zaimplementowano dla pozosta³ych funkcjonalnoœci (2, 3, 5) - aby j¹ przetestowaæ nale¿y przerwaæ przesy³anie odpowiednio du¿ego pliku a nastêpnie ponownie uruchomiæ klienta (komenda uruchamiaj¹ca klienta: java app.TORrentClientTCP 1//numer_klienta), który plik pobiera³/wysy³a³ zanim up³ynie czas wznawiania po³¹czenia zdefiniowany w pliku konfiguracyjnym LUB roz³¹czenie jednego z wielu klientów udostêpniaj¹cych plik pobierany poleceniem multiple_pull  (nie wymagane ponowne po³¹czenie roz³¹czonego klienta)
+5. multiple_pull 03.jpg
+
+Podane komendy dzia³aj¹ dla klienta 2 oraz za³¹czonej struktury katalogów i zawartych w nich plików.
+Komendy dla danych funkcjonalnoœci (H2H) (numer_funkcjonalnoœci komenda):
+1. list
+2. pull 04.jpg
+3. push 05.jpg
+4. brak komendy, wznawianie transmisji zaimplementowano dla pozosta³ych funkcjonalnoœci (2, 3)
+
+Aby ponownie uruchomiæ dan¹ funkcjonalnoœæ nale¿y odtworzyæ pierwotn¹ strukturê plików (skrypt resetDirs.bat).
+
+Program testowano przy u¿yciu systemu Windows 7 oraz Windows 10.
