@@ -1,3 +1,4 @@
+/*
 package app.client.host.host2host;
 
 import app.client.console.host2host.TCPConsoleConnectionH2H;
@@ -43,4 +44,4 @@ public class TCPClientH2H extends Thread {
     void setConnectedClientNumber(int connectedClientNumber) {
         this.connectedClientNumber = connectedClientNumber;
     }
-}
+}*/ // TODO turn on this

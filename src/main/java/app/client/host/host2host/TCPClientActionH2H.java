@@ -1,3 +1,4 @@
+/*
 package app.client.host.host2host;
 
 import app.client.host.ClientCommand;
@@ -5,7 +6,7 @@ import app.config.Config;
 import app.utils.ExceptionHandler;
 import app.utils.Logger;
 import app.utils.connectionUtils.ActionUtils;
-import app.utils.connectionUtils.CommandUtils;
+import app.utils.connectionUtils.UserSentenceUtils;
 import app.utils.connectionUtils.SentenceUtils;
 import app.utils.connectionUtils.TCPConnectionUtils;
 import app.utils.fileUtils.FileList;
@@ -28,8 +29,8 @@ class TCPClientActionH2H {
 
     public static void perform(TCPClientH2H client, Socket connectionSocket, String clientSentence) {
 
-        String command = CommandUtils.getCommand(clientSentence);
-        command = CommandUtils.transformToH2HCommand(command);
+        String command = UserSentenceUtils.getCommand(clientSentence);
+        command = UserSentenceUtils.transformToH2HCommand(command);
 
         switch (ClientCommand.valueOf(command)) {
             case CONNECT:
@@ -297,3 +298,4 @@ class TCPClientActionH2H {
                 receivedFilePartSize);
     }
 }
+*/ // TODO turn on this

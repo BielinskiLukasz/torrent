@@ -1,3 +1,4 @@
+/*
 package app.client.host.host2host;
 
 import app.client.host.ClientCommand;
@@ -80,3 +81,4 @@ class TCPClientConnectionH2H extends Thread {
         Logger.clientDebugLog("TCPClientConnectionH2H: connectWithHost successfully");
     }
 }
+*/ //TODO turn on this

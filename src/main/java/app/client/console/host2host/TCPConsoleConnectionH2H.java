@@ -1,3 +1,4 @@
+/*
 package app.client.console.host2host;
 
 import app.client.host.host2host.TCPClientH2H;
@@ -43,3 +44,4 @@ public class TCPConsoleConnectionH2H extends Thread {
         }
     }
 }
+*/ // TODO turn on this

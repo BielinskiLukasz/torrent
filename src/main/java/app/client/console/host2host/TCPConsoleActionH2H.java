@@ -1,3 +1,4 @@
+/*
 package app.client.console.host2host;
 
 import app.client.console.ConsoleCommand;
@@ -6,7 +7,7 @@ import app.client.host.host2host.TCPClientH2H;
 import app.config.Config;
 import app.utils.Logger;
 import app.utils.connectionUtils.ActionUtils;
-import app.utils.connectionUtils.CommandUtils;
+import app.utils.connectionUtils.UserSentenceUtils;
 import app.utils.connectionUtils.SentenceUtils;
 import app.utils.connectionUtils.TCPConnectionUtils;
 
@@ -27,7 +28,7 @@ class TCPConsoleActionH2H {
 
         userSentence = SentenceUtils.cleanUserSentence(userSentence);
         userSentence = SentenceUtils.setClientNumber(userSentence, client.getConnectedClientNumber());
-        String command = CommandUtils.getConsoleCommand(userSentence);
+        String command = UserSentenceUtils.getConsoleCommand(userSentence);
 
         Logger.consoleDebugLog("perform: " + userSentence);
 
@@ -118,3 +119,4 @@ class TCPConsoleActionH2H {
         return targetClientNumber == clientNumber;
     }
 }
+*/ // TODO turn on this
