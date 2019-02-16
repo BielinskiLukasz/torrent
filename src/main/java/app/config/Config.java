@@ -11,7 +11,7 @@ public class Config {
     public static final int PACKET_MAX_SIZE_IN_KB = 1024;
 
     public static final int MAX_NUMBER_OF_PARAMETERS = 3;
-    private static final char EDITABLE_SPLITS_CHAR = '*';
+    private static final char EDITABLE_SPLITS_CHAR = ':';
     public static final String SPLITS_CHAR = String.valueOf(EDITABLE_SPLITS_CHAR);
     private static final char EDITABLE_FILE_INFO_SPLITS_CHAR = '|';
     public static final String FILE_INFO_SPLITS_CHAR = String.valueOf(EDITABLE_FILE_INFO_SPLITS_CHAR);

@@ -46,6 +46,8 @@ public class UserSentence {
 
     private static ConsoleCommand getCommandSupportedName(String command) {
         switch (command.trim().toUpperCase()) {
+            case "CONNECT":
+                return ConsoleCommand.CONNECT;
             case "L":
             case "LIST":
             case "FILES":
@@ -108,5 +110,14 @@ public class UserSentence {
 
     public ConsoleCommand getUserCommand() {
         return userCommand;
+    }
+
+    @Override
+    public String toString() {
+        return "UserSentence{" +
+                "userCommand=" + userCommand.toString() +
+                ", fileName='" + fileName + '\'' +
+                ", targetClient='" + targetClient + '\'' +
+                '}';
     }
 }

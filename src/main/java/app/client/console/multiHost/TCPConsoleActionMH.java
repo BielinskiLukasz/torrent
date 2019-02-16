@@ -1,44 +1,34 @@
 package app.client.console.multiHost;
 
-import app.client.console.ConsoleCommand;
-import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
 import app.utils.Logger;
-import app.utils.connectionUtils.ActionUtils;
-import app.utils.connectionUtils.CommandUtils;
+import app.utils.connectionUtils.Segment;
 import app.utils.connectionUtils.SentenceUtils;
 import app.utils.connectionUtils.TCPConnectionUtils;
-import app.utils.fileUtils.FileList;
-import app.utils.fileUtils.MD5Sum;
+import app.utils.connectionUtils.UserSentence;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 class TCPConsoleActionMH {
 
-    public static void perform(int clientNumber, String userSentence) {
-        Logger.consoleDebugLog("perform: " + userSentence);
+    public static void perform(int clientNumber, String sentenceFromConsole) {
+        Logger.consoleDebugLog("perform: " + sentenceFromConsole);
 
-        userSentence = SentenceUtils.cleanUserSentence(userSentence);
+        UserSentence userSentence = UserSentence.getUserSentence(sentenceFromConsole);
+
         Logger.consoleDebugLog("perform after clean: " + userSentence);
-        String command = CommandUtils.getConsoleCommand(userSentence);
-        userSentence = SentenceUtils.setClientNumber(userSentence, 0);
 
         Logger.consoleDebugLog("perform after set number: " + userSentence);
 
-        switch (ConsoleCommand.valueOf(command)) {
+        switch (userSentence.getUserCommand()) {
             case FILE_LIST:
-                getFileList();
+                getFileList(clientNumber);
                 break;
-            case PULL: // TODO BACKLOG print message in console if host haven't file
+           /* case PULL: // TODO BACKLOG print message in console if host haven't file
                 pull(clientNumber, userSentence);
                 break;
             case PUSH:
@@ -59,7 +49,7 @@ class TCPConsoleActionMH {
             case UNSUPPORTED_COMMAND:
             default:
                 Logger.consoleLog("command is not supported");
-                break;
+                break;*/ // TODO turn on this
 
             // TODO BACKLOG create function classes for each feature (CONNECT, FILE_LIST, PULL (MULTI_PULL), PUSH, CLOSE)
             //  with have method connected with action e.g. ClientA sending message - PUSH (client number),
@@ -88,14 +78,18 @@ class TCPConsoleActionMH {
         }
     }
 
-    private static void getFileList() {
-        Logger.consoleDebugLog("fire getFileList");
+    private static void getFileList(int clientNumber) {
+        Logger.consoleDebugLog("fire getFileList " + Arrays.toString(Thread.currentThread().getStackTrace())); // TODO test this
 
         Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
-
         DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        String command = String.valueOf(ServerCommand.SERVER_FILE_LIST);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToServer, command);
+        Segment getFileListSegment = Segment.getBuilder()
+                .setSourceClient(clientNumber)
+                .setDestinationClient(0)
+                .setCommand(ServerCommand.SERVER_FILE_LIST.name())
+                .setComment("send list request to server")
+                .build();
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToServer, getFileListSegment.pack());
 
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
         String response = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
@@ -111,10 +105,10 @@ class TCPConsoleActionMH {
 
         TCPConnectionUtils.closeSocket(connectionSocket);
 
-        Logger.consoleLog("Server file list was displayed");
+        Logger.consoleLog("End files list");
     }
 
-    private static void pull(int clientNumber, String userSentence) {
+    /*private static void pull(int clientNumber, String userSentence) {
         Logger.consoleDebugLog("fire pull");
 
         int sourceClientNumber = SentenceUtils.getClientNumber(userSentence);
@@ -322,5 +316,5 @@ class TCPConsoleActionMH {
         TCPConnectionUtils.closeSocket(connectionSocket);
 
         Logger.consoleLog("Connection closed");
-    }
+    }*/ // TODO turn on this
 }
