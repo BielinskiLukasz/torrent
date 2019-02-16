@@ -52,7 +52,7 @@ class MultipleDownloadManager extends Thread {
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String command = String.valueOf(ClientCommand.HANDLE_PUSH_PACK);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                 command,
                 String.valueOf(clientNumber),
                 fileName,
@@ -106,7 +106,7 @@ class MultipleDownloadManager extends Thread {
 
                 command = String.valueOf(ClientCommand.CREATE_PART_OF_FILE);
                 outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-                TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+                TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                         command,
                         String.valueOf(clientNumber),
                         fileName,
@@ -136,7 +136,7 @@ class MultipleDownloadManager extends Thread {
 
                     command = String.valueOf(ClientCommand.CREATE_PART_OF_FILE);
                     outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-                    TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+                    TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                             command,
                             String.valueOf(clientNumber),
                             fileName,
@@ -168,7 +168,7 @@ class MultipleDownloadManager extends Thread {
         String partFileName = fileName + ".part_" + packetNumber;
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                 command,
                 "",
                 partFileName,

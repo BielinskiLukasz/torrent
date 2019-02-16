@@ -88,7 +88,7 @@ class TCPConsoleActionMH {
                 .setCommand(ServerCommand.SERVER_FILE_LIST.name())
                 .setComment("send list request to server")
                 .build();
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToServer, getFileListSegment.pack());
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToServer, getFileListSegment);
 
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
         Segment listSizeSegment = Segment.unpack(TCPConnectionUtils.readBufferedReaderLine(inFromServer));
@@ -176,13 +176,13 @@ class TCPConsoleActionMH {
             fileName = SentenceUtils.getFileName(userSentence);
             if (SentenceUtils.getSentenceSize(userSentence) > 3) {
                 String fileMD5Sum = SentenceUtils.getMD5Sum(userSentence);
-                TCPConnectionUtils.writeMessageToDataOutputStream(outToServer,
+                TCPConnectionUtils.writeSegmentToDataOutputStream(outToServer,
                         command,
                         String.valueOf(clientNumber),
                         fileName,
                         fileMD5Sum);
             } else {
-                TCPConnectionUtils.writeMessageToDataOutputStream(outToServer,
+                TCPConnectionUtils.writeSegmentToDataOutputStream(outToServer,
                         command,
                         String.valueOf(clientNumber),
                         fileName);
@@ -220,7 +220,7 @@ class TCPConsoleActionMH {
                     DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
                     command = String.valueOf(ClientCommand.PUSH_ON_DEMAND);
                     fileName = SentenceUtils.getFileName(userSentence);
-                    TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
+                    TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
 
                     TCPConnectionUtils.closeSocket(connectionSocket);
 
@@ -235,7 +235,7 @@ class TCPConsoleActionMH {
 
                         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
                         command = String.valueOf(ClientCommand.CLIENT_FILE_INFO);
-                        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+                        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                                 command,
                                 String.valueOf(clientWithFile),
                                 fileName);
@@ -308,7 +308,7 @@ class TCPConsoleActionMH {
 
         DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String command = String.valueOf(ServerCommand.UNREGISTER);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToServer, command, String.valueOf(clientNumber));
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToServer, command, String.valueOf(clientNumber));
 
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
         TCPConnectionUtils.readBufferedReaderLine(inFromServer);

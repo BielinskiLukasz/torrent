@@ -73,7 +73,7 @@ class TCPClientConnectionActionMH {
                 .setComment(clientSegment.getComment())
                 .build();
 
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToServer, registerSegment.pack());
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToServer, registerSegment);
 
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
         Segment responseSegment = Segment.unpack(TCPConnectionUtils.readBufferedReaderLine(inFromServer));
@@ -107,7 +107,7 @@ class TCPClientConnectionActionMH {
         String md5Sum = MD5Sum.md5(filePath);
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                 String.valueOf(ConsoleCommand.MULTIPLE_PULL),
                 String.valueOf(clientNumber),
                 fileName,
@@ -167,7 +167,7 @@ class TCPClientConnectionActionMH {
         String command = String.valueOf(ConsoleCommand.MULTIPLE_PULL);
         String md5sum = MD5Sum.md5(selectedPartPath);
         String response = "Sending file " + fileName + " md5 sum";
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                 command,
                 String.valueOf(clientNumber),
                 response,
@@ -306,7 +306,7 @@ class TCPClientConnectionActionMH {
 
             DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
             String command = String.valueOf(ClientCommand.RE_PUSH);
-            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+            TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                     command,
                     String.valueOf(clientNumber),
                     fileName,
@@ -354,7 +354,7 @@ class TCPClientConnectionActionMH {
 
             DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
             String command = String.valueOf(ClientCommand.RE_PUSH);
-            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+            TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                     command,
                     String.valueOf(clientNumber),
                     fileName,
@@ -402,7 +402,7 @@ class TCPClientConnectionActionMH {
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String command = String.valueOf(ClientCommand.HANDLE_RE_PUSH);
         String md5sum = MD5Sum.md5(filePath);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                 command,
                 String.valueOf(clientNumber),
                 fileName,

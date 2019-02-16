@@ -69,7 +69,7 @@ class TCPServerAction {
                 .setComment("send client connection with server confirmation")
                 .build();
 
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, connectionConfirmationSegment.pack());
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, connectionConfirmationSegment);
     }
 
     /*private static void confirmConnection(TCPServer server, Socket connectionSocket, String clientSentence) {
@@ -103,7 +103,7 @@ class TCPServerAction {
                             .setComment("send client list request")
                             .build();
 
-                    TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, getListSegment.pack());
+                    TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, getListSegment);
 
                     BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(userSocket);
                     Segment listSizeSegment = Segment.unpack(TCPConnectionUtils.readBufferedReaderLine(inFromClient));
@@ -154,7 +154,7 @@ class TCPServerAction {
         }
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                 "",
                 String.valueOf(differentFileWithSameName));
 
@@ -182,7 +182,7 @@ class TCPServerAction {
         }
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                 "",
                 String.valueOf(differentFileWithSameName));
 
@@ -199,7 +199,7 @@ class TCPServerAction {
         String response = "Bye client " + clientNumber;
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, response);
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, response);
 
         Logger.serverLog("Unregister client " + clientNumber);
     }
@@ -209,7 +209,7 @@ class TCPServerAction {
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String response = '"' + command + '"' + " command is not supported yet";
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, response);
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, response);
 
         Logger.serverLog("Not supported command message sent");
     }*/ // TODO turn on this

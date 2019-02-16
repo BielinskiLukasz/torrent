@@ -57,14 +57,14 @@ public class ActionUtils {
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
         String command = String.valueOf(ClientCommand.HANDLE_PUSH);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                 command,
                 String.valueOf(sourceClientNumber),
                 fileName);
 
         String md5sum = MD5Sum.md5(filePath);
         String response = "Sending file " + fileName + " md5 sum";
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                 command,
                 String.valueOf(sourceClientNumber),
                 response,
@@ -112,7 +112,7 @@ public class ActionUtils {
         if (reconnect) {
             outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
             command = String.valueOf(ClientCommand.CHECK_SENDING);
-            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+            TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                     command,
                     String.valueOf(sourceClientNumber),
                     fileName,
@@ -144,7 +144,7 @@ public class ActionUtils {
         String command = String.valueOf(ClientCommand.HANDLE_RE_PUSH);
         String md5sum = MD5Sum.md5(filePath);
 
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                 command,
                 String.valueOf(sourceClientNumber),
                 fileName,
@@ -196,7 +196,7 @@ public class ActionUtils {
         if (reconnect) {
             outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
             command = String.valueOf(ClientCommand.CHECK_SENDING);
-            TCPConnectionUtils.writeMessageToDataOutputStream(outToClient,
+            TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                     command,
                     String.valueOf(sourceClientNumber),
                     fileName,
@@ -240,7 +240,7 @@ public class ActionUtils {
                 .setComment("send list size")
                 .build();
 
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, listSizeSegment.pack());
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, listSizeSegment);
 
         serverFileList.forEach(
                 fileData -> {
@@ -252,7 +252,7 @@ public class ActionUtils {
                             .setMessage(String.valueOf(fileData))
                             .setComment("send list element")
                             .build();
-                    TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, listElementSegment.pack());
+                    TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, listElementSegment);
                 }
         );
     }

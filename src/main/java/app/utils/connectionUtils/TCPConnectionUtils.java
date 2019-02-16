@@ -136,19 +136,16 @@ public class TCPConnectionUtils {
         Logger.utilsDebugLog("closeFileInputStream");
     }
 
-    public static void writeMessageToDataOutputStream(DataOutputStream dataOutputStream, String message, String... furtherPartOfMessage) {
-        if (furtherPartOfMessage.length > 0) {
-            message += createAttachedMessage(furtherPartOfMessage);
-        }
+    public static void writeSegmentToDataOutputStream(DataOutputStream dataOutputStream, Segment segment) {
+        Logger.utilsDebugLog("writeSegmentToDataOutputStream");
 
         try {
-            dataOutputStream.writeBytes(message + "\n");
+            dataOutputStream.writeBytes(segment.pack() + "\n");
         } catch (IOException e) {
             ExceptionHandler.handle(e);
         }
 
-        Logger.utilsDebugLog("writeMessageToDataOutputStream");
-        Logger.utilsDebugLog("send: " + message); // TODO refactor/delete (don't need to add split chars here)
+        Logger.utilsDebugLog("send: " + segment); // TODO refactor/delete (don't need to add split chars here)
     }
 
     private static String createAttachedMessage(String[] furtherPartsOfMessage) {
@@ -205,5 +202,9 @@ public class TCPConnectionUtils {
         }
 
         Logger.serverDebugLog("finish read file");
+    }
+
+    public static void writeSegmentToDataOutputStream(DataOutputStream outToClient, String... args) {
+        // TODO remove this temporary adapter
     }
 }
