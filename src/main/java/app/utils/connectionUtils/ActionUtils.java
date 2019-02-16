@@ -220,21 +220,40 @@ public class ActionUtils {
 
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
         String response = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
-        boolean sourceClientConnected = SentenceUtils.getBoolean(response);
+//        boolean sourceClientConnected = SentenceUtils.getBoolean(response); //TODO refactor
 
         TCPConnectionUtils.closeSocket(connectionSocket);
 
-        return sourceClientConnected;
+//        return sourceClientConnected; //TODO refactor
+        return false; //TODO delete after refactor
     }
 
-    public static void sendList(Socket connectionSocket, List serverFileList) {
+    public static void sendList(Socket connectionSocket, List serverFileList, Segment segment) {
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        int listSize = serverFileList.size();
-        String command = String.valueOf(ConsoleCommand.FILE_LIST);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, command, String.valueOf(listSize));
+
+        Segment listSizeSegment = Segment.getBuilder()
+                .setSourceClient(segment.getDestinationClient())
+                .setDestinationClient(segment.getSourceClient())
+                .setCommand(ConsoleCommand.FILE_LIST.name())
+                .setListSize(serverFileList.size())
+                .setMessage("List size")
+                .setComment("send list size")
+                .build();
+
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, listSizeSegment.pack());
 
         serverFileList.forEach(
-                fileData -> TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, String.valueOf(fileData))
+                fileData -> {
+                    Segment listElementSegment = Segment.getBuilder()
+                            .setSourceClient(segment.getDestinationClient())
+                            .setDestinationClient(segment.getSourceClient())
+                            .setCommand(ConsoleCommand.FILE_LIST.name())
+                            .setListSize(serverFileList.size())
+                            .setMessage(String.valueOf(fileData))
+                            .setComment("send list element")
+                            .build();
+                    TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, listElementSegment.pack());
+                }
         );
     }
 }

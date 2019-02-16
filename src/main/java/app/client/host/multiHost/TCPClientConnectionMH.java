@@ -4,6 +4,7 @@ import app.client.host.ClientCommand;
 import app.config.Config;
 import app.utils.ExceptionHandler;
 import app.utils.Logger;
+import app.utils.connectionUtils.Segment;
 import app.utils.connectionUtils.TCPConnectionUtils;
 
 import java.io.BufferedReader;
@@ -62,9 +63,15 @@ class TCPClientConnectionMH extends Thread {
 
         Socket serverSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
 
-        String helloMessage = ClientCommand.CONNECT + Config.SPLITS_CHAR + client.getClientNumber() +
-                Config.SPLITS_CHAR + "Hello, I'm client " + client.getClientNumber();
-        TCPClientConnectionActionMH.perform(client.getClientNumber(), serverSocket, helloMessage);
+        Segment helloSegment = Segment.getBuilder()
+                .setSourceClient(client.getClientNumber())
+                .setDestinationClient(0)
+                .setCommand(ClientCommand.CONNECT.name())
+                .setMessage("Hello, I'm client " + client.getClientNumber())
+                .setComment("connect client with server")
+                .build();
+
+        TCPClientConnectionActionMH.perform(client.getClientNumber(), serverSocket, helloSegment.pack());
 
         TCPConnectionUtils.closeSocket(serverSocket);
 

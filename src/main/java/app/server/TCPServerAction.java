@@ -5,7 +5,6 @@ import app.config.Config;
 import app.utils.Logger;
 import app.utils.connectionUtils.ActionUtils;
 import app.utils.connectionUtils.Segment;
-import app.utils.connectionUtils.SentenceUtils;
 import app.utils.connectionUtils.TCPConnectionUtils;
 
 import java.io.BufferedReader;
@@ -27,7 +26,7 @@ class TCPServerAction {
                 break;
             case SERVER_FILE_LIST: // TODO BACKLOG handle unconnected client selection by server
                 getServerFileList(server); // TODO BACKLOG getting file list for all users in the same time (threads);
-                ActionUtils.sendList(connectionSocket, server.getFileList(), clientSegment);
+                ActionUtils.sendList(connectionSocket, server.getFileList(), segment);
                 break;
             /*case CONFIRM_CONNECTION:
             case CLIENTS_WHO_SHARING_FILE:
@@ -107,12 +106,12 @@ class TCPServerAction {
                     TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, getListSegment.pack());
 
                     BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(userSocket);
-                    String response = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
+                    Segment listSizeSegment = Segment.unpack(TCPConnectionUtils.readBufferedReaderLine(inFromClient));
 
-                    int clientFileListSize = SentenceUtils.getListSize(response);
+                    int clientFileListSize = listSizeSegment.getListSize();
                     for (int i = 0; i < clientFileListSize; i++) {
                         serverFileList.add(
-                                TCPConnectionUtils.readBufferedReaderLine(inFromClient)
+                                Segment.unpack(TCPConnectionUtils.readBufferedReaderLine(inFromClient)).getMessage()
                         );
                     }
 

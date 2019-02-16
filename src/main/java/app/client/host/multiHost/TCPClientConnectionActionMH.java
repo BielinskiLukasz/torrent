@@ -76,9 +76,9 @@ class TCPClientConnectionActionMH {
         TCPConnectionUtils.writeMessageToDataOutputStream(outToServer, registerSegment.pack());
 
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
-        TCPConnectionUtils.readBufferedReaderLine(inFromServer);
+        Segment responseSegment = Segment.unpack(TCPConnectionUtils.readBufferedReaderLine(inFromServer));
 
-        Logger.clientLog("Client " + clientSegment.getDestinationClient() + " has connected to the server");
+        Logger.clientLog("Client " + responseSegment.getDestinationClient() + " has connected to the server");
     }
 
     private static void getClientFileList(Socket connectionSocket, Segment clientSegment) {

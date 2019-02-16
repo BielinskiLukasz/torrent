@@ -4,7 +4,6 @@ import app.config.Config;
 import app.server.ServerCommand;
 import app.utils.Logger;
 import app.utils.connectionUtils.Segment;
-import app.utils.connectionUtils.SentenceUtils;
 import app.utils.connectionUtils.TCPConnectionUtils;
 import app.utils.connectionUtils.UserSentence;
 
@@ -92,12 +91,13 @@ class TCPConsoleActionMH {
         TCPConnectionUtils.writeMessageToDataOutputStream(outToServer, getFileListSegment.pack());
 
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
-        String response = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
+        Segment listSizeSegment = Segment.unpack(TCPConnectionUtils.readBufferedReaderLine(inFromServer));
 
-        int serverFileListSize = SentenceUtils.getListSize(response);
+        int serverFileListSize = listSizeSegment.getListSize();
         for (int i = 0; i < serverFileListSize; i++) {
             Logger.consoleLog(
-                    TCPConnectionUtils.readBufferedReaderLine(inFromServer)
+                    Segment.unpack(TCPConnectionUtils.readBufferedReaderLine(inFromServer))
+                            .getMessage()
                             .replaceAll(String.format("\\%s", Config.FILE_INFO_SPLITS_CHAR), " ")
                     // TODO BACKLOG move getting better format to another place
             );

@@ -148,7 +148,7 @@ public class TCPConnectionUtils {
         }
 
         Logger.utilsDebugLog("writeMessageToDataOutputStream");
-        Logger.utilsDebugLog("send: " + message);
+        Logger.utilsDebugLog("send: " + message); // TODO refactor/delete (don't need to add split chars here)
     }
 
     private static String createAttachedMessage(String[] furtherPartsOfMessage) {
