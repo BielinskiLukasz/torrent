@@ -10,7 +10,7 @@ public class TCPClientMH extends Thread {
     public TCPClientMH(int clientNumber) {
         this.clientNumber = clientNumber;
 
-        Logger.clientDebugLog("TCPClientMH: create client");
+        Logger.clientDebugLog("TCPClientMH: create client " + clientNumber);
     }
 
     public void run() {
