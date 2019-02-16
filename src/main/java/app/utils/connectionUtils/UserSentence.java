@@ -1,12 +1,13 @@
 package app.utils.connectionUtils;
 
+import app.client.console.ConsoleCommand;
 import app.config.Config;
 
 public class UserSentence {
 
     private static final String SPLITS_CHAR = Config.SPLITS_CHAR;
 
-    private String userCommand;
+    private ConsoleCommand userCommand;
     private String fileName;
     private String targetClient;
 
@@ -27,7 +28,7 @@ public class UserSentence {
             case 2:
                 userSentence.fileName = sentenceElements[1];
             case 1:
-                userSentence.userCommand = sentenceElements[0];
+                userSentence.userCommand = getCommandSupportedName(sentenceElements[0]);
             default:
 
         }
@@ -43,8 +44,58 @@ public class UserSentence {
         return sentenceFromConsole.replace(" ", SPLITS_CHAR);
     }
 
-    public String getUserCommand() {
-        return userCommand;
+    private static ConsoleCommand getCommandSupportedName(String command) {
+        switch (command.trim().toUpperCase()) {
+            case "L":
+            case "LIST":
+            case "FILES":
+            case "F":
+            case "FL":
+            case "FILE_LIST":
+            case "FILES LIST":
+            case "FILESLIST":
+            case "FILES_LIST":
+            case "FILE LIST":
+            case "FILELIST":
+                return ConsoleCommand.FILE_LIST;
+            case "PULL":
+            case "PL":
+            case "D":
+            case "DOWNLOAD":
+                return ConsoleCommand.PULL;
+            case "PUSH":
+            case "PS":
+            case "U":
+            case "UPLOAD":
+            case "SEND":
+            case "S":
+                return ConsoleCommand.PUSH;
+            case "MULTIPLE_PULL":
+            case "MULTIPLE PULL":
+            case "MULTIPLEPULL":
+            case "MULTI_PULL":
+            case "MULTI PULL":
+            case "MULTIPULL":
+            case "M_PULL":
+            case "M PULL":
+            case "MPULL":
+            case "MPL":
+            case "MP":
+            case "M":
+                return ConsoleCommand.MULTIPLE_PULL;
+            case "C":
+            case "CLOSE":
+            case "E":
+            case "EXIT":
+            case "Q":
+            case "QUIT":
+            case "UNREGISTER":
+                return ConsoleCommand.CLOSE;
+            case "":
+                return ConsoleCommand.EMPTY_COMMAND;
+            default:
+                return ConsoleCommand.UNSUPPORTED_COMMAND;
+        }
     }
 
     public String getFileName() {
@@ -55,5 +106,7 @@ public class UserSentence {
         return targetClient;
     }
 
-
+    public ConsoleCommand getUserCommand() {
+        return userCommand;
+    }
 }
