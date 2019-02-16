@@ -33,21 +33,25 @@ public class Segment {
         String[] splitSegment = packedSentence.split(String.format("\\%s", Config.SPLITS_CHAR));
 
         Segment segment = new Segment();
-        segment.sourceClient = Integer.parseInt(splitSegment[0]);
-        segment.destinationClient = Integer.parseInt(splitSegment[1]);
+        segment.sourceClient = unpackInt(splitSegment[0]);
+        segment.destinationClient = unpackInt(splitSegment[1]);
         segment.command = splitSegment[2];
         segment.fileName = splitSegment[3];
-        segment.fileSize = Integer.parseInt(splitSegment[4]);
+        segment.fileSize = unpackInt(splitSegment[4]);
         segment.md5Sum = splitSegment[5];
-        segment.sequenceNumber = Integer.parseInt(splitSegment[6]);
-        segment.startByteNumber = Integer.parseInt(splitSegment[7]);
-        segment.endByteNumber = Integer.parseInt(splitSegment[8]);
-        segment.listSize = Integer.parseInt(splitSegment[9]);
-        segment.flag = Integer.parseInt(splitSegment[10]);
+        segment.sequenceNumber = unpackInt(splitSegment[6]);
+        segment.startByteNumber = unpackInt(splitSegment[7]);
+        segment.endByteNumber = unpackInt(splitSegment[8]);
+        segment.listSize = unpackInt(splitSegment[9]);
+        segment.flag = unpackInt(splitSegment[10]);
         segment.message = splitSegment[11];
         segment.comment = splitSegment[12];
 
         return segment;
+    }
+
+    private static int unpackInt(String packedInt) {
+        return packedInt.equals(EMPTY_STRING) ? EMPTY_INT : Integer.parseInt(packedInt);
     }
 
     public int getSourceClient() {
@@ -90,8 +94,8 @@ public class Segment {
         return listSize;
     }
 
-    public int getFlag() {
-        return flag;
+    public boolean getFlag() {
+        return flag == 1;
     }
 
     public String getMessage() {
@@ -103,19 +107,23 @@ public class Segment {
     }
 
     public String pack() {
-        return sourceClient + SPLITS_CHAR +
-                destinationClient + SPLITS_CHAR +
+        return packInt(sourceClient) + SPLITS_CHAR +
+                packInt(destinationClient) + SPLITS_CHAR +
                 command + SPLITS_CHAR +
                 fileName + SPLITS_CHAR +
-                fileSize + SPLITS_CHAR +
+                packInt(fileSize) + SPLITS_CHAR +
                 md5Sum + SPLITS_CHAR +
-                sequenceNumber + SPLITS_CHAR +
-                startByteNumber + SPLITS_CHAR +
-                endByteNumber + SPLITS_CHAR +
-                listSize + SPLITS_CHAR +
-                flag + SPLITS_CHAR +
+                packInt(sequenceNumber) + SPLITS_CHAR +
+                packInt(startByteNumber) + SPLITS_CHAR +
+                packInt(endByteNumber) + SPLITS_CHAR +
+                packInt(listSize) + SPLITS_CHAR +
+                packInt(flag) + SPLITS_CHAR +
                 message + SPLITS_CHAR +
                 comment;
+    }
+
+    private String packInt(int num) {
+        return num == EMPTY_INT ? EMPTY_STRING : String.valueOf(num);
     }
 
     @Override
@@ -195,8 +203,8 @@ public class Segment {
             return this;
         }
 
-        public Builder setFlag(int flag) {
-            segment.flag = flag;
+        public Builder setFlag(boolean flag) {
+            segment.flag = flag ? 1 : 0;
             return this;
         }
 
