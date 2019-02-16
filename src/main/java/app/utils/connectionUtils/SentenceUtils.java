@@ -1,3 +1,4 @@
+/*
 package app.utils.connectionUtils;
 
 import app.config.Config;
@@ -8,7 +9,7 @@ import java.util.Objects;
 public class SentenceUtils {
 
     public static String getCommand(String sentence) {
-        return CommandUtils.getCommand(sentence);
+        return UserSentenceUtils.getCommand(sentence);
     }
 
     public static String getMessage(String sentence) {
@@ -121,3 +122,4 @@ public class SentenceUtils {
         return splitSentence(clientSentence).length;
     }
 }
+*/

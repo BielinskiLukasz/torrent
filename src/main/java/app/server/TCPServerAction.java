@@ -4,10 +4,9 @@ import app.client.host.ClientCommand;
 import app.config.Config;
 import app.utils.Logger;
 import app.utils.connectionUtils.ActionUtils;
+import app.utils.connectionUtils.Segment;
 import app.utils.connectionUtils.SentenceUtils;
 import app.utils.connectionUtils.TCPConnectionUtils;
-import app.utils.fileUtils.FileInfo;
-import app.utils.fileUtils.FileList;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -17,53 +16,43 @@ import java.util.List;
 
 class TCPServerAction {
 
-    static void perform(TCPServer server, Socket connectionSocket, String sentence) {
-        Logger.serverDebugLog("perform: " + sentence);
+    static void perform(TCPServer server, Socket connectionSocket, String packedSegment) {
+        Logger.serverDebugLog("perform: " + packedSegment);
 
-        String command = SentenceUtils.getCommand(sentence);
+        Segment segment = Segment.unpack(packedSegment);
 
-        switch (ServerCommand.valueOf(command)) {
+        switch (ServerCommand.valueOf(segment.getCommand())) {
             case REGISTER:
-                register(server, connectionSocket, sentence);
+                register(server, connectionSocket, segment);
                 break;
             case SERVER_FILE_LIST: // TODO BACKLOG handle unconnected client selection by server
                 getServerFileList(server); // TODO BACKLOG getting file list for all users in the same time (threads);
-                ActionUtils.sendList(connectionSocket, server.getFileList());
+                ActionUtils.sendList(connectionSocket, server.getFileList(), clientSegment);
                 break;
-            case CONFIRM_CONNECTION:
-                confirmConnection(server, connectionSocket, sentence);
-                break;
+            /*case CONFIRM_CONNECTION:
             case CLIENTS_WHO_SHARING_FILE:
-                getClientsWithFile(server, connectionSocket, sentence);
+                getClientsWithFile(server, connectionSocket, packedSegment);
                 break;
             case CLIENTS_WHO_SHARING_SPECIFIC_FILE:
-                getClientsWithSpecificFile(server, connectionSocket, sentence);
+                getClientsWithSpecificFile(server, connectionSocket, packedSegment);
                 break;
             case UNREGISTER:
-                close(server, connectionSocket, sentence);
+                close(server, connectionSocket, packedSegment);
                 break;
             default:
-                sendNotSupportedCommandMessage(connectionSocket, command);
-                break;
+                sendNotSupportedCommandMessage(connectionSocket, segment.getCommand());
+                break;*/ // TODO turn on this
         }
     }
 
-    private static void register(TCPServer server, Socket connectionSocket, String clientSentence) {
-        Logger.serverDebugLog("fire register");
+    private static void register(TCPServer server, Socket connectionSocket, Segment registerSegment) {
+        Logger.serverDebugLog("fire register " + registerSegment);
 
-        int clientNumber = getClientDataFromReceiveRequest(clientSentence);
+        int clientNumber = registerSegment.getSourceClient();
         registerClient(server, clientNumber);
         sendConnectionConfirmation(connectionSocket, clientNumber);
 
         Logger.serverLog("Connection to client " + clientNumber + " was detected");
-    }
-
-    private static int getClientDataFromReceiveRequest(String clientSentence) {
-        String command = SentenceUtils.getCommand(clientSentence);
-        String message = SentenceUtils.getMessage(clientSentence);
-        int clientNumber = SentenceUtils.getClientNumber(clientSentence);
-        Logger.serverDebugLog(command + " input: " + message);
-        return clientNumber;
     }
 
     private static void registerClient(TCPServer server, int clientNumber) {
@@ -72,11 +61,19 @@ class TCPServerAction {
 
     private static void sendConnectionConfirmation(Socket connectionSocket, int clientNumber) {
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        String response = "Hello client " + clientNumber;
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, response);
+
+        Segment connectionConfirmationSegment = Segment.getBuilder()
+                .setSourceClient(0)
+                .setDestinationClient(clientNumber)
+                .setCommand("Connection confirmation")
+                .setMessage("Hello client " + clientNumber)
+                .setComment("send client connection with server confirmation")
+                .build();
+
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, connectionConfirmationSegment.pack());
     }
 
-    private static void confirmConnection(TCPServer server, Socket connectionSocket, String clientSentence) {
+    /*private static void confirmConnection(TCPServer server, Socket connectionSocket, String clientSentence) {
         Logger.serverDebugLog("fire confirmConnection");
 
         int clientNumber = SentenceUtils.getClientNumber(clientSentence);
@@ -87,7 +84,7 @@ class TCPServerAction {
         TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, response, String.valueOf(sourceClientConnected));
 
         Logger.serverLog("Client " + clientNumber + " is connected");
-    }
+    }*/ // TODO turn on this
 
     private static void getServerFileList(TCPServer server) { // TODO BACKLOG secure after unconnected client (stopped)
         Logger.serverDebugLog("fire getServerFileList");
@@ -99,8 +96,15 @@ class TCPServerAction {
                             Config.PORT_NR + userNumber);
 
                     DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(userSocket);
-                    String command = String.valueOf(ClientCommand.CLIENT_FILE_LIST);
-                    TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, command);
+
+                    Segment getListSegment = Segment.getBuilder()
+                            .setSourceClient(0)
+                            .setDestinationClient(userNumber)
+                            .setCommand(ClientCommand.CLIENT_FILE_LIST.name())
+                            .setComment("send client list request")
+                            .build();
+
+                    TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, getListSegment.pack());
 
                     BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(userSocket);
                     String response = TCPConnectionUtils.readBufferedReaderLine(inFromClient);
@@ -123,7 +127,7 @@ class TCPServerAction {
         Logger.serverLog("Server file list sent to client ");
     }
 
-    private static void getClientsWithFile(TCPServer server, Socket connectionSocket, String sentence) {
+    /*private static void getClientsWithFile(TCPServer server, Socket connectionSocket, String sentence) {
         getServerFileList(server);
 
         String fileName = SentenceUtils.getFileName(sentence);
@@ -209,5 +213,5 @@ class TCPServerAction {
         TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, response);
 
         Logger.serverLog("Not supported command message sent");
-    }
+    }*/ // TODO turn on this
 }

@@ -1,3 +1,4 @@
+/*
 package app.client.console.multiHost;
 
 import app.client.host.ClientCommand;
@@ -193,3 +194,4 @@ class MultipleDownloadManager extends Thread {
         // TODO BACKLOG inform about possibility of destroy sourcePart of file
     }
 }
+*/ // TODO turn on this

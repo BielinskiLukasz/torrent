@@ -1,51 +1,33 @@
 package app.client.host.multiHost;
 
-import app.client.console.ConsoleCommand;
 import app.client.host.ClientCommand;
-import app.config.Config;
 import app.server.ServerCommand;
-import app.utils.ExceptionHandler;
 import app.utils.Logger;
 import app.utils.connectionUtils.ActionUtils;
-import app.utils.connectionUtils.CommandUtils;
-import app.utils.connectionUtils.SentenceUtils;
+import app.utils.connectionUtils.Segment;
 import app.utils.connectionUtils.TCPConnectionUtils;
 import app.utils.fileUtils.FileList;
-import app.utils.fileUtils.MD5Sum;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.net.Socket;
-import java.nio.channels.FileChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-
-import static java.lang.Thread.sleep;
 
 class TCPClientConnectionActionMH {
 
-    public static void perform(int clientNumber, Socket connectionSocket, String sentence) {
-        Logger.clientDebugLog("perform: " + sentence);
+    public static void perform(int clientNumber, Socket connectionSocket, String segmentMessage) {
+        Logger.clientDebugLog("perform: " + segmentMessage);
 
-        String command = CommandUtils.getCommand(sentence);
+        Segment segment = Segment.unpack(segmentMessage);
 
-        switch (ClientCommand.valueOf(command)) {
+        switch (ClientCommand.valueOf(segment.getCommand())) {
             case CONNECT:
-                connect(clientNumber, connectionSocket, sentence);
+                connect(connectionSocket, segment);
                 break;
             case CLIENT_FILE_LIST:
-                getClientFileList(clientNumber, connectionSocket, sentence);
+                getClientFileList(connectionSocket, segment);
                 break;
-            case CLIENT_FILE_INFO:
+            /*case CLIENT_FILE_INFO:
                 getFileInfo(clientNumber, connectionSocket, sentence);
                 break;
             case HANDLE_PUSH:
@@ -74,47 +56,45 @@ class TCPClientConnectionActionMH {
                 break;
             default:
                 Logger.clientLog('"' + command + '"' + " command is not supported yet");
-                break;
+                break;*/ // TODO turn on this
         }
     }
 
-    private static void connect(int clientNumber, Socket connectionSocket, String clientSentence) {
+    private static void connect(Socket connectionSocket, Segment clientSegment) {
         Logger.clientDebugLog("fire connect");
 
-        sendConnectionRequest(connectionSocket, clientNumber, clientSentence);
-        receiveConfirmationOfConnection(connectionSocket);
-
-        Logger.clientLog("Client " + clientNumber + " has connected to the server");
-    }
-
-    private static void sendConnectionRequest(Socket connectionSocket, int clientNumber, String clientSentence) {
         DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        String command = String.valueOf(ServerCommand.REGISTER);
-        String message = SentenceUtils.getMessage(clientSentence);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToServer, command, String.valueOf(clientNumber), message);
-    }
 
-    private static void receiveConfirmationOfConnection(Socket connectionSocket) {
+        Segment registerSegment = Segment.getBuilder()
+                .setSourceClient(clientSegment.getSourceClient())
+                .setDestinationClient(clientSegment.getDestinationClient())
+                .setCommand(ServerCommand.REGISTER.name())
+                .setMessage(clientSegment.getMessage())
+                .setComment(clientSegment.getComment())
+                .build();
+
+        TCPConnectionUtils.writeMessageToDataOutputStream(outToServer, registerSegment.pack());
+
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
         TCPConnectionUtils.readBufferedReaderLine(inFromServer);
+
+        Logger.clientLog("Client " + clientSegment.getDestinationClient() + " has connected to the server");
     }
 
-    private static void getClientFileList(int clientNumber, Socket connectionSocket, String clientSentence) {
+    private static void getClientFileList(Socket connectionSocket, Segment clientSegment) {
         Logger.clientDebugLog("fire getClientFileList");
-
-        String command = SentenceUtils.getCommand(clientSentence);
-        Logger.clientDebugLog(command + " input: " + clientSentence);
+        Logger.clientDebugLog("get segment: " + clientSegment);
 
         List<String> clientFileList = FileList.packFileInfoList(
-                FileList.getFileInfoList(clientNumber)
+                FileList.getFileInfoList(clientSegment.getDestinationClient())
         );
 
-        ActionUtils.sendList(connectionSocket, clientFileList);
+        ActionUtils.sendList(connectionSocket, clientFileList, clientSegment);
 
         Logger.clientDebugLog("Client file list sent to server");
     }
 
-    private static void getFileInfo(int clientNumber, Socket connectionSocket, String clientSentence) {
+    /*private static void getFileInfo(int clientNumber, Socket connectionSocket, String clientSentence) {
         Logger.clientDebugLog("fire getFileInfo");
 
         String command = SentenceUtils.getCommand(clientSentence);
@@ -465,5 +445,5 @@ class TCPClientConnectionActionMH {
         int packetNumber = SentenceUtils.getPacketNumber(sentence);
 
         getFilePart(fileName, String.valueOf(packetNumber), startByteNum, endByteNum, clientNumber);
-    }
+    }*/ // TODO turn on this
 }
