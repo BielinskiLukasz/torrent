@@ -1,3 +1,4 @@
+/*
 package app;
 
 import app.client.host.host2host.TCPClientH2H;
@@ -15,3 +16,4 @@ class TORrentHostTCP {
         client.start();
     }
 }
+*/ // TODO turn on this
