@@ -9,7 +9,7 @@ public class UserSentence {
 
     private ConsoleCommand userCommand;
     private String fileName;
-    private String targetClient;
+    private int targetClient;
 
     private UserSentence() {
     }
@@ -24,7 +24,7 @@ public class UserSentence {
         String[] sentenceElements = sentenceFromConsole.split(String.format("\\%s", SPLITS_CHAR));
         switch (sentenceElements.length) {
             case 3:
-                userSentence.targetClient = sentenceElements[2];
+                userSentence.targetClient = Integer.parseInt(sentenceElements[2]);
             case 2:
                 userSentence.fileName = sentenceElements[1];
             case 1:
@@ -104,7 +104,7 @@ public class UserSentence {
         return fileName;
     }
 
-    public String getTargetClient() {
+    public int getTargetClient() {
         return targetClient;
     }
 
