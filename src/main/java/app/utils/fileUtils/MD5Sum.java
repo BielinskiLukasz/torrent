@@ -11,7 +11,7 @@ import java.security.NoSuchAlgorithmException;
 
 public class MD5Sum {
 
-    public static String md5(String filePath) {
+    public static String calculateMd5(String filePath) {
         byte[] data = readFileBytes(filePath);
 
         MessageDigest mDigest = null;
@@ -41,8 +41,8 @@ public class MD5Sum {
     }
 
     public static boolean check(String filePath, String md5Sum) {
-        Logger.clientDebugLog("Check sum for " + filePath + ": " + md5(filePath) + " = " + md5Sum);
+        Logger.clientDebugLog("Check sum for " + filePath + ": " + calculateMd5(filePath) + " = " + md5Sum);
 
-        return md5(filePath).equals(md5Sum);
+        return calculateMd5(filePath).equals(md5Sum);
     }
 }
