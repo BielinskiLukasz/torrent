@@ -28,9 +28,11 @@ class TCPServerAction {
                 getServerFileList(server); // TODO BACKLOG getting file list for all users in the same time (threads);
                 ActionUtils.sendList(connectionSocket, server.getFileList(), segment);
                 break;
-            /*case CONFIRM_CONNECTION:
-            case CLIENTS_WHO_SHARING_FILE:
-                getClientsWithFile(server, connectionSocket, packedSegment);
+            case CONFIRM_CONNECTION:
+                confirmConnection(server, connectionSocket, segment);
+                break;
+            /*case CLIENTS_WHO_SHARING_FILE:
+                getClientsWithFile(server, connectionSocket, segment);
                 break;
             case CLIENTS_WHO_SHARING_SPECIFIC_FILE:
                 getClientsWithSpecificFile(server, connectionSocket, packedSegment);
@@ -60,30 +62,33 @@ class TCPServerAction {
 
     private static void sendConnectionConfirmation(Socket connectionSocket, int clientNumber) {
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-
         Segment connectionConfirmationSegment = Segment.getBuilder()
                 .setSourceClient(0)
                 .setDestinationClient(clientNumber)
-                .setCommand("Connection confirmation")
                 .setMessage("Hello client " + clientNumber)
                 .setComment("send client connection with server confirmation")
                 .build();
-
         TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, connectionConfirmationSegment);
     }
 
-    /*private static void confirmConnection(TCPServer server, Socket connectionSocket, String clientSentence) {
+    private static void confirmConnection(TCPServer server, Socket connectionSocket, Segment pingSegment) {
         Logger.serverDebugLog("fire confirmConnection");
 
-        int clientNumber = SentenceUtils.getClientNumber(clientSentence);
-        boolean sourceClientConnected = server.isClientConnected(clientNumber);
+        int targetClientNumber = pingSegment.getDestinationClient();
+        boolean sourceClientConnected = server.isClientConnected(targetClientNumber);
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        String response = "Client " + clientNumber + " connection confirmation";
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, response, String.valueOf(sourceClientConnected));
+        Segment pingResponse = Segment.getBuilder()
+                .setSourceClient(targetClientNumber)
+                .setDestinationClient(pingSegment.getSourceClient())
+                .setFlag(sourceClientConnected)
+                .setMessage("Ping response")
+                .setComment("send information about client " + targetClientNumber + " connection with server")
+                .build();
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, pingResponse);
 
-        Logger.serverLog("Client " + clientNumber + " is connected");
-    }*/ // TODO turn on this
+        Logger.serverLog("Client " + targetClientNumber + " is connected: " + sourceClientConnected);
+    }
 
     private static void getServerFileList(TCPServer server) { // TODO BACKLOG secure after unconnected client (stopped)
         Logger.serverDebugLog("fire getServerFileList");
@@ -95,14 +100,12 @@ class TCPServerAction {
                             Config.PORT_NR + userNumber);
 
                     DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(userSocket);
-
                     Segment getListSegment = Segment.getBuilder()
                             .setSourceClient(0)
                             .setDestinationClient(userNumber)
                             .setCommand(ClientCommand.CLIENT_FILE_LIST.name())
                             .setComment("send client list request")
                             .build();
-
                     TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, getListSegment);
 
                     BufferedReader inFromClient = TCPConnectionUtils.getBufferedReader(userSocket);

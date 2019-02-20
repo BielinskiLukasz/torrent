@@ -1,17 +1,26 @@
 package app.client.host.multiHost;
 
 import app.client.host.ClientCommand;
+import app.config.Config;
 import app.server.ServerCommand;
+import app.utils.ExceptionHandler;
 import app.utils.Logger;
 import app.utils.connectionUtils.ActionUtils;
 import app.utils.connectionUtils.Segment;
 import app.utils.connectionUtils.TCPConnectionUtils;
 import app.utils.fileUtils.FileList;
+import app.utils.fileUtils.MD5Sum;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.List;
+
+import static java.lang.Thread.sleep;
 
 class TCPClientConnectionActionMH {
 
@@ -27,7 +36,10 @@ class TCPClientConnectionActionMH {
             case CLIENT_FILE_LIST:
                 getClientFileList(connectionSocket, segment);
                 break;
-            /*case CLIENT_FILE_INFO:
+            case HANDLE_PULL:
+                handlePull(connectionSocket, segment);
+                break;
+            /*case CLIENT_FILE_INFO: // TODO check is it use anywhere
                 getFileInfo(clientNumber, connectionSocket, sentence);
                 break;
             case HANDLE_PUSH:
@@ -47,11 +59,11 @@ class TCPClientConnectionActionMH {
                 break;
             case HANDLE_RE_PUSH:
                 handleRePush(clientNumber, connectionSocket, sentence);
-                break;
+                break;*/
             case CHECK_SENDING:
-                checkingSendingCorrectness(clientNumber, sentence);
+                checkingSendingCorrectness(clientNumber, segment);
                 break;
-            case CREATE_PART_OF_FILE:
+            /*case CREATE_PART_OF_FILE:
                 createPartOfFile(clientNumber, sentence);
                 break;
             default:
@@ -64,7 +76,6 @@ class TCPClientConnectionActionMH {
         Logger.clientDebugLog("fire connect");
 
         DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-
         Segment registerSegment = Segment.getBuilder()
                 .setSourceClient(clientSegment.getSourceClient())
                 .setDestinationClient(clientSegment.getDestinationClient())
@@ -72,7 +83,6 @@ class TCPClientConnectionActionMH {
                 .setMessage(clientSegment.getMessage())
                 .setComment(clientSegment.getComment())
                 .build();
-
         TCPConnectionUtils.writeSegmentToDataOutputStream(outToServer, registerSegment);
 
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
@@ -94,6 +104,103 @@ class TCPClientConnectionActionMH {
         Logger.clientDebugLog("Client file list sent to server");
     }
 
+    private static void handlePull(Socket connectionSocket, Segment segment) {
+        Logger.clientDebugLog("fire handlePull");
+
+        boolean haveFile = ActionUtils.isClientHaveFile(segment.getDestinationClient(), segment.getFileName());
+
+        if (haveFile) {
+            String fileName = segment.getFileName();
+            int sourceClientNumber = segment.getDestinationClient();
+            int targetClientNumber = segment.getSourceClient();
+
+            String filePath = Config.BASIC_PATH + sourceClientNumber + "//" + fileName;
+            File file = new File(filePath);
+            Long fileSize = file.length();
+            String md5Sum = MD5Sum.calculateMd5(filePath);
+
+            DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+            Segment confirmFileExistence = Segment.getBuilder()
+                    .setSourceClient(sourceClientNumber)
+                    .setDestinationClient(targetClientNumber)
+                    .setFileName(fileName)
+                    .setFileSize(fileSize)
+                    .setMd5Sum(md5Sum)
+                    .setFlag(true)
+                    .setComment("send info about file existence")
+                    .build();
+            TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, confirmFileExistence);
+
+            BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
+            Segment pullRequestDetails = Segment.unpack(TCPConnectionUtils.readBufferedReaderLine(inFromServer));
+
+            FileInputStream fileInputStream = TCPConnectionUtils.createFileInputStream(file);
+            try {
+                long startByteNumber = pullRequestDetails.getStartByteNumber();
+                Logger.clientDebugLog("Skip " + startByteNumber + " bytes");
+                fileInputStream.skip(startByteNumber);
+            } catch (IOException e) {
+                ExceptionHandler.handle(e);
+            }
+            OutputStream outputStream = TCPConnectionUtils.getOutputStream(connectionSocket);
+            TCPConnectionUtils.writeFileToStream(fileInputStream, outputStream);
+            TCPConnectionUtils.closeFileInputStream(fileInputStream);
+
+            Logger.clientDebugLog("Sending file " + fileName + " to client " + targetClientNumber + " ends");
+
+            boolean reconnect = false;
+            TCPConnectionUtils.closeSocket(connectionSocket);
+
+            for (int i = 0; i < Config.WAITING_TIME_SEC; i++) {
+                try {
+                    Logger.clientDebugLog("Try reconnect with client " + targetClientNumber);
+                    connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR + targetClientNumber);
+                    reconnect = true;
+                    break;
+                } catch (IOException e) {
+                    ExceptionHandler.handle(e);
+                }
+
+                try { // TODO sleep
+                    sleep(1000);
+                } catch (InterruptedException e) {
+                    ExceptionHandler.handle(e);
+                }
+            }
+
+            if (reconnect) {
+                outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+                Segment checkSending = Segment.getBuilder()
+                        .setSourceClient(sourceClientNumber)
+                        .setDestinationClient(targetClientNumber)
+                        .setCommand(ClientCommand.CHECK_SENDING.name())
+                        .setFileName(fileName)
+                        .setFileSize(fileSize)
+                        .setMd5Sum(md5Sum)
+                        .setComment("check correctness of file sending")
+                        .build();
+                TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, checkSending);
+            } else {
+                TCPConnectionUtils.closeSocket(connectionSocket);
+
+                Logger.clientLog("Cannot reconnect with client " + sourceClientNumber);
+            }
+
+        } else {
+            DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+            Segment confirmFileExistence = Segment.getBuilder()
+                    .setSourceClient(segment.getDestinationClient())
+                    .setDestinationClient(segment.getSourceClient())
+                    .setFileName(segment.getFileName())
+                    .setFlag(false)
+                    .setComment("send info about file existence")
+                    .build();
+            TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, confirmFileExistence);
+        }
+
+        Logger.clientDebugLog("handlePull sequence ended");
+    }
+
     /*private static void getFileInfo(int clientNumber, Socket connectionSocket, String clientSentence) {
         Logger.clientDebugLog("fire getFileInfo");
 
@@ -104,7 +211,7 @@ class TCPClientConnectionActionMH {
         String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
         File file = new File(filePath);
         Long fileSize = file.length();
-        String md5Sum = MD5Sum.md5(filePath);
+        String md5Sum = MD5Sum.calculateMd5(filePath);
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
@@ -165,7 +272,7 @@ class TCPClientConnectionActionMH {
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String command = String.valueOf(ConsoleCommand.MULTIPLE_PULL);
-        String md5sum = MD5Sum.md5(selectedPartPath);
+        String md5sum = MD5Sum.calculateMd5(selectedPartPath);
         String response = "Sending file " + fileName + " md5 sum";
         TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                 command,
@@ -289,35 +396,35 @@ class TCPClientConnectionActionMH {
         }
 
         Logger.clientDebugLog(command + " downloading sequence ended");
+    }*/
+
+    private static void checkingSendingCorrectness(int clientNumber, Segment segment) {
+//        Logger.clientDebugLog("fire checkingSendingCorrectness"); // TODO implement
+//
+//        String fileName = SentenceUtils.getFileName(sentence);
+//        String fileMD5Sum = SentenceUtils.getMD5Sum(sentence);
+//        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+//        if (MD5Sum.check(filePath, fileMD5Sum)) {
+//            Logger.clientDebugLog("Confirmation of the correctness of sending");
+//        } else {
+//            int sourceClientNumber = SentenceUtils.getClientNumber(sentence);
+//            Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,
+//                    Config.PORT_NR + sourceClientNumber);
+//
+//            DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+//            String command = String.valueOf(ClientCommand.RE_PUSH);
+//            TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
+//                    command,
+//                    String.valueOf(clientNumber),
+//                    fileName,
+//                    String.valueOf((new File(filePath)).length()));
+//            Logger.clientDebugLog("RePush request sent");
+//
+//            TCPConnectionUtils.closeSocket(connectionSocket);
+//        }
     }
 
-    private static void checkingSendingCorrectness(int clientNumber, String sentence) {
-        Logger.clientDebugLog("fire checkingSendingCorrectness");
-
-        String fileName = SentenceUtils.getFileName(sentence);
-        String fileMD5Sum = SentenceUtils.getMD5Sum(sentence);
-        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
-        if (MD5Sum.check(filePath, fileMD5Sum)) {
-            Logger.clientDebugLog("Confirmation of the correctness of sending");
-        } else {
-            int sourceClientNumber = SentenceUtils.getClientNumber(sentence);
-            Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,
-                    Config.PORT_NR + sourceClientNumber);
-
-            DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-            String command = String.valueOf(ClientCommand.RE_PUSH);
-            TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
-                    command,
-                    String.valueOf(clientNumber),
-                    fileName,
-                    String.valueOf((new File(filePath)).length()));
-            Logger.clientDebugLog("RePush request sent");
-
-            TCPConnectionUtils.closeSocket(connectionSocket);
-        }
-    }
-
-    private static void invokeRePush(int clientNumber,
+    /*private static void invokeRePush(int clientNumber,
                                      Socket connectionSocket,
                                      String clientSentence) {
         Logger.clientDebugLog("fire invokeRePush");
@@ -401,7 +508,7 @@ class TCPClientConnectionActionMH {
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
         String command = String.valueOf(ClientCommand.HANDLE_RE_PUSH);
-        String md5sum = MD5Sum.md5(filePath);
+        String md5sum = MD5Sum.calculateMd5(filePath);
         TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                 command,
                 String.valueOf(clientNumber),

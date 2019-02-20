@@ -1,16 +1,25 @@
 package app.client.console.multiHost;
 
+import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
+import app.utils.ExceptionHandler;
 import app.utils.Logger;
+import app.utils.connectionUtils.ActionUtils;
 import app.utils.connectionUtils.Segment;
 import app.utils.connectionUtils.TCPConnectionUtils;
 import app.utils.connectionUtils.UserSentence;
+import app.utils.fileUtils.MD5Sum;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
-import java.util.Arrays;
+
+import static java.lang.Thread.sleep;
 
 class TCPConsoleActionMH {
 
@@ -19,18 +28,14 @@ class TCPConsoleActionMH {
 
         UserSentence userSentence = UserSentence.getUserSentence(sentenceFromConsole);
 
-        Logger.consoleDebugLog("perform after clean: " + userSentence);
-
-        Logger.consoleDebugLog("perform after set number: " + userSentence);
-
         switch (userSentence.getUserCommand()) {
             case FILE_LIST:
                 getFileList(clientNumber);
                 break;
-           /* case PULL: // TODO BACKLOG print message in console if host haven't file
+            case PULL: // TODO BACKLOG print message in console if host haven't file
                 pull(clientNumber, userSentence);
                 break;
-            case PUSH:
+           /* case PUSH:
                 push(clientNumber, userSentence);
                 break;
             case MULTIPLE_PULL:
@@ -49,6 +54,8 @@ class TCPConsoleActionMH {
             default:
                 Logger.consoleLog("command is not supported");
                 break;*/ // TODO turn on this
+
+            // TODO BACKLOG rename TCP to Tcp
 
             // TODO BACKLOG create function classes for each feature (CONNECT, FILE_LIST, PULL (MULTI_PULL), PUSH, CLOSE)
             //  with have method connected with action e.g. ClientA sending message - PUSH (client number),
@@ -78,7 +85,7 @@ class TCPConsoleActionMH {
     }
 
     private static void getFileList(int clientNumber) {
-        Logger.consoleDebugLog("fire getFileList " + Arrays.toString(Thread.currentThread().getStackTrace())); // TODO test this
+        Logger.consoleDebugLog("fire getFileList ");
 
         Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
         DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
@@ -108,35 +115,174 @@ class TCPConsoleActionMH {
         Logger.consoleLog("End files list");
     }
 
-    /*private static void pull(int clientNumber, String userSentence) {
+    private static void pull(int clientNumber, UserSentence userSentence) {
         Logger.consoleDebugLog("fire pull");
 
-        int sourceClientNumber = SentenceUtils.getClientNumber(userSentence);
+        int targetClientNumber = userSentence.getTargetClient();
 
-        if (isClientChooseHisOwnNumber(clientNumber, sourceClientNumber)) {
+        if (isClientChooseHisOwnNumber(clientNumber, targetClientNumber)) {
             Logger.consoleLog("This is not the client you are looking for :)");
             Logger.consoleLog("There is no need to download the file from yourself");
         } else {
-            if (ActionUtils.isSelectedClientConnected(sourceClientNumber)) {
+            if (ActionUtils.isSelectedClientConnected(clientNumber, targetClientNumber)) {
 
-                Socket hostConnectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP,
-                        Config.PORT_NR + sourceClientNumber);
+                String fileName = userSentence.getFileName();
 
-                DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
-                String command = String.valueOf(ClientCommand.PUSH_ON_DEMAND);
-                String fileName = SentenceUtils.getFileName(userSentence);
-                TCPConnectionUtils.writeMessageToDataOutputStream(outToClient, command, String.valueOf(clientNumber), fileName);
+                Socket connectionSocket = TCPConnectionUtils.createSocket(
+                        Config.HOST_IP, Config.PORT_NR + targetClientNumber);
 
-                TCPConnectionUtils.closeSocket(hostConnectionSocket);
+                DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+                Segment existRequest = Segment.getBuilder()
+                        .setSourceClient(clientNumber)
+                        .setDestinationClient(targetClientNumber)
+                        .setCommand(ClientCommand.HANDLE_PULL.name())
+                        .setFileName(fileName)
+                        .setComment("send file exist request")
+                        .build();
+                TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, existRequest);
 
-                Logger.consoleLog("Sending push request");
+                BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
+                Segment fileDetails = Segment.unpack(TCPConnectionUtils.readBufferedReaderLine(inFromServer));
+
+                if (fileDetails.getFlag()) {
+                    String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+                    File file = new File(filePath);
+
+                    Segment pullRequest = Segment.getBuilder()
+                            .setSourceClient(clientNumber)
+                            .setDestinationClient(targetClientNumber)
+                            .setFileName(fileName)
+                            .setStartByteNumber(file.length())
+                            .setEndByteNumber(fileDetails.getFileSize())
+                            .setComment("send file pull request")
+                            .build();
+                    TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, pullRequest);
+
+                    FileOutputStream fileOutputStream = TCPConnectionUtils.createFileOutputStream(file);
+                    InputStream inputStream = TCPConnectionUtils.getInputStream(connectionSocket);
+                    TCPConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
+                    TCPConnectionUtils.closeFileOutputStream(fileOutputStream);
+
+                    Logger.consoleDebugLog("Receiving file " + fileName + " from client " + targetClientNumber + " ends");
+
+                    if (MD5Sum.check(filePath, fileDetails.getMd5Sum())) {
+                        Logger.clientLog("File downloaded successfully");
+                    } else {
+                        if (file.length() >= fileDetails.getFileSize()) {
+                            Logger.clientLog("Remove invalid file");
+                            file.delete();
+                        }
+                        Logger.clientLog("Unsuccessful file download");
+//                        repull(clientNumber, userSentence); //TODO implement
+                    }
+                } else {
+                    Logger.clientLog("Client " + targetClientNumber + " haven't " + fileName + " file");
+                }
+
+                TCPConnectionUtils.closeSocket(connectionSocket);
+
+                Logger.consoleLog("Sending push request"); // TODO refactor message
             } else {
-                Logger.consoleLog("Client " + sourceClientNumber + " isn't connected");
+                Logger.consoleLog("Client " + targetClientNumber + " isn't connected");
             }
         }
     }
 
-    private static void push(int clientNumber, String userSentence) {
+    private static void repull(int clientNumber, UserSentence userSentence) { // TODO implements repull method
+        Logger.consoleDebugLog("fire pull");
+
+        int targetClientNumber = userSentence.getTargetClient();
+
+        if (isClientChooseHisOwnNumber(clientNumber, targetClientNumber)) {
+            Logger.consoleLog("This is not the client you are looking for :)");
+            Logger.consoleLog("There is no need to download the file from yourself");
+        } else {
+            if (ActionUtils.isSelectedClientConnected(clientNumber, targetClientNumber)) {
+
+                String fileName = userSentence.getFileName();
+
+                Socket connectionSocket = null;
+                boolean reconnect = false;
+
+                for (int i = 0; i < Config.WAITING_TIME_SEC; i++) {
+                    try {
+                        Logger.clientDebugLog("Try connect with client " + targetClientNumber);
+                        connectionSocket = new Socket(Config.HOST_IP, Config.PORT_NR + targetClientNumber);
+                        reconnect = true;
+                        break;
+                    } catch (IOException e) {
+                        ExceptionHandler.handle(e);
+                    }
+
+                    try { // TODO sleep
+                        sleep(1000);
+                    } catch (InterruptedException e) {
+                        ExceptionHandler.handle(e);
+                    }
+                }
+
+                if (reconnect) {
+                    DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(connectionSocket);
+                    Segment existRequest = Segment.getBuilder()
+                            .setSourceClient(clientNumber)
+                            .setDestinationClient(targetClientNumber)
+                            .setCommand(ClientCommand.HANDLE_PULL.name())
+                            .setFileName(fileName)
+                            .setComment("send file exist request")
+                            .build();
+                    TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, existRequest);
+
+                    BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
+                    Segment fileDetails = Segment.unpack(TCPConnectionUtils.readBufferedReaderLine(inFromServer));
+
+                    if (fileDetails.getFlag()) {
+                        String filePath = Config.BASIC_PATH + clientNumber + "//" + fileName;
+                        File file = new File(filePath);
+
+                        Segment pullRequest = Segment.getBuilder()
+                                .setSourceClient(clientNumber)
+                                .setDestinationClient(targetClientNumber)
+                                .setFileName(fileName)
+                                .setStartByteNumber(file.length())
+                                .setEndByteNumber(fileDetails.getFileSize())
+                                .setComment("send file pull request")
+                                .build();
+                        TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient, pullRequest);
+
+                        FileOutputStream fileOutputStream = TCPConnectionUtils.createFileOutputStream(file);
+                        InputStream inputStream = TCPConnectionUtils.getInputStream(connectionSocket);
+                        TCPConnectionUtils.readFileFromStream(fileOutputStream, inputStream);
+                        TCPConnectionUtils.closeFileOutputStream(fileOutputStream);
+
+                        Logger.consoleDebugLog("Receiving file " + fileName + " from client " + targetClientNumber + " ends");
+
+                        if (MD5Sum.check(filePath, fileDetails.getMd5Sum())) {
+                            Logger.clientLog("File downloaded successfully");
+                        } else {
+                            if (file.length() >= fileDetails.getFileSize()) {
+                                Logger.clientLog("Remove invalid file");
+                                file.delete();
+                            }
+                            Logger.clientLog("Unsuccessful file download");
+                            pull(clientNumber, userSentence);
+                        }
+                    } else {
+                        Logger.clientLog("Client " + targetClientNumber + " haven't " + fileName + " file");
+                    }
+
+                    TCPConnectionUtils.closeSocket(connectionSocket);
+
+                    Logger.consoleLog("Sending push request"); // TODO refactor message
+                } else {
+                    Logger.consoleLog("Cannot connect with client " + targetClientNumber);
+                }
+            } else {
+                Logger.consoleLog("Client " + targetClientNumber + " isn't connected");
+            }
+        }
+    }
+
+    /*private static void push(int clientNumber, String userSentence) {
         Logger.consoleDebugLog("fire push");
 
         int targetClientNumber = SentenceUtils.getClientNumber(userSentence);
@@ -150,13 +296,13 @@ class TCPConsoleActionMH {
         } else {
             Logger.consoleLog("You haven't selected file");
         }
-    }
+    }*/
 
     private static boolean isClientChooseHisOwnNumber(int clientNumber, int targetClientNumber) {
         return targetClientNumber == clientNumber;
     }
 
-    private static void multiplePull(int clientNumber, String userSentence, boolean md5SumDefined) {
+    /*private static void multiplePull(int clientNumber, String userSentence, boolean md5SumDefined) {
         Logger.consoleDebugLog("fire multiplePull");
 
         String fileName = SentenceUtils.getFileName(userSentence);

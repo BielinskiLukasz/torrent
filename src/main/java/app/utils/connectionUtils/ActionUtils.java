@@ -1,6 +1,5 @@
 package app.utils.connectionUtils;
 
-import app.client.console.ConsoleCommand;
 import app.client.host.ClientCommand;
 import app.config.Config;
 import app.server.ServerCommand;
@@ -214,9 +213,14 @@ public class ActionUtils {
         Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
 
         DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
-        TCPConnectionUtils.writeMessageToDataOutputStream(outToServer,
-                String.valueOf(ServerCommand.CONFIRM_CONNECTION),
-                String.valueOf(sourceClientNumber));
+        Segment pingRequest = Segment.getBuilder()
+                .setSourceClient(requestClientNumber)
+                .setDestinationClient(targetClientNumber)
+                .setCommand(ServerCommand.CONFIRM_CONNECTION.name())
+                .setMessage("Ping request")
+                .setComment("check client " + targetClientNumber + " connection with server")
+                .build();
+        TCPConnectionUtils.writeSegmentToDataOutputStream(outToServer, pingRequest);
 
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
         Segment response = Segment.unpack(TCPConnectionUtils.readBufferedReaderLine(inFromServer));
