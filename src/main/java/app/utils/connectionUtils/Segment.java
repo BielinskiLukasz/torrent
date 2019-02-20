@@ -65,8 +65,8 @@ public class Segment {
         return fileName;
     }
 
-    public int getFileSize() {
-        return Integer.parseInt(fileSize);
+    public long getFileSize() {
+        return Long.parseLong(fileSize);
     }
 
     public String getMd5Sum() {
@@ -77,12 +77,12 @@ public class Segment {
         return Integer.parseInt(sequenceNumber);
     }
 
-    public int getStartByteNumber() {
-        return Integer.parseInt(startByteNumber);
+    public long getStartByteNumber() {
+        return Long.parseLong(startByteNumber);
     }
 
-    public int getEndByteNumber() {
-        return Integer.parseInt(endByteNumber);
+    public long getEndByteNumber() {
+        return Long.parseLong(endByteNumber);
     }
 
     public int getListSize() {
@@ -164,7 +164,7 @@ public class Segment {
             return this;
         }
 
-        public Builder setFileSize(int fileSize) {
+        public Builder setFileSize(long fileSize) {
             segment.fileSize = String.valueOf(fileSize);
             return this;
         }
@@ -179,12 +179,12 @@ public class Segment {
             return this;
         }
 
-        public Builder setStartByteNumber(int startByteNumber) {
+        public Builder setStartByteNumber(long startByteNumber) {
             segment.startByteNumber = String.valueOf(startByteNumber);
             return this;
         }
 
-        public Builder setEndByteNumber(int endByteNumber) {
+        public Builder setEndByteNumber(long endByteNumber) {
             segment.endByteNumber = String.valueOf(endByteNumber);
             return this;
         }
