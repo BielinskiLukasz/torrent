@@ -62,7 +62,6 @@ class TCPClientConnectionMH extends Thread {
         Logger.clientDebugLog("TCPClientConnectionMH: fire connectWithServer");
 
         Socket serverSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
-
         Segment helloSegment = Segment.getBuilder()
                 .setSourceClient(client.getClientNumber())
                 .setDestinationClient(0)
@@ -70,7 +69,6 @@ class TCPClientConnectionMH extends Thread {
                 .setMessage("Hello, I'm client " + client.getClientNumber())
                 .setComment("connect client with server")
                 .build();
-
         TCPClientConnectionActionMH.perform(client.getClientNumber(), serverSocket, helloSegment.pack());
 
         TCPConnectionUtils.closeSocket(serverSocket);

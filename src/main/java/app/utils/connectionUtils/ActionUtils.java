@@ -41,7 +41,7 @@ public class ActionUtils {
         }
     }
 
-    private static boolean isClientHaveFile(int clientNumber, String fileName) {
+    public static boolean isClientHaveFile(int clientNumber, String fileName) {
         List<String> clientFileNameList = FileList.getFileNameList(clientNumber);
         return clientFileNameList.contains(fileName);
     }
@@ -62,7 +62,7 @@ public class ActionUtils {
                 String.valueOf(sourceClientNumber),
                 fileName);
 
-        String md5sum = MD5Sum.md5(filePath);
+        String md5sum = MD5Sum.calculateMd5(filePath);
         String response = "Sending file " + fileName + " md5 sum";
         TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                 command,
@@ -116,7 +116,7 @@ public class ActionUtils {
                     command,
                     String.valueOf(sourceClientNumber),
                     fileName,
-                    MD5Sum.md5(filePath));
+                    MD5Sum.calculateMd5(filePath));
         } else {
             TCPConnectionUtils.closeSocket(hostConnectionSocket);
 
@@ -142,7 +142,7 @@ public class ActionUtils {
 
         DataOutputStream outToClient = TCPConnectionUtils.getDataOutputStream(hostConnectionSocket);
         String command = String.valueOf(ClientCommand.HANDLE_RE_PUSH);
-        String md5sum = MD5Sum.md5(filePath);
+        String md5sum = MD5Sum.calculateMd5(filePath);
 
         TCPConnectionUtils.writeSegmentToDataOutputStream(outToClient,
                 command,
@@ -200,7 +200,7 @@ public class ActionUtils {
                     command,
                     String.valueOf(sourceClientNumber),
                     fileName,
-                    MD5Sum.md5(filePath));
+                    MD5Sum.calculateMd5(filePath));
         } else {
             TCPConnectionUtils.closeSocket(hostConnectionSocket);
 
@@ -210,7 +210,7 @@ public class ActionUtils {
         Logger.consoleLog("Finished");
     }
 
-    public static boolean isSelectedClientConnected(int sourceClientNumber) {
+    public static boolean isSelectedClientConnected(int requestClientNumber, int targetClientNumber) {
         Socket connectionSocket = TCPConnectionUtils.createSocket(Config.HOST_IP, Config.PORT_NR);
 
         DataOutputStream outToServer = TCPConnectionUtils.getDataOutputStream(connectionSocket);
@@ -219,13 +219,11 @@ public class ActionUtils {
                 String.valueOf(sourceClientNumber));
 
         BufferedReader inFromServer = TCPConnectionUtils.getBufferedReader(connectionSocket);
-        String response = TCPConnectionUtils.readBufferedReaderLine(inFromServer);
-//        boolean sourceClientConnected = SentenceUtils.getBoolean(response); //TODO refactor
+        Segment response = Segment.unpack(TCPConnectionUtils.readBufferedReaderLine(inFromServer));
 
         TCPConnectionUtils.closeSocket(connectionSocket);
 
-//        return sourceClientConnected; //TODO refactor
-        return false; //TODO delete after refactor
+        return response.getFlag();
     }
 
     public static void sendList(Socket connectionSocket, List serverFileList, Segment segment) {
@@ -234,7 +232,6 @@ public class ActionUtils {
         Segment listSizeSegment = Segment.getBuilder()
                 .setSourceClient(segment.getDestinationClient())
                 .setDestinationClient(segment.getSourceClient())
-                .setCommand(ConsoleCommand.FILE_LIST.name())
                 .setListSize(serverFileList.size())
                 .setMessage("List size")
                 .setComment("send list size")
@@ -247,7 +244,6 @@ public class ActionUtils {
                     Segment listElementSegment = Segment.getBuilder()
                             .setSourceClient(segment.getDestinationClient())
                             .setDestinationClient(segment.getSourceClient())
-                            .setCommand(ConsoleCommand.FILE_LIST.name())
                             .setListSize(serverFileList.size())
                             .setMessage(String.valueOf(fileData))
                             .setComment("send list element")

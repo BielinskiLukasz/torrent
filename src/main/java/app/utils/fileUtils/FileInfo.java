@@ -13,7 +13,7 @@ public class FileInfo {
 
         this.clientId = clientId;
         this.name = fileName;
-        this.md5 = MD5Sum.md5(filePath);
+        this.md5 = MD5Sum.calculateMd5(filePath);
     }
 
     FileInfo(String data) {
