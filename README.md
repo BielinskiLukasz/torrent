@@ -1,8 +1,6 @@
 # School project for PJATK SKJ 
 # TORrent
 ***https://github.com/BielinskiLukasz/torrent***
-
-***for English please see below (from the next thick line)***
 ****
 
 Instrukcja:
@@ -104,4 +102,3 @@ exit
 - _utils/Logger.java_ - konfiguracja wyświetlania logów
 
 ****
-### TODO English version update
