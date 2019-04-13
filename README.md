@@ -1,107 +1,60 @@
-# School project for PJATK SKJ 
-# TORrent
-***https://github.com/BielinskiLukasz/torrent***
+# Torrent P2P File Transfer (TCP Implementation)
 
-***for English please see below (from the next thick line)***
-****
+![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white)
+![Protocol](https://img.shields.io/badge/Protocol-TCP-blue?style=for-the-badge)
 
-Instrukcja:
--
-- Aplikacja umożliwia wymianę plików zarówno między dwoma (wersja h2h) jak i wieloma klientami (mh);
-- Aplikacja pracuje pod nadzorem protokołu TCP;
-- Klienci aplikacji realizują polecenia z konsoli jednowątkowo (każdy niezależnie);
-- Każda instancja aplikacji ma domyślny folder z pobieranymi/udostępnianymi plikami (możliwa zmiana folderu w konfiguracji aplikacji);
-- Zakłada się, że powyższy folder został wcześniej utworzony
-- Ścieżki i zmienne globalne mogą być konfigurowane przed skompilowaniem w pliku config/Config.java;
-- Wyświetlanie logów może być konfigurowane przed skompilowaniem w pliku utils/Logger.java;
-- Maksymalny rozmiar przesyłanych plików to 2047MB
+A robust Peer-to-Peer (P2P) file-sharing application implemented in Java, utilizing the **TCP protocol** for reliable data transmission. Developed as a high-performance networking project for **PJATK**, it features both direct Host-to-Host (H2H) and Multi-Host (MH) coordination models.
 
+## 🚀 Key Features
 
-***API***
-- Wszystkie argumenty uruchamianych klientów muszą być oddzielone spacjami;
-- Nazwy plików można podawać w cudzysłowie lub bez niego;
-- Nazwy plików nie mogą zawierać znaku '*';
-- Uruchomienie serwera nie wymaga żadnych argumentów;
-- Uruchomienie klientów pracujących w trybie mh wymaga podania numeru klienta (unikatowa liczba naturalna większa od 0);
-- Uruchomienie pierwszego klienta pracującego w trybie h2h wymaga podania numeru klienta (unikatowa liczba naturalna większa od 0);
-- Uruchomienie drugiego klienta pracującego w trybie h2h wymaga podania numeru klienta (unikatowa liczba naturalna większa od 0) oraz numeru pierwszego klienta;
-- Wszystkie parametry zapytań muszą być oddzielane spacją;
-- Tylko pliki znajdujące się bezpośrednio w domyślnym folderze są widoczne (foldery znajdujące się w domyślnym folderze są pomijane);
+*   **Reliable Data Transfer:** Built entirely on TCP to guarantee packet delivery and data integrity.
+*   **Connection Resilience (Auto-Resume):** Intelligent mechanism that automatically attempts to resume interrupted transfers if a peer reconnects within a configurable grace period.
+*   **Multi-Source Swarming:** The `multiple_pull` feature allows segments of a single file to be downloaded from multiple peers simultaneously, optimizing bandwidth.
+*   **Integrity Verification:** Uses checksums to validate files during listing and after transfer.
+*   **Flexible Architecture:**
+    *   **Host-to-Host (H2H):** Decentralized direct connection between two peers.
+    *   **Multi-Host (MH):** Centralized coordination via a tracker server for managing multiple clients.
 
-**Dostępne zapytania:**
+## 🛠 Technical Specifications
 
-- list
+*   **Language:** Java (Multi-threaded)
+*   **Networking:** Socket Programming (TCP/IP)
+*   **Architecture:** Hybrid Client-Server / P2P
+*   **File Handling:** Supports files up to **2047 MB** (32-bit signed integer limitation).
+*   **Configuration:** Externalized settings via `config/Config.java` and `utils/Logger.java`.
 
-Wyświetla listę dostępnych do pobrania plików wraz z numerem klienta udostępniającego dany plik oraz sumą kontrolną pliku.
-````
-list
-````
+## ⚙️ Configuration
 
-- pull
+The application is highly customizable before compilation:
+*   **`config/Config.java`**: Adjust global paths, default shared directories, connection timeouts, and retry intervals.
+*   **`utils/Logger.java`**: Fine-tune logging verbosity (Debug/Info/Error) for console output.
 
-Pobiera wybrany plik od wskazanego klienta. Przed pobraniem sprawdza, czy wskazany klient połączony jest z serwerem i udostępnia wskazany plik. Wznawia pobieranie w przypadku przerwania połączenia oraz wstrzymania/wyłączenia na krótki czas jednego z klientów (ale nie dwóch, w przypadku wyłączenia dwóch klientów pobieranie nie zostanie wznowione). Czas usiłowania nawiązania ponownego połączenia można edytować w pliku konfiguracyjnym.
+## 💻 Usage & API
 
-W przypadku połączenia h2h nie jest wymagane podawanie numeru klienta.
-````
-Host2host:
-pull nazwa_pliku(string)
+### Running the Application
 
-przykład:
-pull exampleFileFromClient2.txt
+1.  **Tracker Server:** Run the main server class without arguments to start the coordination node.
+2.  **Multi-Host Client:** Start with a unique ID: `java Client [ID]`.
+3.  **Host-to-Host Mode:**
+    *   First Peer: `java Client [ID]`
+    *   Second Peer: `java Client [ID] [First_Peer_ID]`
 
-Mutli host:
-pull numer_klienta_udostępniającego_plik(int) nazwa_pliku(string)
+### Command Reference
 
-przykład:
-pull 2 exampleFileFromClient2.txt
-````
+| Command | Description | Example |
+| :--- | :--- | :--- |
+| `list` | Lists all shared files on the network with owner IDs and checksums. | `list` |
+| `pull` | Downloads a file from a specific client with auto-resume support. | `pull 2 document.pdf` |
+| `push` | Uploads a local file to a specified remote peer. | `push 2 image.png` |
+| `multiple_pull` | Aggregates file segments from all available peers sharing the file. | `multiple_pull dataset.zip` |
+| `exit` | Gracefully disconnects and stops sharing files. | `exit` |
 
-- push
+> **Note:** Wrap filenames containing spaces in quotes. The character `*` is reserved and cannot be used in filenames.
 
-Wysyła wybrany (lokalny) plik do wskazanego klienta. Przed wysłaniem sprawdza, czy wskazany klient połączony jest z serwerem i czy klient wysyłający udostępnia wskazany plik. Wznawia wysyłanie w przypadku przerwania połączenia oraz wstrzymania/wyłączenia na krótki czas jednego z klientów (ale nie dwóch, w przypadku wyłączenia dwóch klientów wysyłanie nie zostanie wznowione). Czas usiłowania nawiązania ponownego połączeniu można edytować w pliku konfiguracyjnym.
+## 📋 Future Roadmap
+- [ ] Transition to 64-bit offsets for files > 2GB.
+- [ ] Implement Regex-based API validation for more robust command parsing.
+- [ ] Add a graphical dashboard using JavaFX.
 
-W przypadku połączenia h2h nie jest wymagane podawanie numeru klienta. 
-````
-Host2host:
-push nazwa_pliku(string)
-
-przykład:
-push otherFileFromCientEnteringCommand.txt
-
-Mutli host:
-push 2 otherFileFromCientEnteringCommand.txt
-
-przykład:
-push 2 otherFileFromCientEnteringCommand.txt
-````
-
-- multiple_pull
-
-Pobiera wybrany plik od udostępniających go klientów. Przed pobraniem sprawdza, którzy klienci aktualnie udostępniają wskazany plik. Wznawia pobieranie w przypadku przerwania połączenia oraz wstrzymania/wyłączenia na krótki czas jednego z klientów (w przypadku dłuższego czasu oczekiwania zacznie pobierać fragment pliku od innego, połączonego klienta). Czas usiłowania nawiązania ponownego połączeniu można edytować w pliku konfiguracyjnym. Polecenie obsługiwane jedynie w wersji mh.
-````
-Mutli host:
-multiple_pull nazwa_pliku(string)
-
-przykład:
-multiple_pull exampleFileFromClients.txt
-````
-
-- exit
-
-Usuwa numer klienta z bazy serwera. Pliki w domyślnym folderze nie będą udostępniane aż do kolejnego połączenia. Po wywołaniu tej komendy możliwe jest bezpieczne zatrzymanie aplikacji klienta - nie zostanie zakłócone połączenie innych klientów z serwerem oraz między klientami.
-````
-exit
-````
-
-### TODO API regex
-***API regex:***
-````
-"not implemented yet"
-````
-
-***Konfiguracja***
-- _config/Config.java_ - konfiguracja ścieżek i zmiennych globalnych
-- _utils/Logger.java_ - konfiguracja wyświetlania logów
-
-****
-### TODO English version update
+---
+*Project developed for the Networking course (SKJ) at the Polish-Japanese Academy of Information Technology.*
