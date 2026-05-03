@@ -1,2 +1,4 @@
-start java -jar ..\..\..\out\artifacts\torrentHost_jar\torrentHost.jar 1
-start java -jar ..\..\..\out\artifacts\torrentHost_jar\torrentHost.jar 2 1
+cd /d "%~dp0..\..\.."
+
+start java -jar target\torrentClient-bin.jar 1
+start java -jar target\torrentClient-bin.jar 2 1
