@@ -1,107 +1,218 @@
-# School project for PJATK SKJ 
-# TORrent
-***https://github.com/BielinskiLukasz/torrent***
+# Torrent P2P File Transfer (TCP Implementation)
 
-***for English please see below (from the next thick line)***
-****
+![Status](https://img.shields.io/badge/status-finished-brightgreen)
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Java](https://img.shields.io/badge/Java-8-orange?logo=openjdk)
+![Protocol](https://img.shields.io/badge/Protocol-TCP-blue)
+![Architecture](https://img.shields.io/badge/Architecture-P2P%20%2F%20Client--Server-lightgrey)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
-Instrukcja:
--
-- Aplikacja umożliwia wymianę plików zarówno między dwoma (wersja h2h) jak i wieloma klientami (mh);
-- Aplikacja pracuje pod nadzorem protokołu TCP;
-- Klienci aplikacji realizują polecenia z konsoli jednowątkowo (każdy niezależnie);
-- Każda instancja aplikacji ma domyślny folder z pobieranymi/udostępnianymi plikami (możliwa zmiana folderu w konfiguracji aplikacji);
-- Zakłada się, że powyższy folder został wcześniej utworzony
-- Ścieżki i zmienne globalne mogą być konfigurowane przed skompilowaniem w pliku config/Config.java;
-- Wyświetlanie logów może być konfigurowane przed skompilowaniem w pliku utils/Logger.java;
-- Maksymalny rozmiar przesyłanych plików to 2047MB
+A robust Peer-to-Peer (P2P) file-sharing application implemented in Java, utilizing the **TCP protocol** for reliable data transmission. Developed as a high-performance networking project for **PJATK**, it features both direct Host-to-Host (H2H) and Multi-Host (MH) coordination models.
 
+## 📌 Project Status
 
-***API***
-- Wszystkie argumenty uruchamianych klientów muszą być oddzielone spacjami;
-- Nazwy plików można podawać w cudzysłowie lub bez niego;
-- Nazwy plików nie mogą zawierać znaku '*';
-- Uruchomienie serwera nie wymaga żadnych argumentów;
-- Uruchomienie klientów pracujących w trybie mh wymaga podania numeru klienta (unikatowa liczba naturalna większa od 0);
-- Uruchomienie pierwszego klienta pracującego w trybie h2h wymaga podania numeru klienta (unikatowa liczba naturalna większa od 0);
-- Uruchomienie drugiego klienta pracującego w trybie h2h wymaga podania numeru klienta (unikatowa liczba naturalna większa od 0) oraz numeru pierwszego klienta;
-- Wszystkie parametry zapytań muszą być oddzielane spacją;
-- Tylko pliki znajdujące się bezpośrednio w domyślnym folderze są widoczne (foldery znajdujące się w domyślnym folderze są pomijane);
+This project is **feature-complete** and considered **finished**.  
+The application is stable, fully functional, and ready for use in both H2H and MH modes.
 
-**Dostępne zapytania:**
+Further improvements listed below are optional ideas for future development.
 
-- list
+## 🚀 Key Features
 
-Wyświetla listę dostępnych do pobrania plików wraz z numerem klienta udostępniającego dany plik oraz sumą kontrolną pliku.
-````
-list
-````
+* **Reliable Data Transfer:** Built entirely on TCP to guarantee packet delivery and data integrity.
+* **Connection Resilience (Auto-Resume):** Automatically resumes interrupted transfers if a peer reconnects within a configurable grace period.
+* **Multi-Source Swarming:** The `multiple_pull` feature downloads different file segments from multiple peers simultaneously.
+* **Integrity Verification:** Uses checksums to validate files during listing and after transfer.
+* **Flexible Architecture:**
+  * **Host-to-Host (H2H):** Direct decentralized communication.
+  * **Multi-Host (MH):** Centralized coordination via a tracker server.
 
-- pull
+## 🛠 Technical Specifications
 
-Pobiera wybrany plik od wskazanego klienta. Przed pobraniem sprawdza, czy wskazany klient połączony jest z serwerem i udostępnia wskazany plik. Wznawia pobieranie w przypadku przerwania połączenia oraz wstrzymania/wyłączenia na krótki czas jednego z klientów (ale nie dwóch, w przypadku wyłączenia dwóch klientów pobieranie nie zostanie wznowione). Czas usiłowania nawiązania ponownego połączenia można edytować w pliku konfiguracyjnym.
+* **Language:** Java (Multi-threaded)
+* **Networking:** Socket Programming (TCP/IP)
+* **Architecture:** Hybrid Client-Server / P2P
+* **File Handling:** Supports files up to **2047 MB** (32-bit signed integer limitation).
+* **Configuration:** Externalized settings via `config/Config.java` and `utils/Logger.java`.
 
-W przypadku połączenia h2h nie jest wymagane podawanie numeru klienta.
-````
-Host2host:
-pull nazwa_pliku(string)
+## ⚙️ Configuration
 
-przykład:
-pull exampleFileFromClient2.txt
+The application is highly customizable before compilation:
+* **`config/Config.java`** — global paths, shared directories, timeouts, retry intervals.
+* **`utils/Logger.java`** — logging verbosity (Debug/Info/Error).
 
-Mutli host:
-pull numer_klienta_udostępniającego_plik(int) nazwa_pliku(string)
+---
 
-przykład:
-pull 2 exampleFileFromClient2.txt
-````
+# ⚙️ Building & Running (Maven + JAR)
 
-- push
+### **Requirements**
+- Java 8+
+- Maven 3.6+
+- Windows (for test scripts)
 
-Wysyła wybrany (lokalny) plik do wskazanego klienta. Przed wysłaniem sprawdza, czy wskazany klient połączony jest z serwerem i czy klient wysyłający udostępnia wskazany plik. Wznawia wysyłanie w przypadku przerwania połączenia oraz wstrzymania/wyłączenia na krótki czas jednego z klientów (ale nie dwóch, w przypadku wyłączenia dwóch klientów wysyłanie nie zostanie wznowione). Czas usiłowania nawiązania ponownego połączeniu można edytować w pliku konfiguracyjnym.
+### **1. Build the project**
 
-W przypadku połączenia h2h nie jest wymagane podawanie numeru klienta. 
-````
-Host2host:
-push nazwa_pliku(string)
+The project generates two independent JARs:
 
-przykład:
-push otherFileFromCientEnteringCommand.txt
+- `torrentServer.jar` — tracker (MH mode)
+- `torrentClient.jar` — client (H2H & MH)
 
-Mutli host:
-push 2 otherFileFromCientEnteringCommand.txt
+Build using Maven:
 
-przykład:
-push 2 otherFileFromCientEnteringCommand.txt
-````
+```bash
+mvn clean package
+```
 
-- multiple_pull
+Generated files:
 
-Pobiera wybrany plik od udostępniających go klientów. Przed pobraniem sprawdza, którzy klienci aktualnie udostępniają wskazany plik. Wznawia pobieranie w przypadku przerwania połączenia oraz wstrzymania/wyłączenia na krótki czas jednego z klientów (w przypadku dłuższego czasu oczekiwania zacznie pobierać fragment pliku od innego, połączonego klienta). Czas usiłowania nawiązania ponownego połączeniu można edytować w pliku konfiguracyjnym. Polecenie obsługiwane jedynie w wersji mh.
-````
-Mutli host:
-multiple_pull nazwa_pliku(string)
+```
+target/torrentServer.jar
+target/torrentClient.jar
+```
 
-przykład:
-multiple_pull exampleFileFromClients.txt
-````
+---
 
-- exit
+### **2. Running the application**
 
-Usuwa numer klienta z bazy serwera. Pliki w domyślnym folderze nie będą udostępniane aż do kolejnego połączenia. Po wywołaniu tej komendy możliwe jest bezpieczne zatrzymanie aplikacji klienta - nie zostanie zakłócone połączenie innych klientów z serwerem oraz między klientami.
-````
-exit
-````
+#### **Tracker (Multi-Host)**
 
-### TODO API regex
-***API regex:***
-````
-"not implemented yet"
-````
+```bash
+java -jar target/torrentServer.jar
+```
 
-***Konfiguracja***
-- _config/Config.java_ - konfiguracja ścieżek i zmiennych globalnych
-- _utils/Logger.java_ - konfiguracja wyświetlania logów
+#### **Client (Multi-Host)**
 
-****
-### TODO English version update
+```bash
+java -jar target/torrentClient.jar <ID>
+```
+
+Example:
+
+```bash
+java -jar target/torrentClient.jar 2
+```
+
+#### **Client (Host-to-Host)**
+
+Client 1:
+
+```bash
+java -jar target/torrentClient.jar 1
+```
+
+Client 2 connecting to 1:
+
+```bash
+java -jar target/torrentClient.jar 2 1
+```
+
+---
+
+# 🧪 Testing (H2H / MH)
+
+The project includes `.bat` scripts to reproduce test scenarios from SKJ labs.
+
+---
+
+## 🔄 Reset test environment
+
+Before each test:
+
+```bat
+reset_dirs.bat
+```
+
+This script:
+
+- clears directories `TORrent_1`, `TORrent_2`, `TORrent_3`
+- restores test files from `files/`
+
+---
+
+## 🧩 Multi-Host (MH) Testing
+
+Start full MH environment:
+
+```bat
+run_MH.bat
+```
+
+This launches:
+
+1. tracker  
+2. client 1  
+3. client 2  
+4. client 3  
+
+### **Available commands (for client 2)**
+
+| # | Functionality | Command | Description |
+|---|---------------|---------|-------------|
+| 1 | List files | `list` | Retrieves file list + MD5 checksums |
+| 2 | Pull | `pull 1 01.jpg` | Downloads file from client 1 |
+| 3 | Push | `push 3 02.jpg` | Uploads file to client 3 |
+| 4 | Auto-resume | *(no command)* | Restart client before timeout |
+| 5 | Swarming | `multiple_pull 03.jpg` | Downloads file from multiple peers |
+
+### **Testing auto-resume**
+
+Works for:
+
+- `pull`
+- `push`
+- `multiple_pull`
+
+To test:
+
+1. Start a large transfer  
+2. Kill the client  
+3. Restart it **before the resume timeout** from `Config.java`
+
+For `multiple_pull`, disconnecting one peer is enough — others finish the job.
+
+---
+
+## 🔗 Host-to-Host (H2H) Testing
+
+Start H2H environment:
+
+```bat
+run_H2H.bat
+```
+
+This launches:
+
+- client 1  
+- client 2 (connected to 1)
+
+### **Available commands**
+
+| # | Functionality | Command |
+|---|---------------|---------|
+| 1 | List files | `list` |
+| 2 | Pull | `pull 04.jpg` |
+| 3 | Push | `push 05.jpg` |
+| 4 | Auto-resume | *(no command)* |
+
+---
+
+## 🔁 Reset after each test
+
+```bat
+reset_dirs.bat
+```
+
+---
+
+## 💡 Future Ideas (Optional Enhancements)
+
+- [ ] Transition to 64-bit offsets for files > 2GB.
+- [ ] Implement Regex-based API validation for more robust command parsing.
+- [ ] Add a graphical dashboard using JavaFX.
+
+## 📄 License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+---
+
+*Project developed for the Networking course (SKJ) at the Polish-Japanese Academy of Information Technology.*
