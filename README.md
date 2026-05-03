@@ -57,5 +57,9 @@ The application is highly customizable before compilation:
 - [ ] Implement Regex-based API validation for more robust command parsing.
 - [ ] Add a graphical dashboard using JavaFX.
 
+## 📄 License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
 ---
 *Project developed for the Networking course (SKJ) at the Polish-Japanese Academy of Information Technology.*
