@@ -1,10 +1,11 @@
 # Torrent P2P File Transfer (TCP Implementation)
 
 ![Status](https://img.shields.io/badge/status-finished-brightgreen)
-![Version](https://img.shields.io/badge/version-1.0-blue)
-
-![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
-![Protocol](https://img.shields.io/badge/Protocol-TCP-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Java](https://img.shields.io/badge/Java-8-orange?logo=openjdk)
+![Protocol](https://img.shields.io/badge/Protocol-TCP-blue)
+![Architecture](https://img.shields.io/badge/Architecture-P2P%20%2F%20Client--Server-lightgrey)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
 A robust Peer-to-Peer (P2P) file-sharing application implemented in Java, utilizing the **TCP protocol** for reliable data transmission. Developed as a high-performance networking project for **PJATK**, it features both direct Host-to-Host (H2H) and Multi-Host (MH) coordination models.
 
