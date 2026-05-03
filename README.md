@@ -18,49 +18,190 @@ Further improvements listed below are optional ideas for future development.
 
 ## 🚀 Key Features
 
-*   **Reliable Data Transfer:** Built entirely on TCP to guarantee packet delivery and data integrity.
-*   **Connection Resilience (Auto-Resume):** Intelligent mechanism that automatically attempts to resume interrupted transfers if a peer reconnects within a configurable grace period.
-*   **Multi-Source Swarming:** The `multiple_pull` feature allows segments of a single file to be downloaded from multiple peers simultaneously, optimizing bandwidth.
-*   **Integrity Verification:** Uses checksums to validate files during listing and after transfer.
-*   **Flexible Architecture:**
-    *   **Host-to-Host (H2H):** Decentralized direct connection between two peers.
-    *   **Multi-Host (MH):** Centralized coordination via a tracker server for managing multiple clients.
+* **Reliable Data Transfer:** Built entirely on TCP to guarantee packet delivery and data integrity.
+* **Connection Resilience (Auto-Resume):** Automatically resumes interrupted transfers if a peer reconnects within a configurable grace period.
+* **Multi-Source Swarming:** The `multiple_pull` feature downloads different file segments from multiple peers simultaneously.
+* **Integrity Verification:** Uses checksums to validate files during listing and after transfer.
+* **Flexible Architecture:**
+  * **Host-to-Host (H2H):** Direct decentralized communication.
+  * **Multi-Host (MH):** Centralized coordination via a tracker server.
 
 ## 🛠 Technical Specifications
 
-*   **Language:** Java (Multi-threaded)
-*   **Networking:** Socket Programming (TCP/IP)
-*   **Architecture:** Hybrid Client-Server / P2P
-*   **File Handling:** Supports files up to **2047 MB** (32-bit signed integer limitation).
-*   **Configuration:** Externalized settings via `config/Config.java` and `utils/Logger.java`.
+* **Language:** Java (Multi-threaded)
+* **Networking:** Socket Programming (TCP/IP)
+* **Architecture:** Hybrid Client-Server / P2P
+* **File Handling:** Supports files up to **2047 MB** (32-bit signed integer limitation).
+* **Configuration:** Externalized settings via `config/Config.java` and `utils/Logger.java`.
 
 ## ⚙️ Configuration
 
 The application is highly customizable before compilation:
-*   **`config/Config.java`**: Adjust global paths, default shared directories, connection timeouts, and retry intervals.
-*   **`utils/Logger.java`**: Fine-tune logging verbosity (Debug/Info/Error) for console output.
+* **`config/Config.java`** — global paths, shared directories, timeouts, retry intervals.
+* **`utils/Logger.java`** — logging verbosity (Debug/Info/Error).
 
-## 💻 Usage & API
+---
 
-### Running the Application
+# ⚙️ Building & Running (Maven + JAR)
 
-1.  **Tracker Server:** Run the main server class without arguments to start the coordination node.
-2.  **Multi-Host Client:** Start with a unique ID: `java Client [ID]`.
-3.  **Host-to-Host Mode:**
-    *   First Peer: `java Client [ID]`
-    *   Second Peer: `java Client [ID] [First_Peer_ID]`
+### **Requirements**
+- Java 8+
+- Maven 3.6+
+- Windows (for test scripts)
 
-### Command Reference
+### **1. Build the project**
 
-| Command | Description | Example |
-| :--- | :--- | :--- |
-| `list` | Lists all shared files on the network with owner IDs and checksums. | `list` |
-| `pull` | Downloads a file from a specific client with auto-resume support. | `pull 2 document.pdf` |
-| `push` | Uploads a local file to a specified remote peer. | `push 2 image.png` |
-| `multiple_pull` | Aggregates file segments from all available peers sharing the file. | `multiple_pull dataset.zip` |
-| `exit` | Gracefully disconnects and stops sharing files. | `exit` |
+The project generates two independent JARs:
 
-> **Note:** Wrap filenames containing spaces in quotes. The character `*` is reserved and cannot be used in filenames.
+- `torrentServer.jar` — tracker (MH mode)
+- `torrentClient.jar` — client (H2H & MH)
+
+Build using Maven:
+
+```bash
+mvn clean package
+```
+
+Generated files:
+
+```
+target/torrentServer.jar
+target/torrentClient.jar
+```
+
+---
+
+### **2. Running the application**
+
+#### **Tracker (Multi-Host)**
+
+```bash
+java -jar target/torrentServer.jar
+```
+
+#### **Client (Multi-Host)**
+
+```bash
+java -jar target/torrentClient.jar <ID>
+```
+
+Example:
+
+```bash
+java -jar target/torrentClient.jar 2
+```
+
+#### **Client (Host-to-Host)**
+
+Client 1:
+
+```bash
+java -jar target/torrentClient.jar 1
+```
+
+Client 2 connecting to 1:
+
+```bash
+java -jar target/torrentClient.jar 2 1
+```
+
+---
+
+# 🧪 Testing (H2H / MH)
+
+The project includes `.bat` scripts to reproduce test scenarios from SKJ labs.
+
+---
+
+## 🔄 Reset test environment
+
+Before each test:
+
+```bat
+reset_dirs.bat
+```
+
+This script:
+
+- clears directories `TORrent_1`, `TORrent_2`, `TORrent_3`
+- restores test files from `files/`
+
+---
+
+## 🧩 Multi-Host (MH) Testing
+
+Start full MH environment:
+
+```bat
+run_MH.bat
+```
+
+This launches:
+
+1. tracker  
+2. client 1  
+3. client 2  
+4. client 3  
+
+### **Available commands (for client 2)**
+
+| # | Functionality | Command | Description |
+|---|---------------|---------|-------------|
+| 1 | List files | `list` | Retrieves file list + MD5 checksums |
+| 2 | Pull | `pull 1 01.jpg` | Downloads file from client 1 |
+| 3 | Push | `push 3 02.jpg` | Uploads file to client 3 |
+| 4 | Auto-resume | *(no command)* | Restart client before timeout |
+| 5 | Swarming | `multiple_pull 03.jpg` | Downloads file from multiple peers |
+
+### **Testing auto-resume**
+
+Works for:
+
+- `pull`
+- `push`
+- `multiple_pull`
+
+To test:
+
+1. Start a large transfer  
+2. Kill the client  
+3. Restart it **before the resume timeout** from `Config.java`
+
+For `multiple_pull`, disconnecting one peer is enough — others finish the job.
+
+---
+
+## 🔗 Host-to-Host (H2H) Testing
+
+Start H2H environment:
+
+```bat
+run_H2H.bat
+```
+
+This launches:
+
+- client 1  
+- client 2 (connected to 1)
+
+### **Available commands**
+
+| # | Functionality | Command |
+|---|---------------|---------|
+| 1 | List files | `list` |
+| 2 | Pull | `pull 04.jpg` |
+| 3 | Push | `push 05.jpg` |
+| 4 | Auto-resume | *(no command)* |
+
+---
+
+## 🔁 Reset after each test
+
+```bat
+reset_dirs.bat
+```
+
+---
 
 ## 💡 Future Ideas (Optional Enhancements)
 
@@ -73,4 +214,5 @@ The application is highly customizable before compilation:
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
+
 *Project developed for the Networking course (SKJ) at the Polish-Japanese Academy of Information Technology.*
