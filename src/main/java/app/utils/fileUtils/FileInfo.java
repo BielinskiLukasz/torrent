@@ -2,14 +2,11 @@ package app.utils.fileUtils;
 
 import app.config.Config;
 
-import java.io.File;
-
 public class FileInfo {
 
     final int clientId;
     final String name;
     final String md5;
-    final long fileSize;
 
     FileInfo(String fileName, int clientId) {
         String filePath = Config.BASIC_PATH + clientId + "\\" + fileName;
@@ -17,7 +14,6 @@ public class FileInfo {
         this.clientId = clientId;
         this.name = fileName;
         this.md5 = MD5Sum.md5(filePath);
-        this.fileSize = (new File(filePath)).length();
     }
 
     FileInfo(String data) {
@@ -28,9 +24,7 @@ public class FileInfo {
         this.md5 = splittedData[2];
         if (splittedData.length > 3) {
             String filePath = Config.BASIC_PATH + clientId + "\\" + name;
-            this.fileSize = (new File(filePath)).length();
         } else {
-            this.fileSize = 0;
         }
     }
 

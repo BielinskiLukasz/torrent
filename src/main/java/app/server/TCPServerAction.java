@@ -27,7 +27,7 @@ class TCPServerAction {
                 register(server, connectionSocket, sentence);
                 break;
             case SERVER_FILE_LIST: // TODO BACKLOG handle unconnected client selection by server
-                getServerFileList(server, connectionSocket); // TODO BACKLOG getting file list for all users in the same time (threads);
+                getServerFileList(server); // TODO BACKLOG getting file list for all users in the same time (threads);
                 ActionUtils.sendList(connectionSocket, server.getFileList());
                 break;
             case CONFIRM_CONNECTION:
@@ -89,7 +89,7 @@ class TCPServerAction {
         Logger.serverLog("Client " + clientNumber + " is connected");
     }
 
-    private static void getServerFileList(TCPServer server, Socket connectionSocket) { // TODO BACKLOG secure after unconnected client (stopped)
+    private static void getServerFileList(TCPServer server) { // TODO BACKLOG secure after unconnected client (stopped)
         Logger.serverDebugLog("fire getServerFileList");
 
         List<String> serverFileList = new ArrayList<>();
@@ -124,7 +124,7 @@ class TCPServerAction {
     }
 
     private static void getClientsWithFile(TCPServer server, Socket connectionSocket, String sentence) {
-        getServerFileList(server, connectionSocket);
+        getServerFileList(server);
 
         String fileName = SentenceUtils.getFileName(sentence);
         final String[] md5sum = new String[1];
@@ -159,7 +159,7 @@ class TCPServerAction {
     }
 
     private static void getClientsWithSpecificFile(TCPServer server, Socket connectionSocket, String sentence) {
-        getServerFileList(server, connectionSocket);
+        getServerFileList(server);
 
         String fileName = SentenceUtils.getFileName(sentence);
         String md5sum = SentenceUtils.getMD5Sum(sentence);
