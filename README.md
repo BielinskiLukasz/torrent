@@ -1,5 +1,7 @@
 # Torrent P2P File Transfer (TCP Implementation)
+
 ![Status](https://img.shields.io/badge/status-finished-brightgreen)
+![Version](https://img.shields.io/badge/version-1.0-blue)
 
 ![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Protocol](https://img.shields.io/badge/Protocol-TCP-blue?style=for-the-badge)
